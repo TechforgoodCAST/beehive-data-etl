@@ -1,2 +1,6 @@
 grantnav*.json
 grantnav*.csv
+proposals*.csv
+missing.txt
+tags.txt
+*.pyc
