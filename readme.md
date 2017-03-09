@@ -39,7 +39,13 @@ if len(bulk)>0:
 
 Found in `to_mongo.py`.
 
-3. Add classification details
+3. Make `charity-base` work
+---------------------------
+
+Need to make sure that the `mainCharity.companyNumber` field has an index on
+to make lookups quicker
+
+4. Add classification details
 -----------------------------
 
 Run `add_class.py`. This currently adds organisation classification details
@@ -54,7 +60,7 @@ than the Beehive categories. A readacross between the two is found in
 (ie classify at the grant level not organisation level). Some exploration of
 this started in
 
-4. Transform into Beehive data structure
+5. Transform into Beehive data structure
 ----------------------------------------
 
 Structure found here: <https://beehive-data.api-docs.io/v1/grants/NL6w7tWRLTM2vhdSE>
@@ -78,7 +84,7 @@ to transform the grant record into the right format.
 ### 5. Add the fund slug
 
 
-5. Import into Beehive data
+6. Import into Beehive data
 ---------------------------
 
 Options:
