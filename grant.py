@@ -290,7 +290,8 @@ class Grant():
         self.beneficiaries = []
         self.cdb = cdb  # charity database
 
-    def clean_grant(self, grant):
+    @staticmethod
+    def clean_grant(grant):
 
         # set recipient details
         for k, r in enumerate(grant.setdefault("recipientOrganization", [{}])):
@@ -307,7 +308,8 @@ class Grant():
         """
         return self.grant.get("title","") + " " + self.grant.get("description","")
 
-    def parseCharityNumber(self, regno):
+    @staticmethod
+    def parseCharityNumber(regno):
         """
         Clean a charity number so it can be searched for
 
@@ -354,7 +356,8 @@ class Grant():
 
         return list(set(beneficiaries))
 
-    def get_char_financial(self, char = None):
+    @staticmethod
+    def get_char_financial(char = None):
         """
         Financial information
         """
@@ -432,7 +435,8 @@ class Grant():
 
         return financial
 
-    def get_multi_national(self, char = None):
+    @staticmethod
+    def get_multi_national(char = None):
         """
         Work out if the charity operates across more than one country
         """
@@ -454,7 +458,8 @@ class Grant():
             multi_national = True
         return multi_national
 
-    def get_operating_for(self, char):
+    @staticmethod
+    def get_operating_for(char):
         """
         Work out how long the recipient has been operating for
 
@@ -610,13 +615,15 @@ class Grant():
 
         return grantProgramme
 
-    def classify_grant(self, desc, regexes):
+    @staticmethod
+    def classify_grant(desc, regexes):
         """
         Use regexes to return a list of possible beneficiaries
         """
         return list(set([r for r in regexes if re.search(regexes[r], desc, re.I)]))
 
-    def classify_grant_ages(self, desc):
+    @staticmethod
+    def classify_grant_ages(desc):
         """
         Get an age range from a text string - something like "10-19 years old" or
         "aged 24-64".
