@@ -42,46 +42,90 @@ Found in `to_mongo.py`.
 3. Make `charity-base` work
 ---------------------------
 
-Need to make sure that the `mainCharity.companyNumber` field has an index on
-to make lookups quicker
+Clone from [Github Repository](https://github.com/tithebarn/charity-base).
+[Download the OSCR register](http://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download),
+and then run commands to add Charity Commission and OSCR data to MongoDB:
 
-4. Add classification details
------------------------------
+```bash
+$ node download-register.js --year 2016 --month 09
+$ node zip-to-csvs.js --in ./cc-register.zip --out ./cc-register-csvs --type cc
+$ node zip-to-csvs.js --in ./CharityExport-08-Mar-2017.zip --out ./oscr-register-csvs --type oscr
+$ node csvs-to-mongo.js --in oscr-register-csvs --dbName oscr-register --type oscr
+$ node csvs-to-mongo.js --in cc-register-csvs --dbName cc-register --type cc
+$ node merge-extracts.js --batchSize 5000
+$ node supplement.js --scrapeBatchSize 5 # optional
+```
 
-Run `add_class.py`. This currently adds organisation classification details
-by matching with data about charities, found in the `charity-base` mongo
-collection.
+You'll also need to make sure that the `mainCharity.companyNumber` field has an
+index to make lookups quicker. If you don't do this then the next step will take
+too long.
 
-These are based on the codes used by the Charity Commission and OSCR, rather
-than the Beehive categories. A readacross between the two is found in
-`field-readacross.csv`.
+4. Add classification details and transform into Beehive data structure
+-----------------------------------------------------------------------
 
-**@todo** Add keyword searching for beneficiaries based on the grant description
-(ie classify at the grant level not organisation level). Some exploration of
-this started in
+Run `output.py`. This iterates through all the grants in the `360giving`.`grants`
+MongoDB collection. Using the `Grant` class in `grant.py` it creates an object
+for each grant.
 
-5. Transform into Beehive data structure
-----------------------------------------
+The `g.process_grant()` function does the following:
 
-Structure found here: <https://beehive-data.api-docs.io/v1/grants/NL6w7tWRLTM2vhdSE>
+1.  Get data about the recipient from the `charity-base`.`charities` MongoDB
+    collection (`Grant.fetch_recipients()`). This also tries to work out the
+    type of organisation, how long they have operated for, and get the latest
+    financial information.
 
-Need to:
+    _Note: this stage allows for multiple recipients, but the end result only
+    outputs the first recipient._
 
-### 1. Change data schema to match Beehive data
+    **@todo**: Add in companies data here too.
 
-Use similar to [this rake task on Beehive data](https://github.com/TechforgoodCAST/beehive-data/blob/master/lib/tasks/import.rake)
-to transform the grant record into the right format.
+2.  Produce a list of beneficiaries for the grant (`Grant.get_beneficiaries()`).
+    This is based on the list found in the `Grant.ben_categories` variable. The
+    list is generated in two ways:
 
-### 2. Add charity details from charity-base.
+    1. Through mapping the Charity Commission and OSCR beneficiary categories
+    for the recipient organisation to the Grant.ben_categories. These mappings
+    are found in `Grant.cc_to_beehive` and `Grant.oscr_to_beehive`.
 
+    2. Through applying a series of regular expressions to the title and
+    description of the grant. These regular expressions are found in `Grant.ben_regexes`.
+    If a regular expression matches then that beneficiary category is added to
+    the grant.
 
-### 3. Add company details from Companies House API/URIs.
+3.  Fill in the `affect_people` and `affect_other` variables using
+    `Grant.get_affected()`.
 
+4.  Get a list of the age ranges that the grant relates to using
+    `Grant.get_ages()`. This is done in two ways:
 
-### 4. Add `beneficiaries` and `locations` data to grant record.
+    1. Through applying a series of regular expressions for keywords (like "child"
+    "elderly", etc) to the grant title and description. These are found in
+    `Grant.age_regexes` and they are transformed into age ranges based on
+    `Grant.age_bens`.
 
+    2. Through applying a regular expression that looks for strings like "5-15
+    years" in the grant description, and extracting the resulting start and end
+    ages.
 
-### 5. Add the fund slug
+    These two results are transformed into the Beehive age categories (found in
+    `Grant.age_categories` through looking at overlap in the age ranges.
+
+5.  Attempt to classify the genders intended to benefit from the grant. This
+    uses a series of regexes (in `Grant.gender_regexes`) to look for grants that
+    mention ("men", "women" or "transgender"). If only one of those categories
+    are selected then it is chosen, otherwise the field is "All genders".
+
+**@todo**: Add location classification details.
+
+After the `Grant.process_grant()` is run the grant is ready to be output in the
+[correct structure for `beehive-data`](https://beehive-data.api-docs.io/v1/grants/NL6w7tWRLTM2vhdSE).
+This is done using `Grant.beehive_output()`.
+
+The only non-formatting change that happens at the output stage is to pass the
+funder and grant programme through `Grant.get_grant_programme()` which uses
+`Grant.swap_funds` to change the name of some of the grant programmes in the
+data to make them more useful. Not all funders and funds are included - any not
+found in `Grant.swap_funds` are passed through as-is.
 
 
 6. Import into Beehive data
