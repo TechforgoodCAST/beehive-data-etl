@@ -11,7 +11,7 @@ Shown on the [Developer page](http://grantnav.threesixtygiving.org/developers).
 Do this by running:
 
 ```bash
-$ python to_mongo.py
+$ python input.py
 ```
 
 The command line options for this are:
