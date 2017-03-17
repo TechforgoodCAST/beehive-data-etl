@@ -646,7 +646,7 @@ class Grant():
             r["operating_for"] = self.get_operating_for(r["charity"], grant_date)
 
             # use charity or company postcode if blank
-            if r["postalCode"].strip() == "":
+            if r["postalCode"] is not None and r["postalCode"].strip() == "":
                 r["postalCode"] = None
             if r["postalCode"] is None and r["charity"] is not None:
                 r["postalCode"] = r["charity"].get("contact", {}).get("postcode")
