@@ -303,6 +303,17 @@ class Grant():
                 if grant["recipientOrganization"][k][i] is not None:
                     grant["recipientOrganization"][k][i] = grant["recipientOrganization"][k][i].strip()
 
+        # if the planned dates are the wrong way round then fix
+        for k, i in enumerate(grant.get("plannedDates", [{}])):
+            if i.get("startDate") is not None and i.get("endDate") is not None:
+                startDate =  dateutil.parser.parse(i.get("startDate"))
+                endDate =  dateutil.parser.parse(i.get("endDate"))
+                if startDate > endDate:
+                    grant["plannedDates"][k].update({
+                        "startDate": i.get("endDate"),
+                        "endDate": i.get("startDate")
+                    })
+
         return grant
 
     def get_desc(self):
