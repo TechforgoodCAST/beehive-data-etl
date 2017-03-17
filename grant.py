@@ -2,6 +2,7 @@
 
 import re
 from datetime import datetime
+import dateutil.parser
 
 class Grant():
     """docstring for ."""
@@ -319,6 +320,7 @@ class Grant():
         """
         if regno is None:
             return None
+        regno = str(regno)
         regno = regno.strip().upper()
         regno = regno.replace('NO.', '')
         regno = regno.replace('GB-CHC-', '')
@@ -326,6 +328,11 @@ class Grant():
         regno = regno.replace(' ', '').replace('O', '0');
         if regno=="":
             return None
+        if regno[0:2]!="SC":
+            try:
+                regno = int(regno)
+            except ValueError:
+                pass
         return regno
 
     def get_charity(self, charityNumber):
@@ -334,7 +341,7 @@ class Grant():
         """
         charityNumber = self.parseCharityNumber(charityNumber)
         if charityNumber:
-            return self.cdb.charities.find_one({"charityNumber": charityNumber, "subNumber": 0})
+            return self.cdb.charities.find_one({"charityNumber": {"$in": [charityNumber, str(charityNumber)] }, "subNumber": 0})
 
     def get_charity_beneficiaries(self, char = None):
         """
@@ -369,12 +376,14 @@ class Grant():
         financial = {
             "income": None,
             "spending": None,
+            "financial_fye": None,
             "employees": None,
-            "volunteers": None
+            "volunteers": None,
+            "people_fye": None
         }
         if char is None:
             return financial
-
+        grant_date = time_from
         if time_from is None:
             time_from = datetime.now()
 
@@ -383,7 +392,7 @@ class Grant():
         use_i = None
         for i in char.get("financial", []):
             if i["income"] and i["spending"]:
-                if time_from < i["fyEnd"] and time_from > i["fyStart"]:
+                if time_from <= i["fyEnd"] and time_from >= i["fyStart"]:
                     use_i = i["fyEnd"]
                 if max_i is None or i["fyEnd"] > max_i:
                     max_i = i["fyEnd"]
@@ -393,8 +402,11 @@ class Grant():
 
         for i in char.get("financial", []):
             if i["fyEnd"]==use_i:
+                financial["financial_fye"] = str(i["fyEnd"])
                 financial["income"] = i["income"]
                 financial["spending"] = i["spending"]
+
+        #print("Grant date is %s, using data from %s" % (grant_date, use_i))
 
         # volunteers and employees from part b
         max_i = None
@@ -410,6 +422,7 @@ class Grant():
 
         for i in char.get("partB", []):
             if i["fyEnd"]==use_i:
+                financial["people_fye"] = str(i["fyEnd"])
                 financial["employees"] = i["people"]["employees"]
                 financial["volunteers"] = i["people"]["volunteers"]
 
@@ -501,6 +514,7 @@ class Grant():
         ]
 
         reg_date = char.get("registration",[{}])[0].get("regDate")
+
         if reg_date is None:
             return -1
         time_operating = time_from - reg_date
@@ -596,7 +610,7 @@ class Grant():
         """
         Fetch details about charity and company recipients, and guess organization type
         """
-        grant_date = self.grant.get("awardDate")
+        grant_date = dateutil.parser.parse(self.grant.get("awardDate"), ignoretz=True)
         for k, r in enumerate(self.grant.setdefault("recipientOrganization", [{}])):
             # get charity and company details
             char_comp = self.get_charity_and_company( r.get("charityNumber"), r.get("companyNumber") )
@@ -619,6 +633,12 @@ class Grant():
 
             # work out the time operating_for
             r["operating_for"] = self.get_operating_for(r["charity"], grant_date)
+
+            # use charity or company postcode if blank
+            if r["postalCode"].strip() == "":
+                r["postalCode"] = None
+            if r["postalCode"] is None and r["charity"] is not None:
+                r["postalCode"] = r["charity"].get("contact", {}).get("postcode")
 
             # get website url
             if (r["url"] is None or r["url"]=="") and r["charity"] is not None:
@@ -757,6 +777,8 @@ class Grant():
         beehive = {
             "publisher":            grant.get("dataset",{}).get("publisher",{}).get("name"),
             "license":              grant.get("dataset",{}).get("license"),
+            "source":               grant.get("dataset",{}).get("distribution", [{}])[0].get("accessURL"),
+            "source_file":          grant.get("dataset",{}).get("distribution", [{}])[0].get("downloadURL"),
             "grant_identifier":     grant.get("id"),
             "funder_identifier":    grant.get("fundingOrganization",[{}])[0].get("id"),
             "funder":               grant.get("fundingOrganization",[{}])[0].get("name"),
@@ -778,7 +800,7 @@ class Grant():
                 "country":                  "GB",
                 "org_type":                 recipient.get("orgtype"),
                 "name":                     recipient.get("name"),
-                "charity_number":           recipient.get("charityNumber"),
+                "charity_number":           str(recipient.get("charityNumber")),
                 "company_number":           recipient.get("companyNumber"),
                 "organisation_number":      None,
                 "city":                     None,
@@ -788,10 +810,12 @@ class Grant():
                 "multi_national":           recipient.get("multi_national"),
             },
             "operating_for":            recipient.get("operating_for"),
-            "income":                   recipient.get("income"),
-            "spending":                 recipient.get("spending"),
-            "employees":                recipient.get("employees"),
-            "volunteers":               recipient.get("volunteers"),
+            "income":                   recipient.get("income", "Unknown"),
+            "spending":                 recipient.get("spending", "Unknown"),
+            "employees":                recipient.get("employees", "Unknown"),
+            "volunteers":               recipient.get("volunteers", "Unknown"),
+            "financial_fye":            recipient.get("financial_fye"), # date used for financial data
+            "people_fye":               recipient.get("people_fye"), # date used for people data
             "beneficiaries":{
                 "affect_people": self.affect_people,
                 "affect_other":  self.affect_other,
