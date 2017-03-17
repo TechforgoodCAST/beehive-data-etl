@@ -13,6 +13,7 @@ def main():
     parser.add_argument('--charity-db', '-cdb', default='charity-base', help='Database containing charity data')
     parser.add_argument('--output-db', '-odb', default='beehive-data', help='Database to output data for Beehive')
     parser.add_argument('--limit', '-l', type=int, default=10000, help='Size of chunks imported in bulk')
+    parser.add_argument('--skip', '-s', type=int, default=0, help='Records to skip from the start')
     args = parser.parse_args()
 
     client = MongoClient(args.mongo_host, args.mongo_port)
@@ -25,7 +26,7 @@ def main():
     bulk = client[args.output_db].grants.initialize_unordered_bulk_op()
     bulk_count = 0
     k=0
-    for k,g in enumerate(db.grants.find()):
+    for k,g in enumerate(db.grants.find(no_cursor_timeout=True).skip(args.skip)):
         g = Grant(g, client[args.charity_db]) # generate grant object
         g.process_grant() # process the grant details
         g_output = g.beehive_output() # produce output in Beehive format
