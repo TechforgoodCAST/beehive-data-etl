@@ -1,8 +1,7 @@
 From 360 Giving to Beehive Data
 ===============================
 
-1. Download grantnav and import into Mongo
--------------------------
+## 1. Download grantnav and import into Mongo
 
 Use this file: <http://grantnav.threesixtygiving.org/api/grants.json>. Big file:
  ~450Mb.
@@ -24,8 +23,7 @@ The command line options for this are:
 - `--mongo-db`: name of the database to insert into (default `360giving`)
 - `--limit`: number of records to insert at once (default `10000`)
 
-2. Make `charity-base` work
----------------------------
+## 2. Setup `charity-base`
 
 Clone from [Github Repository](https://github.com/tithebarn/charity-base).
 [Download the OSCR register](http://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download),
@@ -47,8 +45,7 @@ You'll also need to make sure that the `mainCharity.companyNumber` field has an
 index to make lookups quicker. This is done by running `mongo charity-base --eval "db.charities.createIndex({'mainCharity.companyNumber': 1})"`.
 If you don't do this then the next step will take too long.
 
-3. Add classification details and transform into Beehive data structure
------------------------------------------------------------------------
+## 3. Add classification details and transform into Beehive data structure
 
 Run `output.py`. This iterates through all the grants in the `360giving`.`grants`
 MongoDB collection. Using the `Grant` class in `grant.py` it creates an object
@@ -127,8 +124,7 @@ The command line options for `output.py` are:
 - `--output-db`: name of the database to output data in correct format (default `beehive-data`)
 - `--limit`: number of records to insert at once (default `10000`)
 
-4. Import into Beehive data
----------------------------
+## 4. Import into Beehive data
 
 Options:
 
