@@ -54,6 +54,10 @@ Run `output.py`. This iterates through all the grants in the `360giving`.`grants
 MongoDB collection. Using the `Grant` class in `grant.py` it creates an object
 for each grant.
 
+```bash
+$ python output.py
+```
+
 The `g.process_grant()` function does the following:
 
 1.  Get data about the recipient from the `charity-base`.`charities` MongoDB
@@ -114,6 +118,14 @@ funder and grant programme through `Grant.get_grant_programme()` which uses
 data to make them more useful. Not all funders and funds are included - any not
 found in `Grant.swap_funds` are passed through as-is.
 
+The command line options for `output.py` are:
+
+- `--mongo-port`: port for acccessing mongo (default `27017`)
+- `--mongo-host`: host for accessing mongo (default `localhost`)
+- `--grant-db`: name of the database holding 360 giving data (default `360giving`)
+- `--charity-db`: name of the database holding charity data from `charity-base` (default `charity-base`)
+- `--output-db`: name of the database to output data in correct format (default `beehive-data`)
+- `--limit`: number of records to insert at once (default `10000`)
 
 4. Import into Beehive data
 ---------------------------
