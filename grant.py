@@ -359,9 +359,12 @@ class Grant():
         return list(set(beneficiaries))
 
     @staticmethod
-    def get_char_financial(char = None):
+    def get_char_financial(char = None, time_from=None):
         """
         Financial information
+
+        Retrieved either based on the latest available data (if time_from is
+        None) or based on a date given.
         """
         financial = {
             "income": None,
@@ -371,26 +374,42 @@ class Grant():
         }
         if char is None:
             return financial
+
+        if time_from is None:
+            time_from = datetime.now()
+
         # income and spending
         max_i = None
+        use_i = None
         for i in char.get("financial", []):
             if i["income"] and i["spending"]:
+                if time_from < i["fyEnd"] and time_from > i["fyStart"]:
+                    use_i = i["fyEnd"]
                 if max_i is None or i["fyEnd"] > max_i:
                     max_i = i["fyEnd"]
 
+        if use_i is None:
+            use_i = max_i
+
         for i in char.get("financial", []):
-            if i["fyEnd"]==max_i:
+            if i["fyEnd"]==use_i:
                 financial["income"] = i["income"]
                 financial["spending"] = i["spending"]
 
         # volunteers and employees from part b
         max_i = None
+        use_i = None
         for i in char.get("partB", []):
+            if time_from < i["fyEnd"] and time_from > i["fyStart"]:
+                use_i = i["fyEnd"]
             if max_i is None or i["fyEnd"] > max_i:
                 max_i = i["fyEnd"]
 
+        if use_i is None:
+            use_i = max_i
+
         for i in char.get("partB", []):
-            if i["fyEnd"]==max_i:
+            if i["fyEnd"]==use_i:
                 financial["employees"] = i["people"]["employees"]
                 financial["volunteers"] = i["people"]["volunteers"]
 
@@ -461,7 +480,7 @@ class Grant():
         return multi_national
 
     @staticmethod
-    def get_operating_for(char):
+    def get_operating_for(char, time_from = None):
         """
         Work out how long the recipient has been operating for
 
@@ -469,6 +488,9 @@ class Grant():
         """
         if char is None:
             return -1
+
+        if time_from is None:
+            time_from = datetime.now()
 
         operating_fors = [
             ['Yet to start', 0],
@@ -481,7 +503,7 @@ class Grant():
         reg_date = char.get("registration",[{}])[0].get("regDate")
         if reg_date is None:
             return -1
-        time_operating = datetime.now() - reg_date
+        time_operating = time_from - reg_date
         age = float(time_operating.days / 365)
 
         if age <= 1:
@@ -574,6 +596,7 @@ class Grant():
         """
         Fetch details about charity and company recipients, and guess organization type
         """
+        grant_date = self.grant.get("awardDate")
         for k, r in enumerate(self.grant.setdefault("recipientOrganization", [{}])):
             # get charity and company details
             char_comp = self.get_charity_and_company( r.get("charityNumber"), r.get("companyNumber") )
@@ -589,13 +612,13 @@ class Grant():
                 r["name"] = None
 
             # get financial details
-            r.update( self.get_char_financial(r["charity"]) )
+            r.update( self.get_char_financial(r["charity"], grant_date) )
 
             # work out if multi national
             r["multi_national"] = self.get_multi_national(r["charity"])
 
             # work out the time operating_for
-            r["operating_for"] = self.get_operating_for(r["charity"])
+            r["operating_for"] = self.get_operating_for(r["charity"], grant_date)
 
             # get website url
             if (r["url"] is None or r["url"]=="") and r["charity"] is not None:
@@ -762,13 +785,13 @@ class Grant():
                 "region":                   None,
                 "postal_code":              recipient.get("postalCode"),
                 "website":                  recipient.get("url"),
-                "operating_for":            recipient.get("operating_for"),
-                "income":                   recipient.get("income"),
-                "spending":                 recipient.get("spending"),
-                "employees":                recipient.get("employees"),
-                "volunteers":               recipient.get("volunteers"),
                 "multi_national":           recipient.get("multi_national"),
             },
+            "operating_for":            recipient.get("operating_for"),
+            "income":                   recipient.get("income"),
+            "spending":                 recipient.get("spending"),
+            "employees":                recipient.get("employees"),
+            "volunteers":               recipient.get("volunteers"),
             "beneficiaries":{
                 "affect_people": self.affect_people,
                 "affect_other":  self.affect_other,
