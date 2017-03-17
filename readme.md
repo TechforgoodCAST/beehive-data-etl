@@ -39,13 +39,13 @@ $ node data/zip-to-csvs.js --in ./data/CharityExport-17-Mar-2017.zip --out ./dat
 $ node data/csvs-to-mongo.js --in ./data/oscr-register-csvs --dbName oscr-register --type oscr
 $ node data/csvs-to-mongo.js --in ./data/cc-register-csvs/RegPlusExtract_March_2017 --dbName cc-register --type cc
 $ node data/merge-extracts.js --batchSize 5000
-$ mongo
+$ mongo charity-base --eval "db.charities.createIndex({'mainCharity.companyNumber': 1})" # create index on companyNumber
 $ node supplement.js --scrapeBatchSize 5 # optional
 ```
 
 You'll also need to make sure that the `mainCharity.companyNumber` field has an
-index to make lookups quicker. If you don't do this then the next step will take
-too long.
+index to make lookups quicker. This is done by running `mongo charity-base --eval "db.charities.createIndex({'mainCharity.companyNumber': 1})"`.
+If you don't do this then the next step will take too long.
 
 3. Add classification details and transform into Beehive data structure
 -----------------------------------------------------------------------
