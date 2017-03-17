@@ -1,7 +1,7 @@
 From 360 Giving to Beehive Data
 ===============================
 
-1. Download from grantnav
+1. Download grantnav and import into Mongo
 -------------------------
 
 Use this file: <http://grantnav.threesixtygiving.org/api/grants.json>. Big file:
@@ -9,37 +9,22 @@ Use this file: <http://grantnav.threesixtygiving.org/api/grants.json>. Big file:
 
 Shown on the [Developer page](http://grantnav.threesixtygiving.org/developers).
 
-2. Import into mongo
---------------------
+Do this by running:
 
-```python
-from pymongo import MongoClient
-import json
-
-client = MongoClient('localhost', 27017)
-db = client['360giving']
-
-
-grantnav = 'grantnav-20170301150836.json'
-
-with open(grantnav) as g:
-    grants = json.load(g)
-
-bulk_limit = 10000
-bulk = []
-for i in grants["grants"]:
-    bulk.append(i)
-    if len(bulk)>=bulk_limit:
-        db.grants.insert_many(bulk)
-        bulk = []
-
-if len(bulk)>0:
-    db.grants.insert_many(bulk)
+```bash
+$ python to_mongo.py
 ```
 
-Found in `to_mongo.py`.
+The command line options for this are:
 
-3. Make `charity-base` work
+- `--grantnav`: location of the grantnav JSON file, can be a local file or a URL.
+  Default is <http://grantnav.threesixtygiving.org/api/grants.json>
+- `--mongo-port`: port for acccessing mongo (default `27017`)
+- `--mongo-host`: host for accessing mongo (default `localhost`)
+- `--mongo-db`: name of the database to insert into (default `360giving`)
+- `--limit`: number of records to insert at once (default `10000`)
+
+2. Make `charity-base` work
 ---------------------------
 
 Clone from [Github Repository](https://github.com/tithebarn/charity-base).
@@ -47,12 +32,14 @@ Clone from [Github Repository](https://github.com/tithebarn/charity-base).
 and then run commands to add Charity Commission and OSCR data to MongoDB:
 
 ```bash
-$ node download-register.js --year 2016 --month 09
-$ node zip-to-csvs.js --in ./cc-register.zip --out ./cc-register-csvs --type cc
-$ node zip-to-csvs.js --in ./CharityExport-08-Mar-2017.zip --out ./oscr-register-csvs --type oscr
-$ node csvs-to-mongo.js --in oscr-register-csvs --dbName oscr-register --type oscr
-$ node csvs-to-mongo.js --in cc-register-csvs --dbName cc-register --type cc
-$ node merge-extracts.js --batchSize 5000
+$ npm install
+$ node data/download-register.js --year 2016 --month 09 --out ./data/cc-register.zip
+$ node data/zip-to-csvs.js --in ./data/cc-register.zip --out ./data/cc-register-csvs --type cc
+$ node data/zip-to-csvs.js --in ./data/CharityExport-17-Mar-2017.zip --out ./data/oscr-register-csvs --type oscr
+$ node data/csvs-to-mongo.js --in ./data/oscr-register-csvs --dbName oscr-register --type oscr
+$ node data/csvs-to-mongo.js --in ./data/cc-register-csvs/RegPlusExtract_March_2017 --dbName cc-register --type cc
+$ node data/merge-extracts.js --batchSize 5000
+$ mongo
 $ node supplement.js --scrapeBatchSize 5 # optional
 ```
 
@@ -60,7 +47,7 @@ You'll also need to make sure that the `mainCharity.companyNumber` field has an
 index to make lookups quicker. If you don't do this then the next step will take
 too long.
 
-4. Add classification details and transform into Beehive data structure
+3. Add classification details and transform into Beehive data structure
 -----------------------------------------------------------------------
 
 Run `output.py`. This iterates through all the grants in the `360giving`.`grants`
@@ -128,7 +115,7 @@ data to make them more useful. Not all funders and funds are included - any not
 found in `Grant.swap_funds` are passed through as-is.
 
 
-6. Import into Beehive data
+4. Import into Beehive data
 ---------------------------
 
 Options:
