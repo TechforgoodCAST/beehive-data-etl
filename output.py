@@ -32,7 +32,7 @@ def main():
         bulk.find({"grant_identifier": g_output["grant_identifier"]}).upsert().replace_one(g_output) # add to MongoDB collection
         bulk_count+=1
         #print(json.dumps(g_output, indent=4))
-        if k % 1000 == 0:
+        if (k+1) % 1000 == 0:
             print("Processed %s grants" % str(k+1))
         if bulk_count >= args.limit:
             bulk.execute()
