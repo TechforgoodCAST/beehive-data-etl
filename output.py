@@ -24,6 +24,7 @@ def main():
 #    for k,g in enumerate(db.grants.aggregate([{"$sample":{"size":20}}])):
     bulk = client[args.output_db].grants.initialize_unordered_bulk_op()
     bulk_count = 0
+    k=0
     for k,g in enumerate(db.grants.find()):
         g = Grant(g, client[args.charity_db]) # generate grant object
         g.process_grant() # process the grant details
@@ -32,7 +33,7 @@ def main():
         bulk_count+=1
         #print(json.dumps(g_output, indent=4))
         if k % 1000 == 0:
-            print("Processed %s grants" % k)
+            print("Processed %s grants" % str(k+1))
         if bulk_count >= args.limit:
             bulk.execute()
             print("Persisted %s records to database" % bulk_count)
@@ -41,7 +42,7 @@ def main():
     if bulk_count>0:
         bulk.execute()
         print("Persisted %s records to database" % bulk_count)
-    print("Finished processing %s grants" % k)
+    print("Finished processing %s grants" % str(k+1))
 
 
 if __name__ == '__main__':
