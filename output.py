@@ -12,6 +12,7 @@ def main():
     parser.add_argument('--grant-db', '-gdb', default='360giving', help='Database containing grantnav data')
     parser.add_argument('--charity-db', '-cdb', default='charity-base', help='Database containing charity data')
     parser.add_argument('--output-db', '-odb', default='beehive-data', help='Database to output data for Beehive')
+    parser.add_argument('--limit', '-l', type=int, default=10000, help='Size of chunks imported in bulk')
     args = parser.parse_args()
 
     client = MongoClient(args.mongo_host, args.mongo_port)
@@ -32,11 +33,14 @@ def main():
         #print(json.dumps(g_output, indent=4))
         if k % 1000 == 0:
             print("Processed %s grants" % k)
-        if bulk_count >= 10000:
+        if bulk_count >= args.limit:
             bulk.execute()
             print("Persisted %s records to database" % bulk_count)
             bulk = client[args.output_db].grants.initialize_unordered_bulk_op()
             bulk_count =0
+    if bulk_count>0:
+        bulk.execute()
+        print("Persisted %s records to database" % bulk_count)
     print("Finished processing %s grants" % k)
 
 
