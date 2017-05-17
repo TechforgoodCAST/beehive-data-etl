@@ -8,11 +8,12 @@ import urllib.request
 def main():
 
     parser = argparse.ArgumentParser(description='Import grantnav file to mongo db')
-    parser.add_argument('--grantnav', default='http://grantnav.threesixtygiving.org/api/grants.json', help='Location of grantnav file downloaded from <http://grantnav.threesixtygiving.org/api/grants.json>')
     parser.add_argument('--mongo-port', '-p', type=int, default=27017, help='Port for mongo db instance')
     parser.add_argument('--mongo-host', '-mh', default='localhost', help='Host for mongo db instance')
     parser.add_argument('--mongo-db', '-db', default='360giving', help='Database to import data to')
     parser.add_argument('--limit', '-l', type=int, default=10000, help='Size of chunks imported in bulk')
+    parser.add_argument('--inner', default=None, help='Key of inner variable storing grants data (ie if data is stored in `{"grants": [...]}` rather than just `[...]`)')
+    parser.add_argument('grantnav', default='http://grantnav.threesixtygiving.org/api/grants.json', help='Location of grantnav file downloaded from <http://grantnav.threesixtygiving.org/api/grants.json>')
     args = parser.parse_args()
 
     client = MongoClient(args.mongo_host, args.mongo_port)
@@ -31,8 +32,12 @@ def main():
     with open(grantnav) as g:
         grants = json.load(g)
 
+    if args.inner and args.inner in grants:
+        grants = grants[args.inner]
+
     bulk = []
-    for k, i in enumerate(grants["grants"]):
+    for k, i in enumerate(grants):
+        i["_id"] = i["id"]
         bulk.append(i)
         if len(bulk)>=args.limit:
             db.grants.insert_many(bulk)

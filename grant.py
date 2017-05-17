@@ -366,13 +366,13 @@ class Grant():
         # Charity Commission beneficiaries
         for c in char.get("class",[]):
             if c in self.cc_to_beehive:
-                beneficiaries += self.cc_to_beehive[c]
+                beneficiaries.append(self.cc_to_beehive[c])
 
         # OSCR beneficiaries
         for i in char.get("beta",{}):
             for c in char.get("beta",{})[i]:
                 if c in self.oscr_to_beehive:
-                    beneficiaries += self.oscr_to_beehive[c]
+                    beneficiaries.append(self.oscr_to_beehive[c])
 
         return list(set(beneficiaries))
 
@@ -402,7 +402,7 @@ class Grant():
         max_i = None
         use_i = None
         for i in char.get("financial", []):
-            if i["income"] and i["spending"]:
+            if i["income"] and i["spending"] and i["fyEnd"] and i.get("fyStart"):
                 if time_from <= i["fyEnd"] and time_from >= i["fyStart"]:
                     use_i = i["fyEnd"]
                 if max_i is None or i["fyEnd"] > max_i:
@@ -566,7 +566,7 @@ class Grant():
         """
         get information about a charity and company based on a recipient
         """
-        char = None
+        charity = None
         company = None
 
         # first check if a charity or company exists
