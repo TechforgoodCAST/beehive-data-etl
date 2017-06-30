@@ -4,6 +4,9 @@ grantnav*.csv
 proposals*.csv
 missing.txt
 tags.txt
+*.json
+*.csv
+data/
 
 archive/
 
