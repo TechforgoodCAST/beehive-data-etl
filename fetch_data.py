@@ -1,15 +1,19 @@
 from __future__ import print_function
-from pymongo import MongoClient
 import argparse
 import json
 import os
 import urllib.request
-from beehive_schema.swap_funds import SWAP_FUNDS
-from slugify import slugify
 from pprint import pprint
 import dateutil.parser
-import flattentool
 import datetime
+import tempfile
+import shutil
+
+from pymongo import MongoClient
+from slugify import slugify
+import flattentool
+
+from beehive_schema.swap_funds import SWAP_FUNDS
 
 
 def fetch_url(url, new_file):
@@ -96,7 +100,7 @@ def process_register(db, created_since=None, only_funders=None):
                 "downloadedOn": datetime.datetime.now()
             }, upsert=True)
 
-            import_file(db, usefile_json)
+            import_file(db, usefile_json, source=d.get("accessURL"), license=f.get("license"))
 
 
 # from: https://github.com/ThreeSixtyGiving/datagetter/blob/master/get.py#L53
@@ -131,7 +135,7 @@ def convert_spreadsheet(input_path, converted_path, file_type):
     )
 
 
-def import_file(db, filename, inner="grants"):
+def import_file(db, filename, inner="grants", source=None, license=None):
     if os.path.isfile(filename):
         usefile = filename
         print("Using existing file: %s" % usefile)
@@ -154,6 +158,10 @@ def import_file(db, filename, inner="grants"):
     for k, i in enumerate(grants):
         i = process_grant(i)
         i["_id"] = i["id"]
+        i["dataset"] = {
+            "license": license,
+            "source": source
+        }
         bulk.find({'_id': i["_id"]}).upsert().replace_one(i)
 
     print_mongo_bulk_result(bulk.execute(), "grants")
