@@ -150,3 +150,17 @@ def insight_durations():
     data = request.json['data']['duration']
     result = recommender.check_durations(data)
     return jsonify(result)
+
+
+@app.route('/insight/all', methods=['POST'])
+# @auth.login_required
+def insight_all():
+    bens = recommender.check_beneficiaries(request.json['data'].get("beneficiaries", {}))
+    amounts = recommender.check_amounts(request.json['data'].get("amount", None))
+    durations = recommender.check_durations(request.json['data'].get("duration", None))
+    funds = set(list(bens.keys()) + list(amounts.keys()) + list(durations.keys()))
+    return jsonify({f: {
+        "beneficiaries": bens.get(f, 0),
+        "amounts": amounts.get(f, 0),
+        "durations": durations.get(f, 0),
+    } for f in funds})
