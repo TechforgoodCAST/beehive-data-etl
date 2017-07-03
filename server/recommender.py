@@ -58,7 +58,7 @@ class Recommender:
         return new_result
 
     def get_amounts(self):
-        return self.db.grants.aggregate([{
+        result = self.db.grants.aggregate([{
             "$group": {
                 "_id": {
                     "fund": {
@@ -76,9 +76,17 @@ class Recommender:
                 "_id": 0,
                 "fund_slug": {"$concat": ["$_id.funder", "-", "$_id.fund"]},
                 "amounts": "$amounts",
-                "durations": {"$concatArrays": "$durations"}
+                "durations": "$durations"
             }
         }])
+        data = []
+        for i in result:
+            data.append({
+                "fund_slug": i["fund_slug"],
+                "amounts": [a for a in i["amounts"] if a is not None],
+                "durations": [a for a in i["durations"] if a is not None]
+            })
+        return data
 
     def __generate_scores(self, field, request, tolerance, bandwidth=0.1):
         result = {}
@@ -110,4 +118,4 @@ class Recommender:
         return self.__generate_scores('amounts', user_input, 10000)
 
     def check_durations(self, user_input):
-        return self.__generate_scores('durations', user_input, 10000)
+        return self.__generate_scores('durations', user_input, 1)
