@@ -10,6 +10,8 @@ from queries.funders import funders_query
 from queries.amounts import amounts_query
 from queries.durations import durations_query
 
+from recommender import Recommender
+
 app = Flask(__name__)  # create the application instance :)
 app.config.from_object(__name__)  # load config from this file , flaskr.py
 
@@ -33,10 +35,12 @@ app.logger.info("Connected to '%s' mongo database [host: %s, port: %s]" % (
     app.config["MONGO_PORT"]
 ))
 
+recommender = Recommender(db=db)
+
 # styling
 sass(app, input_dir='assets/scss', output_dir='css')
-#app.add_url_rule('/favicon.ico',
-#                 redirect_to=url_for('static', filename='favicon.ico'))
+# app.add_url_rule('/favicon.ico',
+#                  redirect_to=url_for('static', filename='favicon.ico'))
 
 
 @app.route('/')
@@ -121,3 +125,28 @@ def fund_summary(fund_slug=None):
     fund_summary = list(grants)[0]
     fund_summary = process_fund_summary(fund_summary)
     return jsonify(fund_summary)
+
+
+# Beehive insight
+@app.route('/insight/beneficiaries', methods=['POST'])
+# @auth.login_required
+def insight_beneficiaries():
+    data = request.json['data']
+    result = recommender.check_beneficiaries(data)
+    return jsonify(result)
+
+
+@app.route('/insight/amounts', methods=['POST'])
+# @auth.login_required
+def insight_amounts():
+    data = request.json['data']['amount']
+    result = recommender.check_amounts(data)
+    return jsonify(result)
+
+
+@app.route('/insight/durations', methods=['POST'])
+# @auth.login_required
+def insight_durations():
+    data = request.json['data']['duration']
+    result = recommender.check_durations(data)
+    return jsonify(result)
