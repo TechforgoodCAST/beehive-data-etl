@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class='ui container basic segment'>
+  <h1 class='ui header'>
+    <a class='logo' href='/' title='Beehive Data'>Beehive Data</a>
+  </h1>
+  <hr>
+  <h2>{{ grants|length }} grants to <strong>{{ charity }}</strong></h2>
+  <table class="ui table">
+    <thead>
+      <tr>
+        <th>From</th>
+        <th>Amount</th>
+        <th>Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for g in grants %}
+      <tr>
+        <td>
+          <a href="{{ url_for('funder', funder_id=g.get("fundingOrganization", [{}])[0].get("id")) }}">
+            {{ g.get("fundingOrganization", [{}])[0].get("name","[Unknown]") }}
+          </a>
+        </td>
+        <td class="right aligned">
+          {% if g.get("currency", "GBP") != "GBP": %}
+            [{{ g.get("currency", "GBP") }}]
+          {% endif %}
+          {{ "{:,.0f}".format(g.get("amountAwarded", 0)) }}
+        </td>
+        <td class="right aligned">{{ g.get("awardDate","[Unknown]").strftime("%d/%m/%Y") }}</td>
+        <td class="selectable">
+          <a href="{{ url_for('grant', grant_id=g.get("id") ) }}">
+            More details…
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
