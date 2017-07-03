@@ -1,0 +1,97 @@
+body {
+  height: auto; }
+
+  a:hover {
+    text-decoration: underline; }
+
+    hr {
+      border-style: solid;
+      border-color: #eaeaea !important;
+      border-width: 1px !important;
+      margin-bottom: 1em; }
+
+      .radio {
+        padding: 0 4px; }
+        .radio input {
+          margin-right: 4px; }
+
+.ui.red, .ui.basic.red.button {
+  transition: all 0.25s; }
+
+  .ui.red {
+    color: #ffffff !important;
+    background-color: #da5d39 !important; }
+    .ui.red:hover {
+      background-color: #ed684a !important; }
+      @media screen and (max-width: 480px) {
+        .ui.red:first-child {
+          margin-bottom: 10px;   }
+}
+
+.ui.basic.red.button {
+  color: #da5d39 !important;
+  box-shadow: 0px 0px 0px 1px #da5d39 inset !important; }
+  .ui.basic.red.button:hover {
+    color: #ed684a !important;
+    box-shadow: 0px 0px 0px 1px #ed684a inset !important; }
+
+.hidden {
+  display: none; }
+
+  .red {
+    color: #da5d39;
+    transition: all 0.25s; }
+    .red:hover {
+      color: #ed684a; }
+
+#logo, #header, #footer {
+  text-align: center; }
+
+  #logo {
+    margin-top: 3em;
+    margin-bottom: 0;
+    padding-bottom: 0.5em; }
+
+    #header {
+      margin-top: 0; }
+
+      .logo {
+        display: inline-block;
+        position: relative;
+        width: 200px;
+        height: 52px;
+        background-size: 200px 67px;
+        background: url("/static/images/logo.svg") no-repeat;
+        left: -12px;
+        text-indent: -9999px; }
+        .logo:after {
+          position: absolute;
+          content: "Alpha";
+          color: #999999;
+          font-size: 10px;
+          font-weight: bold;
+          right: -29px;
+          top: 10px;
+          text-indent: 0; }
+
+.icons {
+  width: 30px;
+  height: 30px;
+  background: url("/static/images/icons.svg") no-repeat;
+  background-size: 90px 30px;
+  display: inline-block;
+  position: relative;
+  top: 7px;
+  margin-right: 4px; }
+  .icons.impact {
+    background-position: 0 0; }
+    .icons.decisions {
+      background-position: -30px 0; }
+      .icons.tools {
+        background-position: -60px 0; }
+
+#footer {
+  margin-bottom: 3em; }
+
+  #beneficiaries {
+    min-height: 550px; }

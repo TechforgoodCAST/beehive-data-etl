@@ -2,7 +2,9 @@ from __future__ import print_function
 from pymongo import MongoClient
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash, jsonify
+from flaskext.sass import sass
 from dateutil.relativedelta import relativedelta
+
 from queries.fund_summary import fund_summary_query, process_fund_summary
 from queries.funders import funders_query
 from queries.amounts import amounts_query
@@ -19,16 +21,35 @@ app.config.update(dict(
     MONGO_PORT=27017,
     MONGO_HOST='localhost',
     MONGO_DB='360giving',
+    GA_KEY='UA-30021098-3'
 ))
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 client = MongoClient(app.config["MONGO_HOST"], app.config["MONGO_PORT"])
 db = client[app.config["MONGO_DB"]]
-print("Connected to '%s' mongo database [host: %s, port: %s]" % (
+app.logger.info("Connected to '%s' mongo database [host: %s, port: %s]" % (
     app.config["MONGO_DB"],
     app.config["MONGO_HOST"],
     app.config["MONGO_PORT"]
 ))
+
+# styling
+sass(app, input_dir='assets/scss', output_dir='css')
+#app.add_url_rule('/favicon.ico',
+#                 redirect_to=url_for('static', filename='favicon.ico'))
+
+
+@app.route('/')
+def index():
+    return render_template('index.html', ga_key=app.config['GA_KEY'])
+
+
+@app.route('/examples')
+def examples():
+    return render_template('examples.html', ga_key=app.config['GA_KEY'])
+
+
+
 
 
 @app.route('/grant/<grant_id>')
