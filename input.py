@@ -12,6 +12,15 @@ import flattentool
 import datetime
 
 
+def fetch_url(url, new_file):
+    request = urllib.request.Request(url, headers={
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0"
+    })
+    with urllib.request.urlopen(request) as f:
+        with open(new_file, "wb") as new_f:
+            new_f.write(f.read())
+
+
 def fetch_register(db, data_register="http://data.threesixtygiving.org/data.json"):
     """
     Fetch list of files from the JSON feed of the data register and store them
@@ -19,7 +28,7 @@ def fetch_register(db, data_register="http://data.threesixtygiving.org/data.json
     """
     temp_file = 'data/dcat.json'
     print("Downloading from: %s" % data_register)
-    urllib.request.urlretrieve(data_register, temp_file)
+    fetch_url(data_register, temp_file)
     print("Saved as: %s" % temp_file)
 
     # open the file and save each record to DB
@@ -64,9 +73,15 @@ def process_register(db, created_since=None, only_funders=None):
             usefile_json = 'data/{}-{}.{}'.format(f.get("identifier"), k, "json")
             print("Downloading from: %s" % filename)
             try:
-                urllib.request.urlretrieve(filename, usefile)
-            except urllib.error.HTTPError:
-                print("DOWNLOAD FAILED: {}".format(filename))
+                fetch_url(filename, usefile)
+            except urllib.error.HTTPError as e:
+                print()
+                print("*****************")
+                print("DOWNLOAD FAILED")
+                print("URL: {}".format(filename))
+                print("REASON: {}".format(str(e)))
+                print("*****************")
+                print()
                 continue
             print("Saved as: %s" % usefile)
 
@@ -123,7 +138,7 @@ def import_file(db, filename, inner="grants"):
     else:
         usefile = "data/grants.json"
         print("Downloading from: %s" % filename)
-        urllib.request.urlretrieve(filename, usefile)
+        fetch_url(filename, usefile)
         print("Saved as: %s" % usefile)
 
     with open(usefile, encoding='utf8') as g:
@@ -210,10 +225,8 @@ def main():
     parser.add_argument('--mongo-port', '-p', type=int, default=27017, help='Port for mongo db instance')
     parser.add_argument('--mongo-host', '-mh', default='localhost', help='Host for mongo db instance')
     parser.add_argument('--mongo-db', '-db', default='360giving', help='Database to import data to')
-    parser.add_argument('--inner', default=None, help='Key of inner variable storing grants data (ie if data is stored in `{"grants": [...]}` rather than just `[...]`)')
     parser.add_argument('--files-since', default=None, help="Look only for files modified since this date (in format YYYY-MM-DD)")
     parser.add_argument('--funders', default=None, help="Only update from these funders (comma separated list of funder prefixes)")
-    # parser.add_argument('grantnav', nargs="+", default='http://grantnav.threesixtygiving.org/api/grants.json', help='Location of grantnav file downloaded from <http://grantnav.threesixtygiving.org/api/grants.json>')
     args = parser.parse_args()
 
     client = MongoClient(args.mongo_host, args.mongo_port)
