@@ -225,6 +225,7 @@ def main():
     parser.add_argument('--mongo-port', '-p', type=int, default=27017, help='Port for mongo db instance')
     parser.add_argument('--mongo-host', '-mh', default='localhost', help='Host for mongo db instance')
     parser.add_argument('--mongo-db', '-db', default='360giving', help='Database to import data to')
+    parser.add_argument('--registry', default="http://data.threesixtygiving.org/data.json", help="URL to download the data registry from")
     parser.add_argument('--files-since', default=None, help="Look only for files modified since this date (in format YYYY-MM-DD)")
     parser.add_argument('--funders', default=None, help="Only update from these funders (comma separated list of funder prefixes)")
     args = parser.parse_args()
@@ -238,7 +239,7 @@ def main():
     if args.funders:
         args.funders = args.funders.split(",")
 
-    fetch_register(db)
+    fetch_register(db, args.registry)
     process_register(db, args.files_since, args.funders)
 
 if __name__ == '__main__':
