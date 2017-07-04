@@ -216,7 +216,7 @@ def process_grant(i):
                 if r.get("id", "").startswith("GB-COH-"):
                     r["companyNumber"] = r["id"].replace("GB-COH-", "")
 
-            if r.get("charityNumber", "").strip().lower() in ["n/a", "-", "no", ""]:
+            if r.get("charityNumber") and r.get("charityNumber", "").strip().lower() in ["n/a", "-", "no", ""]:
                 r["charityNumber"] = None
 
     return i
