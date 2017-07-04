@@ -2,7 +2,7 @@ from __future__ import print_function
 from pymongo import MongoClient
 import argparse
 import dateutil.relativedelta
-from input import print_mongo_bulk_result, process_grant
+from fetch_data import print_mongo_bulk_result, process_grant
 import re
 
 
@@ -29,11 +29,18 @@ def main():
         for r in grant["recipientOrganization"]:
 
             # check combinations of charity number and company number
-            if len(r.get("charityNumber", "")) > 0 and len(r.get("companyNumber", "")) > 0:
+            charityNumber = r.get("charityNumber")
+            companyNumber = r.get("companyNumber")
+            if charityNumber == "":
+                charityNumber = None
+            if companyNumber == "":
+                companyNumber = None
+                
+            if charityNumber and companyNumber:
                 grant["beehive"]["org_type"] = 3
-            elif len(r.get("charityNumber", "")) > 0:
+            elif charityNumber:
                 grant["beehive"]["org_type"] = 1
-            elif len(r.get("companyNumber", "")) > 0:
+            elif companyNumber:
                 grant["beehive"]["org_type"] = 2
             elif re.search(r'\b(school|college|university|council|academy|borough)\b', r["name"], flags=re.I):
                 grant["beehive"]["org_type"] = 4

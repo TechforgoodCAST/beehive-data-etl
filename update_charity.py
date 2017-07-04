@@ -5,7 +5,7 @@ import dateutil.relativedelta
 from beehive_schema.cc_aoo import CC_AOO_CODES
 from beehive_schema.beneficiaries import *
 from update_beneficiaries import classify_grant
-from input import print_mongo_bulk_result
+from fetch_data import print_mongo_bulk_result
 
 # convert charity commission classification categories to beehive ones
 cc_to_beehive = {
@@ -32,6 +32,8 @@ oscr_to_beehive = {
 
 
 def clean_charity_number(regno):
+    if not regno:
+        return regno
     regno = regno.replace("SCO", "SC0")
     regno = regno.replace("GB-CHC-", "")
     regno = regno.replace(" ", "")
@@ -60,6 +62,9 @@ def main():
         grant.setdefault("beehive", {})
         for r in grant["recipientOrganization"]:
             charityNumber = clean_charity_number(r["charityNumber"])
+            if not charityNumber or charityNumber == "":
+                continue
+
             charity = cdb.charities.find_one({"charityNumber": charityNumber})
             r.setdefault("beehive", {})
             r["beehive"].setdefault("beneficiaries", [])

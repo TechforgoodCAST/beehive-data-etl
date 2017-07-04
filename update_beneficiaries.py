@@ -3,7 +3,7 @@ from pymongo import MongoClient
 import argparse
 from beehive_schema.beneficiaries import *
 import re
-from input import print_mongo_bulk_result
+from fetch_data import print_mongo_bulk_result
 
 
 def classify_grant(desc, regexes):
