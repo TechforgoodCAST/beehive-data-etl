@@ -87,6 +87,12 @@ def funders():
     return jsonify(list(funders))
 
 
+@app.route('/funders.html')
+def funders_html():
+    funders = db.grants.aggregate(funders_query())
+    return render_template('funders.html', funders=list(funders))
+
+
 @app.route('/funder/<funder_id>')
 @app.route('/funder/<funder_id>.json')
 def funder(funder_id=None):

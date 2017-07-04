@@ -6,6 +6,7 @@ def funders_query():
             "$group": {
                 "_id": {
                     "funder": {"$arrayElemAt": ["$fundingOrganization.slug", 0]},
+                    "funder_name": {"$arrayElemAt": ["$fundingOrganization.name", 0]},
                     "fund": {"$arrayElemAt": ["$grantProgramme.slug", 0]},
                     "year": {"$year": "$awardDate"},
                 },
@@ -16,7 +17,9 @@ def funders_query():
             "$group": {
                 "_id": {
                     "funder": "$_id.funder",
+                    "funder_name": "$_id.funder_name",
                     "fund": "$_id.fund",
+                    "fund_name": "$_id.fund_name",
                 },
                 "years": {
                     "$push": {
@@ -29,11 +32,20 @@ def funders_query():
                 "count": {"$sum": "$count"},
             }
         }, {
+            "$sort": {
+                "funder": 1,
+                "fund": 1
+            }
+        }, {
             "$group": {
-                "_id": "$_id.funder",
+                "_id": {
+                    "funder": "$_id.funder",
+                    "funder_name": "$_id.funder_name",
+                },
                 "funds": {
                     "$push": {
                         "fund": "$_id.fund",
+                        "fund_name": "$_id.fund_name",
                         "fund_slug": {"$concat": ["$_id.funder", "-", "$_id.fund"]},
                         "years": "$years",
                         "count": "$count",
@@ -47,7 +59,8 @@ def funders_query():
         }, {
             "$project": {
                 "_id": 0,
-                "funder": "$_id",
+                "funder": "$_id.funder",
+                "funder_name": "$_id.funder_name",
                 "funds": "$funds",
                 "count": "$count",
                 "sum": "$sum",
