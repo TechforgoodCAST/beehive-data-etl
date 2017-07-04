@@ -84,8 +84,14 @@ def fund_summary_query(fund_slug, one_year_before):
                 # source and license
                 "source_license": [{
                     "$group": {
-                        "_id": {"license": "$dataset.license", "source": "$dataset.distribution.accessURL"},
+                        "_id": {"license": "$dataset.license", "source": "$dataset.source"},
                         "grant_count": {"$sum": 1}
+                    }
+                }, {
+                    "$project": {
+                        "_id": 0,
+                        "license": "$_id.license",
+                        "source": "$_id.source"
                     }
                 }],
 
