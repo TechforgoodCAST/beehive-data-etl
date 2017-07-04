@@ -301,8 +301,8 @@ def fund_summary_query(fund_slug, one_year_before):
             "$project": {
                 "sources": "$source_license",
                 "fund_slug": {"$arrayElemAt": ["$aggregates._id", 0]},
-                "period_end": {"$arrayElemAt": ["$aggregates.period_end", 0]},
-                "period_start": {"$arrayElemAt": ["$aggregates.period_start", 0]},
+                "period_end": {"$dateToString": {"format": "%Y-%m-%d", "date": {"$arrayElemAt": ["$aggregates.period_end", 0]}}},
+                "period_start": {"$dateToString": {"format": "%Y-%m-%d", "date": {"$arrayElemAt": ["$aggregates.period_start", 0]}}},
                 "grant_count": {"$arrayElemAt": ["$aggregates.grant_count", 0]},
                 "recipient_count": {"$arrayElemAt": ["$aggregates.recipient_count", 0]},
                 "amount_awarded_sum": {"$arrayElemAt": ["$aggregates.amount_awarded_sum", 0]},
@@ -367,6 +367,8 @@ def process_fund_summary(results):
                 new_d.append(new_i)
             results[d] = new_d
         results[d] = process_distribution(results[d], results["grant_count"])
+
+    results["sources"] = {s["license"]: s["source"] for s in results["sources"]}
 
     return results
 
