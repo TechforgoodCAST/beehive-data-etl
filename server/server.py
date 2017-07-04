@@ -4,6 +4,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash, jsonify
 from flaskext.sass import sass
 from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 from queries.fund_summary import fund_summary_query, process_fund_summary
 from queries.funders import funders_query
@@ -115,7 +116,7 @@ def durations():
 
 @app.route('/integrations/fund_summary/<fund_slug>')
 def fund_summary(fund_slug=None):
-    latest_date = db.grants.aggregate([
+    latest_date = list(db.grants.aggregate([
         {"$match": {
             "fund_slug": fund_slug,
         }},
@@ -123,8 +124,11 @@ def fund_summary(fund_slug=None):
             "_id": "$fund_slug",
             "period_end": {"$max": "$awardDate"},
         }}
-    ])
-    latest_date = list(latest_date)[0]["period_end"]
+    ]))
+    if len(latest_date) > 0:
+        latest_date = latest_date[0]["period_end"]
+    else:
+        latest_date = datetime.now()
     one_year_before = latest_date - relativedelta(months=12)
 
     grants = db.grants.aggregate(fund_summary_query(fund_slug, one_year_before))
