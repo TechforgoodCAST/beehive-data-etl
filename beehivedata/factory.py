@@ -23,9 +23,9 @@ def create_app(config=None):
         SECRET_KEY='development key',
         USERNAME='admin',
         PASSWORD='default',
-        MONGO_PORT=27017,
-        MONGO_HOST='localhost',
-        MONGO_DB='360giving',
+        MONGODB_PORT=27017,
+        MONGODB_HOST='localhost',
+        MONGODB_DB='360giving',
         GA_KEY='UA-30021098-3'
     ))
     app.config.update(config or {})

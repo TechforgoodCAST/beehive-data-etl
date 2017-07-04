@@ -4,12 +4,16 @@ from pymongo import MongoClient, ASCENDING, DESCENDING
 
 def connect_db():
     """Connects to the specific database."""
-    client = MongoClient(current_app.config["MONGO_HOST"], current_app.config["MONGO_PORT"])
-    db = client[current_app.config["MONGO_DB"]]
+    if current_app.config["MONGODB_URI"]:
+        client = MongoClient(current_app.config["MONGODB_URI"])
+        db = client.get_default_database()
+    else:
+        client = MongoClient(current_app.config["MONGODB_HOST"], current_app.config["MONGODB_PORT"])
+        db = client[current_app.config["MONGODB_DB"]]
     current_app.logger.info("Connected to '%s' mongo database [host: %s, port: %s]" % (
-        current_app.config["MONGO_DB"],
-        current_app.config["MONGO_HOST"],
-        current_app.config["MONGO_PORT"]
+        db.name,
+        client.address[0],
+        client.address[1]
     ))
     return db
 
