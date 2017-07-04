@@ -1,3 +1,130 @@
+ben_categories = {
+    "public": {
+        "label": "The general public",
+        "group": "People",
+        "position": 25
+    },
+    "crime": {
+        "label": "Affected or involved with crime",
+        "group": "People",
+        "position": 24
+    },
+    "relationship": {
+        "label": "With family/relationship challenges",
+        "group": "People",
+        "position": 23
+    },
+    "disabilities": {
+        "label": "With disabilities",
+        "group": "People",
+        "position": 22
+    },
+    "religious": {
+        "label": "With specific religious/spiritual beliefs",
+        "group": "People",
+        "position": 21
+    },
+    "disasters": {
+        "label": "Affected by disasters",
+        "group": "People",
+        "position": 20
+    },
+    "education": {
+        "label": "In education",
+        "group": "People",
+        "position": 19
+    },
+    "unemployed": {
+        "label": "Who are unemployed",
+        "group": "People",
+        "position": 18
+    },
+    "ethnic": {
+        "label": "From a specific ethnic background",
+        "group": "People",
+        "position": 17
+    },
+    "water": {
+        "label": "With water/sanitation access challenges",
+        "group": "People",
+        "position": 16
+    },
+    "food": {
+        "label": "With food access challenges",
+        "group": "People",
+        "position": 15
+    },
+    "housing": {
+        "label": "With housing/shelter challenges",
+        "group": "People",
+        "position": 14
+    },
+    "animals": {
+        "label": "Animals and wildlife",
+        "group": "Other",
+        "position": 13
+    },
+    "buildings": {
+        "label": "Buildings and places",
+        "group": "Other",
+        "position": 12
+    },
+    "mental": {
+        "label": "With mental diseases or disorders",
+        "group": "People",
+        "position": 11
+    },
+    "orientation": {
+        "label": "With a specific sexual orientation",
+        "group": "People",
+        "position": 10
+    },
+    "environment": {
+        "label": "Climate and the environment",
+        "group": "Other",
+        "position": 9
+    },
+    "physical": {
+        "label": "With physical diseases or disorders",
+        "group": "People",
+        "position": 8
+    },
+    "organisation": {
+        "label": "This organisation",
+        "group": "Other",
+        "position": 7
+    },
+    "organisations": {
+        "label": "Other organisations",
+        "group": "Other",
+        "position": 6
+    },
+    "poverty": {
+        "label": "Facing income poverty",
+        "group": "People",
+        "position": 5
+    },
+    "refugees": {
+        "label": "Who are refugees and asylum seekers",
+        "group": "People",
+        "position": 4
+    },
+    "services": {
+        "label": "Involved with the armed or rescue services",
+        "group": "People",
+        "position": 3
+    },
+    "care": {
+        "label": "In, leaving, or providing care",
+        "group": "People",
+        "position": 2
+    },
+    "exploitation": {
+        "label": "At risk of sexual exploitation, trafficking, forced labour, or servitude",
+        "group": "People",
+        "position": 1
+    }
+}
 
 DISTRIBUTIONS = {
     "duration_awarded_months_distribution": [
@@ -26,6 +153,7 @@ DISTRIBUTIONS = {
         (100000, {"position": 3, "label": "£100k - £1m"}),
         (1000000, {"position": 4, "label": "£1m - £10m"}),
         (10000000, {"position": 5, "label": "£10m+"}),
+        ("Unknown", {"position": 6, "label": 'Unknown'}),
         (1000000000, None)
     ],
     "employees_distribution": [
@@ -37,6 +165,7 @@ DISTRIBUTIONS = {
         (100, {"position": 6, "label": "101 - 250"}),
         (250, {"position": 7, "label": "251 - 500"}),
         (500, {"position": 8, "label": "500+"}),
+        ("Unknown", {"position": 9, "label": 'Unknown'}),
         (1000000, None)
     ],
     "gender_distribution": [
@@ -45,9 +174,81 @@ DISTRIBUTIONS = {
         ("Male", {"position": 3, "label": "Male"}),
         ("Transgender", {"position": 4, "label": "Transgender"}),
         ("Other", {"position": 5, "label": "Other"}),
+    ],
+    "operating_for_distribution": [
+        (0, {"position": 1, "label": 'Yet to start'}),
+        (0.1, {"position": 2, "label": 'Less than 12 months'}),
+        (1, {"position": 3, "label": 'Less than 3 years'}),
+        (3, {"position": 4, "label": '4 years or more'}),
+        ("Unknown", {"position": 5, "label": 'Unknown'}),
+        (1000000, None)
+    ],
+    "age_group_distribution": [
+        ("Older adults (80+)", {
+            "label": "Older adults (80+)",
+            "age_from": 80,
+            "age_to": 150,
+            "position": 1
+        }),
+        ("Mature adults (51-80 years)", {
+            "label": "Mature adults (51-80 years)",
+            "age_from": 51,
+            "age_to": 80,
+            "position": 2
+        }),
+        ("Adults (36-50 years)", {
+            "label": "Adults (36-50 years)",
+            "age_from": 36,
+            "age_to": 50,
+            "position": 3
+        }),
+        ("Young adults (20-35 years)", {
+            "label": "Young adults (20-35 years)",
+            "age_from": 20,
+            "age_to": 35,
+            "position": 4
+        }),
+        ("Adolescents (12-19 years)", {
+            "label": "Adolescents (12-19 years)",
+            "age_from": 12,
+            "age_to": 19,
+            "position": 5
+        }),
+        ("Children (4-11 years)", {
+            "label": "Children (4-11 years)",
+            "age_from": 4,
+            "age_to": 11,
+            "position": 6
+        }),
+        ("Infants (0-3 years)", {
+            "label": "Infants (0-3 years)",
+            "age_from": 0,
+            "age_to": 3,
+            "position": 7
+        }),
+        ("All ages", {
+            "label": "All ages",
+            "age_from": 0,
+            "age_to": 150,
+            "position": 8
+        })
+    ],
+    "beneficiary_distribution": [(b, {
+        "label": ben_categories[b]["label"],
+        "group": ben_categories[b]["position"],
+        "sort": b,
+        "position": ben_categories[b]["position"],
+    }) for b in ben_categories],
+    "geographic_scale_distribution": [
+        (2, {"position": 1, "label": "An entire country"}),
+        (0, {"position": 2, "label": "One or more local areas"}),
+        (1, {"position": 3, "label": "One or more regions"}),
+        (3, {"position": 4, "label": "Across many countries"})
     ]
 }
 DISTRIBUTIONS["volunteers_distribution"] = DISTRIBUTIONS["employees_distribution"]
+
+AMOUNT_STEP = 5000
 
 
 def fund_summary_query(fund_slug, one_year_before):
@@ -95,7 +296,7 @@ def fund_summary_query(fund_slug, one_year_before):
                     }
                 }],
 
-                # # bucket into similar groups to income
+                # # @TODO: change to bucket into similar groups to income
                 # "amount_awarded_distribution": [{
                 #     "$bucket": {
                 #           "groupBy": "$amountAwarded",
@@ -111,7 +312,7 @@ def fund_summary_query(fund_slug, one_year_before):
                 # Distribution of awarded amounts, in bands of 5000
                 "amount_awarded_distribution": [{
                     "$group": {
-                        "_id": {"$multiply": [{"$floor": {"$divide": ["$amountAwarded", 5000]}}, 5000]},
+                        "_id": {"$multiply": [{"$floor": {"$divide": ["$amountAwarded", AMOUNT_STEP]}}, AMOUNT_STEP]},
                         "count": {"$sum": 1},
                         "sum": {"$sum": "$amountAwarded"},
                     }
@@ -202,7 +403,7 @@ def fund_summary_query(fund_slug, one_year_before):
                 "operating_for_distribution": [{
                     "$bucket": {
                         "groupBy": "$beehive.operating_for",
-                        "boundaries": [0, 1, 3, 1000000],
+                        "boundaries": [0, 0.1, 1, 3, 1000000],
                         "default": "Unknown",
                         "output": {
                             "count": {"$sum": 1},
@@ -225,18 +426,9 @@ def fund_summary_query(fund_slug, one_year_before):
                     "$unwind": "$beehive.ages"
                 }, {
                     "$group": {
-                        "_id": "$beehive.ages",
+                        "_id": "$beehive.ages.label",
                         "count": {"$sum": 1},
                         "sum": {"$sum": "$amountAwarded"},
-                    }
-                }, {
-                    "$project": {
-                        "_id": 0,
-                        "age_from": "$_id.age_from",
-                        "age_to": "$_id.age_to",
-                        "label": "$_id.label",
-                        "count": "$count",
-                        "sum": "$sum",
                     }
                 }],
 
@@ -310,6 +502,7 @@ def fund_summary_query(fund_slug, one_year_before):
                 "amount_awarded_median": {"$arrayElemAt": ["$aggregates.amount_awarded_median", 0]},
                 "amount_awarded_min": {"$arrayElemAt": ["$aggregates.amount_awarded_min", 0]},
                 "amount_awarded_max": {"$arrayElemAt": ["$aggregates.amount_awarded_max", 0]},
+                "amount_awarded_distribution": "$amount_awarded_distribution",
                 "duration_awarded_months_mean": {"$arrayElemAt": ["$aggregates.duration_awarded_months_mean", 0]},
                 "duration_awarded_months_median": {"$arrayElemAt": ["$aggregates.duration_awarded_months_median", 0]},
                 "duration_awarded_months_min": {"$arrayElemAt": ["$aggregates.duration_awarded_months_min", 0]},
@@ -334,9 +527,10 @@ def fund_summary_query(fund_slug, one_year_before):
 
 
 def process_fund_summary(results):
-
+    print(results["operating_for_distribution"])
     # process distributions
     distributions = [
+        "amount_awarded_distribution",
         "duration_awarded_months_distribution",
         "award_month_distribution",
         "org_type_distribution",
@@ -366,14 +560,25 @@ def process_fund_summary(results):
                         new_i["sum"] = r["sum"]
                 new_d.append(new_i)
             results[d] = new_d
-        results[d] = process_distribution(results[d], results["grant_count"])
+        results[d] = process_distribution(results[d], d, results["grant_count"])
 
     results["sources"] = {s["license"]: s["source"] for s in results["sources"]}
 
     return results
 
 
-def process_distribution(distribution, total=None):
+def process_distribution(distribution, dist_name, total=None):
+
+    # actions for particular distributions
+    if dist_name == "amount_awarded_distribution":
+        distribution = [{
+            "segment": i["_id"] / AMOUNT_STEP,
+            "start": i["_id"],
+            "end": i["_id"] + (AMOUNT_STEP - 1),
+            "count": i["count"],
+            "sum": i["sum"]
+        } for i in distribution]
+
     if not total:
         total = sum([a["count"] for a in distribution])
     return [add_percent(a, total) for a in distribution]

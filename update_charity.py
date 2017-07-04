@@ -76,7 +76,7 @@ def main():
             # work out how long charity was operating for
             r["regDate"] = charity.get("registration", [{}])[0].get("regDate")
             if r["regDate"]:
-                grant["beehive"]["operating_for"] = (grant["awardDate"] - r["regDate"]).days / 365
+                grant["beehive"]["operating_for"] = float((grant["awardDate"] - r["regDate"]).days) / 365
 
             # get financial data
             max_i = None

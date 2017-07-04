@@ -35,7 +35,7 @@ def main():
                 charityNumber = None
             if companyNumber == "":
                 companyNumber = None
-                
+
             if charityNumber and companyNumber:
                 grant["beehive"]["org_type"] = 3
             elif charityNumber:
