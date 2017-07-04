@@ -281,6 +281,21 @@ def fund_summary_query(fund_slug, one_year_before):
                         "sum": {"$sum": "$amountAwarded"},
                     }
                 }],
+
+                # examples of grants
+                "grant_examples": [{
+                    "$sample": {"size": 3}
+                }, {
+                    "$project": {
+                        "_id": 0,
+                        "title": "$title",
+                        "recipient": {"$arrayElemAt": ["$recipientOrganization.name", 0]},
+                        "amount": "$amountAwarded",
+                        "currency": "$currency",
+                        "award_date": {"$dateToString": {"format": "%Y-%m-%d", "date": "$awardDate"}},
+                        "id": "$_id",
+                    }
+                }]
             }
         }, {
             "$project": {
@@ -312,6 +327,7 @@ def fund_summary_query(fund_slug, one_year_before):
                 "geographic_scale_distribution": "$geographic_scale_distribution",
                 "country_distribution": "$country_distribution",
                 "district_distribution": "$district_distribution",
+                "grant_examples": "$grant_examples",
             }
         }
     ]
