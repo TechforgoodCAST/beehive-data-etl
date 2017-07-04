@@ -1,11 +1,12 @@
 from __future__ import print_function
 from pymongo import MongoClient
-import argparse
 import dateutil.relativedelta
-from beehive_schema.cc_aoo import CC_AOO_CODES
-from beehive_schema.beneficiaries import *
-from update_beneficiaries import classify_grant
-from fetch_data import print_mongo_bulk_result
+
+from ..db import get_db
+from ..assets.cc_aoo import CC_AOO_CODES
+from ..assets.beneficiaries import *
+from .update_beneficiaries import classify_grant
+from .fetch_data import print_mongo_bulk_result
 
 # convert charity commission classification categories to beehive ones
 cc_to_beehive = {
@@ -41,19 +42,11 @@ def clean_charity_number(regno):
     return regno
 
 
-def main():
+def update_charity(charitybase_db={"port": 27017, "host": "localhost", "db": "charity-base"}):
 
-    parser = argparse.ArgumentParser(description='Update Charity data for grants in database')
-    parser.add_argument('--mongo-port', '-p', type=int, default=27017, help='Port for mongo db instance')
-    parser.add_argument('--mongo-host', '-mh', default='localhost', help='Host for mongo db instance')
-    parser.add_argument('--mongo-db', '-db', default='360giving', help='Database to import data to')
-    parser.add_argument('--charitybase-db', '-cdb', default='charity-base', help='Charity Base database')
-    args = parser.parse_args()
-
-    client = MongoClient(args.mongo_host, args.mongo_port)
-    db = client[args.mongo_db]
-    cdb = client[args.charitybase_db]
-    print("Connected to '%s' mongo database [host: %s, port: %s]" % (args.mongo_db, args.mongo_host, args.mongo_port))
+    db = get_db()
+    client = MongoClient(charitybase_db["host"], charitybase_db["port"])
+    cdb = client[charitybase_db["db"]]
     print("Connected to '%s' charitybase database [host: %s, port: %s]" % (args.charitybase_db, args.mongo_host, args.mongo_port))
 
     bulk = db.grants.initialize_unordered_bulk_op()
@@ -175,6 +168,3 @@ def main():
         bulk.find({'_id': grant["_id"]}).replace_one(grant)
 
     print_mongo_bulk_result(bulk.execute(), "grants")
-
-if __name__ == '__main__':
-    main()

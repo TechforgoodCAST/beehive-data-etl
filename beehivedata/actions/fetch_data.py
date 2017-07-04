@@ -1,19 +1,17 @@
 from __future__ import print_function
-import argparse
 import json
 import os
 import urllib.request
-from pprint import pprint
 import dateutil.parser
 import datetime
 import tempfile
 import shutil
 
-from pymongo import MongoClient
 from slugify import slugify
 import flattentool
 
-from beehive_schema.swap_funds import SWAP_FUNDS
+from ..db import get_db
+from ..assets.swap_funds import SWAP_FUNDS
 
 
 def fetch_url(url, new_file):
@@ -227,28 +225,14 @@ def print_mongo_bulk_result(result, name="records"):
         print("{:,.0f} {} {}".format(result["n" + i], name, i.lower()))
 
 
-def main():
+def fetch_data(registry="http://data.threesixtygiving.org/data.json",
+               files_since=None, funders=None):
+    db = get_db()
 
-    parser = argparse.ArgumentParser(description='Import grantnav file to mongo db')
-    parser.add_argument('--mongo-port', '-p', type=int, default=27017, help='Port for mongo db instance')
-    parser.add_argument('--mongo-host', '-mh', default='localhost', help='Host for mongo db instance')
-    parser.add_argument('--mongo-db', '-db', default='360giving', help='Database to import data to')
-    parser.add_argument('--registry', default="http://data.threesixtygiving.org/data.json", help="URL to download the data registry from")
-    parser.add_argument('--files-since', default=None, help="Look only for files modified since this date (in format YYYY-MM-DD)")
-    parser.add_argument('--funders', default=None, help="Only update from these funders (comma separated list of funder prefixes)")
-    args = parser.parse_args()
+    if files_since:
+        files_since = dateutil.parser.parse(files_since, ignoretz=True)
+    if funders:
+        funders = funders.split(",")
 
-    client = MongoClient(args.mongo_host, args.mongo_port)
-    db = client[args.mongo_db]
-    print("Connected to '%s' mongo database [host: %s, port: %s]" % (args.mongo_db, args.mongo_host, args.mongo_port))
-
-    if args.files_since:
-        args.files_since = dateutil.parser.parse(args.files_since, ignoretz=True)
-    if args.funders:
-        args.funders = args.funders.split(",")
-
-    fetch_register(db, args.registry)
-    process_register(db, args.files_since, args.funders)
-
-if __name__ == '__main__':
-    main()
+    fetch_register(db, registry)
+    process_register(db, files_since, funders)

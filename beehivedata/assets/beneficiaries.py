@@ -2,103 +2,128 @@
 ben_categories = {
     "public": {
         "label": "The general public",
-        "group": "People"
+        "group": "People",
+        "position": 25
     },
     "crime": {
         "label": "Affected or involved with crime",
-        "group": "People"
+        "group": "People",
+        "position": 24
     },
     "relationship": {
         "label": "With family/relationship challenges",
-        "group": "People"
+        "group": "People",
+        "position": 23
     },
     "disabilities": {
         "label": "With disabilities",
-        "group": "People"
+        "group": "People",
+        "position": 22
     },
     "religious": {
         "label": "With specific religious/spiritual beliefs",
-        "group": "People"
+        "group": "People",
+        "position": 21
     },
     "disasters": {
         "label": "Affected by disasters",
-        "group": "People"
+        "group": "People",
+        "position": 20
     },
     "education": {
         "label": "In education",
-        "group": "People"
+        "group": "People",
+        "position": 19
     },
     "unemployed": {
         "label": "Who are unemployed",
-        "group": "People"
+        "group": "People",
+        "position": 18
     },
     "ethnic": {
         "label": "From a specific ethnic background",
-        "group": "People"
+        "group": "People",
+        "position": 17
     },
     "water": {
         "label": "With water/sanitation access challenges",
-        "group": "People"
+        "group": "People",
+        "position": 16
     },
     "food": {
         "label": "With food access challenges",
-        "group": "People"
+        "group": "People",
+        "position": 15
     },
     "housing": {
         "label": "With housing/shelter challenges",
-        "group": "People"
+        "group": "People",
+        "position": 14
     },
     "animals": {
         "label": "Animals and wildlife",
-        "group": "Other"
+        "group": "Other",
+        "position": 13
     },
     "buildings": {
         "label": "Buildings and places",
-        "group": "Other"
+        "group": "Other",
+        "position": 12
     },
     "mental": {
         "label": "With mental diseases or disorders",
-        "group": "People"
+        "group": "People",
+        "position": 11
     },
     "orientation": {
         "label": "With a specific sexual orientation",
-        "group": "People"
+        "group": "People",
+        "position": 10
     },
     "environment": {
         "label": "Climate and the environment",
-        "group": "Other"
+        "group": "Other",
+        "position": 9
     },
     "physical": {
         "label": "With physical diseases or disorders",
-        "group": "People"
+        "group": "People",
+        "position": 8
     },
     "organisation": {
         "label": "This organisation",
-        "group": "Other"
+        "group": "Other",
+        "position": 7
     },
     "organisations": {
         "label": "Other organisations",
-        "group": "Other"
+        "group": "Other",
+        "position": 6
     },
     "poverty": {
         "label": "Facing income poverty",
-        "group": "People"
+        "group": "People",
+        "position": 5
     },
     "refugees": {
         "label": "Who are refugees and asylum seekers",
-        "group": "People"
+        "group": "People",
+        "position": 4
     },
     "services": {
         "label": "Involved with the armed or rescue services",
-        "group": "People"
+        "group": "People",
+        "position": 3
     },
     "care": {
         "label": "In, leaving, or providing care",
-        "group": "People"
+        "group": "People",
+        "position": 2
     },
     "exploitation": {
         "label": "At risk of sexual exploitation, trafficking, forced labour, or servitude",
-        "group": "People"
+        "group": "People",
+        "position": 1
     }
 }
 
