@@ -33,7 +33,12 @@ def create_app(config=None):
         USERS_COLLECTION='users'
     ))
     app.config.update(config or {})
-    app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+
+    # @TODO: get environment variables for heroku
+    if os.environ.get("MONGODB_URI"):
+        app.config.update(dict(
+            MONGODB_URI=os.environ.get("MONGODB_URI")
+        ))
 
     register_blueprints(app)
     register_cli(app)
