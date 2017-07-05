@@ -41,6 +41,7 @@ def fetch_register(db, data_register="http://data.threesixtygiving.org/data.json
             i["_id"] = i["identifier"]
             i["modified"] = dateutil.parser.parse(i["modified"], ignoretz=True)
             i["issued"] = dateutil.parser.parse(i["issued"], ignoretz=True)
+            i["publisher"]["slug"] = slugify(i["publisher"]["name"])
 
             bulk.find({'_id': i["_id"]}).upsert().replace_one(i)
 
@@ -55,11 +56,20 @@ def process_register(db, created_since=None, only_funders=None):
         conditions["modified"] = {"$gte": created_since}
         print("Looking for files modified since {}".format(created_since))
 
+    # only including particular funders
     if only_funders:
         if isinstance(only_funders, list):
-            conditions["publisher.prefix"] = {"$in": only_funders}
+            conditions["$or"] = [
+                {"publisher.prefix": {"$in": only_funders}},
+                {"publisher.name": {"$in": only_funders}},
+                {"publisher.slug": {"$in": only_funders}},
+            ]
         else:
-            conditions["publisher.prefix"] = only_funders
+            conditions["$or"] = [
+                {"publisher.prefix": only_funders},
+                {"publisher.name": only_funders},
+                {"publisher.slug": only_funders},
+            ]
 
     files = db.files.find(conditions)
     print("Found {} files to import".format(files.count()))
@@ -172,12 +182,25 @@ def process_grant(i):
     # default grant programme is "main fund"
     grantprogramme = i.get("grantProgramme", [{}])[0].get("title", "Main Fund")
     funder = i["fundingOrganization"][0]["name"]
+
     # check whether we're swapping the fund name
     if funder in SWAP_FUNDS:
         if SWAP_FUNDS[funder] == "":
             grantprogramme = "Main Fund"
         elif grantprogramme in SWAP_FUNDS[funder]:
             grantprogramme = SWAP_FUNDS[funder][grantprogramme]
+
+        # swap fund name based on grant amount
+        # based on a particular pattern in the SWAP_FUNDS variable
+        if isinstance(SWAP_FUNDS[funder], dict)  \
+            and SWAP_FUNDS[funder].get("fund_amounts") \
+                and grantprogramme == "Main Fund":
+                    fund_amounts = SWAP_FUNDS[funder].get("fund_amounts")
+                    grantprogramme = fund_amounts["funds"][-1]
+                    for k, v in enumerate(fund_amounts["amounts"]):
+                        if i.get("amountAwarded") < v:
+                            grantprogramme = fund_amounts["funds"][k]
+
     # slugify the funder and grant programme
     funder = slugify(funder)
     i["fundingOrganization"][0]["slug"] = funder
@@ -231,8 +254,6 @@ def fetch_data(registry="http://data.threesixtygiving.org/data.json",
 
     if files_since:
         files_since = dateutil.parser.parse(files_since, ignoretz=True)
-    if funders:
-        funders = funders.split(",")
 
     fetch_register(db, registry)
     process_register(db, files_since, funders)

@@ -66,4 +66,10 @@ SWAP_FUNDS = {
         "Project Sponsorship 2015/16": "Project Sponsorship",
         "Open Grants round 2015/16": "Open Grants",
     },
+    "R S Macdonald Charitable Trust": {
+        "fund_amounts": {
+            "amounts": [10000],
+            "funds": ["Small grants", "Large grants"]
+        }
+    }
 }
