@@ -5,7 +5,7 @@ from pymongo.errors import ConfigurationError
 
 def connect_db():
     """Connects to the specific database."""
-    if current_app.config["MONGODB_URI"]:
+    if current_app.config.get("MONGODB_URI"):
         client = MongoClient(current_app.config["MONGODB_URI"])
         try:
             db = client.get_default_database()

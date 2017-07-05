@@ -3,12 +3,14 @@ from flask import Flask, g
 from flaskext.sass import sass
 import click
 
-from .db import init_db
+from .db import init_db, get_db
+from .login import login_manager, register_user
 
 from .views.insight import insight
 from .views.integrations import integrations
 from .views.api import api
 from .views.home import home
+from .views.user import user
 
 from .actions.fetch_data import fetch_data
 from .actions.update_organisations import update_organisations
@@ -26,7 +28,8 @@ def create_app(config=None):
         MONGODB_PORT=27017,
         MONGODB_HOST='localhost',
         MONGODB_DB='360giving',
-        GA_KEY='UA-30021098-3'
+        GA_KEY='UA-30021098-3',
+        USERS_COLLECTION='users'
     ))
     app.config.update(config or {})
     app.config.from_envvar('FLASKR_SETTINGS', silent=True)
@@ -34,6 +37,7 @@ def create_app(config=None):
     register_blueprints(app)
     register_cli(app)
     # register_teardowns(app)
+    login_manager.init_app(app)
 
     sass(app, input_dir='assets/scss', output_dir='css')
 
@@ -45,6 +49,7 @@ def register_blueprints(app):
     app.register_blueprint(integrations, url_prefix='/v1/integrations')
     app.register_blueprint(api, url_prefix='/v1')
     app.register_blueprint(home)
+    app.register_blueprint(user)
     return None
 
 
@@ -90,6 +95,12 @@ def register_cli(app):
         update_organisations()
         update_charity({"host": host, "port": port, "db": db})
         update_beneficiaries()
+
+    @app.cli.command("register_user")
+    @click.argument('email')
+    @click.argument('password')
+    def register_user_command(email, password):
+        register_user(email, password)
 
 
 # def register_teardowns(app):
