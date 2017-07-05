@@ -131,7 +131,6 @@ def fund_summary_query(fund_slug, one_year_before):
             "$match": {
                 "fund_slug": fund_slug,
                 "awardDate": {"$gt": one_year_before}
-                # @TODO: also restrict to latest grants
             }
         }, {
             "$facet": {
