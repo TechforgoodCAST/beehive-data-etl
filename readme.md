@@ -5,21 +5,19 @@ Initial setup
 -------------
 
 - Setup MongoDB and get it running
-- Setup CharityBase and get it running
-- See "Fetch 360 Giving data" below
-- Run the server
+- Setup CharityBase and import the data into the database
+- setup virtual environment, and activate it
+- install any needed requirements `pip install -r requirements.txt`
+- install the application package through `pip install -e .`
+- Add an environment variable `FLASK_APP` pointing to `beehivedata.beehivedata`
+- Initialise the database by running `flask init_db`
+- Fetch any data using `flask fetch_all`
+- Run the server with `flask run`
 
-Run server
-----------
+Run development server
+----------------------
 
-First set the environment variable `FLASK_APP` to `server/server.py`.
-
-```
-set FLASK_APP=server/server.py # windows
-export FLASK_APP=server/server.py # unix
-```
-
-Then run `flask run` from the command line.
+Run `flask run` from the command line.
 
 For development/debug mode set `FLASK_DEBUG` environmental variable to `1`.
 
@@ -50,12 +48,8 @@ If you don't do this then the next step will take too long.
 Fetch 360 Giving data
 ---------------------
 
-NB you may want to set an index on charityNumber first using:
-
-```
-mongo 360giving --eval "db.grants.createIndex({'recipientOrganization.id': 1})"
-mongo 360giving --eval "db.grants.createIndex({'recipientOrganization.charityNumber': 1})"
-```
+This step can either be run in one go using `flask fetch_all`, or in the individual
+steps shown below.
 
 ### 1. Download published data and import into Mongo
 
@@ -67,28 +61,25 @@ the database.
 Run the command using:
 
 ```bash
-$ python fetch_data.py
+$ flask fetch_data
 ```
 
 The command can also be run to just fetch the files that have been updated since
 a given date:
 
 ```bash
-$ python fetch_data.py --files-since 2017-01-01
+$ flask fetch_data --files-since 2017-01-01
 ```
 
 You can also set it to just download the data for a particular funder, using a
-comma-separated list of the funder prefixes. Eg:
+comma-separated list of the funder prefixes, slugs or names. Eg:
 
 ```bash
-$ python fetch_data.py --funders 360G-ocf
+$ flask fetch_data --funders 360G-ocf
 ```
 
 The command line options for this are:
 
-- `--mongo-port`: port for acccessing mongo (default `27017`)
-- `--mongo-host`: host for accessing mongo (default `localhost`)
-- `--mongo-db`: name of the database to insert into (default `360giving`)
 - `--files-since`: fetch only files updated after this date (in `YYYY-MM-DD` format, default all files)
 - `--funders`: only fetch these funders (list of funder prefixes separated by comma, default all funders)
 - `--registry`: where to find the data registry (default `http://data.threesixtygiving.org/data.json`)
@@ -98,14 +89,14 @@ The command line options for this are:
 These two steps update the organisations in the data. They are run using:
 
 ```bash
-$ python update_organisations.py
-$ python update_charity.py
+$ flask update_organisations
+$ flask update_charity
 ```
 
-`update_organisations.py` tries to guess the organisation type of the recipient
+`update_organisations` tries to guess the organisation type of the recipient
 organisation and apply the Beehive codes to it.
 
-`update_charities.py` gets data about the recipient from the `charity-base`.`charities`
+`update_charities` gets data about the recipient from the `charity-base`.`charities`
 MongoDB collection. It then tries to work out the type of organisation, how long
 they have operated for, and get the latest financial information.
 
@@ -114,9 +105,9 @@ outputs the first recipient._
 
 **@todo**: Add in companies data here too.
 
-Note that for both scripts the `--mongo-port`, `--mongo-host` and `--mongo-db`
-flags are available. The `update_charity.py` script also has a `--charitybase-db`
-flag which can be used to set the charitybase database name.
+The `update_charity.py` script has `--host`, `--port`, `--db` which are used
+to connect to the charitybase database (the defaults are the same as the
+charitybase defaults).
 
 ### 3. Update beneficiaries
 
@@ -124,7 +115,7 @@ Using regexes and other techniques, try to identify the beneficiaries of each
 grant, including the age range and gender.
 
 ```bash
-$ python update_beneficiaries.py
+$ flask update_beneficiaries
 ```
 
 **@todo**: Add location classification details.
