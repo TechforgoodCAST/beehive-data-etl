@@ -9,6 +9,7 @@ import shutil
 
 from slugify import slugify
 import flattentool
+from flask import current_app
 
 from ..db import get_db
 from ..assets.swap_funds import SWAP_FUNDS
@@ -243,9 +244,10 @@ def process_grant(i):
     return i
 
 
-def print_mongo_bulk_result(result, name="records"):
-    for i in ["Inserted", "Matched", "Modified", "Removed", "Upserted"]:
-        print("{:,.0f} {} {}".format(result["n" + i], name, i.lower()))
+def print_mongo_bulk_result(result, name="records", messages=[]):
+    messages.extend(["{:,.0f} {} {}".format(result["n" + i], name, i.lower())
+                    for i in ["Inserted", "Matched", "Modified", "Removed", "Upserted"]])
+    current_app.logger.info("\r\n".join(messages))
 
 
 def fetch_data(registry="http://data.threesixtygiving.org/data.json",

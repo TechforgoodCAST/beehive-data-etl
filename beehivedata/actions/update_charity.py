@@ -1,6 +1,7 @@
 from __future__ import print_function
 from pymongo import MongoClient
 import dateutil.relativedelta
+from flask import current_app
 
 from ..db import get_db
 from ..assets.cc_aoo import CC_AOO_CODES
@@ -47,7 +48,13 @@ def update_charity(charitybase_db={"port": 27017, "host": "localhost", "db": "ch
     db = get_db()
     client = MongoClient(charitybase_db["host"], charitybase_db["port"])
     cdb = client[charitybase_db["db"]]
-    print("Connected to '%s' charitybase database [host: %s, port: %s]" % (args.charitybase_db, args.mongo_host, args.mongo_port))
+    current_app.logger.info("Connected to '%s' mongo database [host: %s, port: %s]" % (
+        cdb.name,
+        client.address[0],
+        client.address[1]
+    ))
+
+    missing_charities = 0
 
     bulk = db.grants.initialize_unordered_bulk_op()
 
@@ -63,8 +70,11 @@ def update_charity(charitybase_db={"port": 27017, "host": "localhost", "db": "ch
             r["beehive"].setdefault("beneficiaries", [])
 
             if not charity:
-                print("Charity {} not found".format(r["charityNumber"]))
+                r["charityStatus"] = "not found"
+                missing_charities += 1
                 continue
+
+            r["charityStatus"] = "found"
 
             # work out how long charity was operating for
             r["regDate"] = charity.get("registration", [{}])[0].get("regDate")
@@ -167,4 +177,6 @@ def update_charity(charitybase_db={"port": 27017, "host": "localhost", "db": "ch
 
         bulk.find({'_id': grant["_id"]}).replace_one(grant)
 
-    print_mongo_bulk_result(bulk.execute(), "grants")
+    print_mongo_bulk_result(bulk.execute(), "grants", messages=[
+        "{:,.0f} charities not found".format(missing_charities)
+    ])
