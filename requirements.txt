@@ -10,7 +10,7 @@ Flask-BabelEx==0.9.3
 Flask-Login==0.4.0
 Flask-Mail==0.9.1
 Flask-Principal==0.4.0
-flask-sass==0.1
+-e git+https://github.com/imiric/flask-sass.git#egg=flask-sass
 Flask-WTF==0.14.2
 -e git+https://github.com/OpenDataServices/flatten-tool.git@58c8422977068bb75d614ba28c9972420509e2aa#egg=flattentool
 gunicorn==19.7.1
