@@ -1,6 +1,6 @@
 from flask import current_app, g
 from pymongo import MongoClient, ASCENDING, DESCENDING
-from pymongo.errors import ConfigurationError
+from pymongo.errors import ConfigurationError, CollectionInvalid
 
 
 def connect_db():
@@ -25,9 +25,17 @@ def connect_db():
 def init_db():
     """Initializes the database."""
     db = get_db()
-    # with current_app.open_resource('schema.sql', mode='r') as f:
-    #     db.cursor().executescript(f.read())
-    # db.commit()
+
+    for c in ["grants", "downloads", "files", current_app.config['USERS_COLLECTION']]:
+        try:
+            db.create_collection(c)
+        except CollectionInvalid:
+            pass
+
+    db.grants.create_index("recipientOrganization.charityNumber")
+    db.grants.create_index("recipientOrganization.companyNumber")
+    db.grants.create_index("recipientOrganization.id")
+    db[current_app.config['USERS_COLLECTION']].create_index("email", unique=True)
 
 
 def get_db():
