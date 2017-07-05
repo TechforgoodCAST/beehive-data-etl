@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, jsonify
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
+from flask_login import login_required
 
 from ..db import get_db
 from ..assets.queries.fund_summary import fund_summary_query, process_fund_summary
@@ -11,6 +12,7 @@ integrations = Blueprint('integrations', __name__)
 
 
 @integrations.route('/amounts')
+@login_required
 def amounts():
     db = get_db()
     amounts = db.grants.aggregate(amounts_query())
@@ -18,6 +20,7 @@ def amounts():
 
 
 @integrations.route('/durations')
+@login_required
 def durations():
     db = get_db()
     durations = db.grants.aggregate(durations_query())
@@ -25,6 +28,7 @@ def durations():
 
 
 @integrations.route('/fund_summary/<fund_slug>')
+@login_required
 def fund_summary(fund_slug=None):
     db = get_db()
     latest_date = list(db.grants.aggregate([

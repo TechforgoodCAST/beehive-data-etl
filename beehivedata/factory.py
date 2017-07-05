@@ -2,6 +2,7 @@ import os
 from flask import Flask, g
 from flaskext.sass import sass
 import click
+from pymongo.errors import DuplicateKeyError
 
 from .db import init_db, get_db
 from .login import login_manager, register_user
@@ -102,7 +103,11 @@ def register_cli(app):
     @click.argument('email')
     @click.argument('password')
     def register_user_command(email, password):
-        register_user(email, password)
+        try:
+            register_user(email, password)
+            print("User created.")
+        except DuplicateKeyError:
+            print("User already present in DB.")
 
 
 # def register_teardowns(app):

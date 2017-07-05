@@ -401,7 +401,7 @@ def fund_summary_query(fund_slug, one_year_before):
 
 
 def process_fund_summary(results):
-    print(results["operating_for_distribution"])
+
     # process distributions
     distributions = [
         "amount_awarded_distribution",
