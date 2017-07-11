@@ -34,6 +34,7 @@ class BeehivedataTestCase(unittest.TestCase):
         self.setup_test_data()
 
     def setup_test_user(self):
+        self.db.users.drop()
         register_user("test@example.com", "test", "Test User")
         app.config['WTF_CSRF_ENABLED'] = False
 
