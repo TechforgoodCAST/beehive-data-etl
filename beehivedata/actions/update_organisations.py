@@ -44,4 +44,4 @@ def update_organisations():
 
         bulk.find({'_id': grant["_id"]}).replace_one(grant)
 
-    print_mongo_bulk_result(bulk.execute(), "grants")
+    print_mongo_bulk_result(bulk.execute(), "grants", [])
