@@ -25,6 +25,11 @@ def connect_db():
 def init_db():
     """Initializes the database."""
     db = get_db()
+    current_app.logger.info("Initialising '%s' mongo database [host: %s, port: %s]" % (
+        db.name,
+        db.client.address[0],
+        db.client.address[1]
+    ))
 
     for c in ["grants", "downloads", "files", current_app.config['USERS_COLLECTION']]:
         try:
@@ -45,3 +50,14 @@ def get_db():
     if not hasattr(g, 'db'):
         g.db = connect_db()
     return g.db
+
+
+def close_db(error):
+    """Closes the database again at the end of the request."""
+    if hasattr(g, 'db'):
+        g.db.client.close()
+        current_app.logger.info("Disconnected from '%s' mongo database [host: %s, port: %s]" % (
+            g.db.name,
+            g.db.client.address[0],
+            g.db.client.address[1]
+        ))

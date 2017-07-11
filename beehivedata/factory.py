@@ -4,7 +4,7 @@ from flaskext.sass import sass
 import click
 from pymongo.errors import DuplicateKeyError
 
-from .db import init_db, get_db
+from .db import init_db, close_db
 from .login import login_manager, register_user
 
 from .views.insight import insight
@@ -122,13 +122,7 @@ def register_cli(app):
 
 
 def register_teardowns(app):
-    @app.teardown_appcontext
-    def close_db(error):
-        """Closes the database again at the end of the request."""
-        if hasattr(g, 'db'):
-            g.db.client.close()
-            current_app.logger.info("Disconnected from '%s' mongo database [host: %s, port: %s]" % (
-                g.db.name,
-                g.db.client.address[0],
-                g.db.client.address[1]
-            ))
+
+    # @app.teardown_appcontext
+    def close_db_teardown(error):
+        close_db()
