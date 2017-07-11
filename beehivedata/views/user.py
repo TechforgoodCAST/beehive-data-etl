@@ -23,17 +23,17 @@ def login():
     return render_template('login.html', title='login', form=form)
 
 
-@user.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegisterForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        db = get_db()
-        try:
-            register_user(form.email.data, form.password.data, form.name.data)
-            flash("User created", category='success')
-        except DuplicateKeyError:
-            flash("User already exists with that email address", category='error')
-    return render_template('register.html', title='register', form=form)
+# @user.route('/register', methods=['GET', 'POST'])
+# def register():
+#     form = RegisterForm()
+#     if request.method == 'POST' and form.validate_on_submit():
+#         db = get_db()
+#         try:
+#             register_user(form.email.data, form.password.data, form.name.data)
+#             flash("User created", category='success')
+#         except DuplicateKeyError:
+#             flash("User already exists with that email address", category='error')
+#     return render_template('register.html', title='register', form=form)
 
 
 @user.route('/logout')
