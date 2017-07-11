@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, jsonify
+from pymongo import ASCENDING, DESCENDING
 
 from ..db import get_db
 from ..assets.queries.funders import funders_query
