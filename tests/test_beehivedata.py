@@ -5,7 +5,6 @@ import tempfile
 from flask import g, current_app, appcontext_pushed
 from flask_login import login_user
 from contextlib import contextmanager
-import mongomock
 
 from beehivedata.beehivedata import app
 from beehivedata.login import register_user, User
@@ -22,19 +21,16 @@ class BeehivedataTestCase(unittest.TestCase):
         self.app_context = app.app_context()
         self.app_context.push()
         self.setup_database()
+
+    def setup_database(self):
+        for i in ["MONGODB_URI", "MONGODB_PORT", "MONGODB_HOST"]:
+            if current_app.config.get(i.replace("MONGODB_", "MONGODB_TEST_")):
+                current_app.config[i] = current_app.config.get(i.replace("MONGODB_", "MONGODB_TEST_"))
+
+        current_app.config["MONGODB_DB"] = current_app.config.get("MONGODB_TEST_DB")
         beehivedata.db.init_db()
         self.setup_test_user()
         self.setup_test_data()
-
-    def setup_database(self):
-        client = mongomock.MongoClient()
-        self.db = client['360giving_test']
-        setattr(g, 'db', self.db)
-        current_app.logger.info("Connected to '%s' mongomock database [host: %s, port: %s]" % (
-            self.db.name,
-            self.db.client.address[0],
-            self.db.client.address[1]
-        ))
 
     def setup_test_user(self):
         register_user("test@example.com", "test", "Test User")
@@ -63,12 +59,13 @@ class BeehivedataTestCase(unittest.TestCase):
 
     def tearDown(self):
         db = beehivedata.db.get_db()
-        current_app.logger.info("Disconnecting from '%s' mongomock database [host: %s, port: %s]" % (
+        current_app.logger.info("Deleting data from '%s' mongo database [host: %s, port: %s]" % (
             db.name,
             db.client.address[0],
             db.client.address[1]
         ))
-        db.client.close()
+        db.users.drop()
+        # db.client.drop_database(db.name)
         self.app_context.pop()
         self.tempdir.cleanup()
 

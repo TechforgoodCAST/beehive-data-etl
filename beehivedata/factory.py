@@ -30,6 +30,7 @@ def create_app(config=None):
         MONGODB_PORT=27017,
         MONGODB_HOST='localhost',
         MONGODB_DB='360giving',
+        MONGODB_TEST_DB='360giving_test',
         GA_KEY='UA-30021098-3',
         USERS_COLLECTION='users'
     ))
