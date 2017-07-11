@@ -29,6 +29,7 @@ class BeehivedataTestCase(unittest.TestCase):
 
         current_app.config["MONGODB_DB"] = current_app.config.get("MONGODB_TEST_DB")
         beehivedata.db.init_db()
+        self.db = beehivedata.db.get_db()
         self.setup_test_user()
         self.setup_test_data()
 
@@ -37,14 +38,12 @@ class BeehivedataTestCase(unittest.TestCase):
         app.config['WTF_CSRF_ENABLED'] = False
 
     def setup_test_data(self):
-        db = beehivedata.db.get_db()
-
         fetch_register(os.path.join(os.path.dirname(__file__), "seed_data/dcat.json"), self.tempdir.name)
 
         # change file urls to the test data
-        for i in db["files"].find():
+        for i in self.db["files"].find():
             i["distribution"][0]["downloadURL"] = os.path.join(os.path.dirname(__file__), i["distribution"][0]["downloadURL"])
-            db["files"].replace_one({"_id": i["_id"]}, i)
+            self.db["files"].replace_one({"_id": i["_id"]}, i)
 
         process_register(save_dir=self.tempdir.name)
 
@@ -58,14 +57,13 @@ class BeehivedataTestCase(unittest.TestCase):
         return self.app.get('/logout', follow_redirects=True)
 
     def tearDown(self):
-        db = beehivedata.db.get_db()
         current_app.logger.info("Deleting data from '%s' mongo database [host: %s, port: %s]" % (
-            db.name,
-            db.client.address[0],
-            db.client.address[1]
+            self.db.name,
+            self.db.client.address[0],
+            self.db.client.address[1]
         ))
-        db.users.drop()
-        # db.client.drop_database(db.name)
+        self.db.users.drop()
+        self.db.client.drop_database(self.db.name)
         self.app_context.pop()
         self.tempdir.cleanup()
 
