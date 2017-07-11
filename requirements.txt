@@ -1,4 +1,4 @@
--e git+https://github.com/TechforgoodCAST/beehive-data-etl.git@6a0ae320fe4fe548f45b464815b4017c8755f935#egg=beehivedata
+-e git+https://github.com/TechforgoodCAST/beehive-data-etl.git@b384cd11afe0f8dcbf03f7431e5a5fe682451296#egg=beehivedata
 certifi==2017.4.17
 chardet==3.0.4
 click==6.7
@@ -9,6 +9,7 @@ Flask-Login==0.4.0
 -e git+https://github.com/imiric/flask-sass.git@12323e631749cae5da105c7096e7db5a033dddaf#egg=flask_sass
 Flask-WTF==0.14.2
 -e git+https://github.com/OpenDataServices/flatten-tool.git@58c8422977068bb75d614ba28c9972420509e2aa#egg=flattentool
+gunicorn==19.7.1
 idna==2.5
 itsdangerous==0.24
 jdcal==1.3
