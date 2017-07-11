@@ -1,12 +1,10 @@
-grantnav*.json
-grants.json
-grantnav*.csv
-proposals*.csv
+# data files
 missing.txt
 tags.txt
 *.json
 *.csv
 data/
+!tests/data/*.json
 
 archive/
 
