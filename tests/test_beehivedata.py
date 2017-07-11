@@ -1,18 +1,22 @@
 import os
-from beehivedata.beehivedata import app
-from beehivedata.login import register_user, User
-import beehivedata.db
 import unittest
 import tempfile
+
 from flask import g, current_app, appcontext_pushed
 from flask_login import login_user
 from contextlib import contextmanager
 import mongomock
 
+from beehivedata.beehivedata import app
+from beehivedata.login import register_user, User
+import beehivedata.db
+from beehivedata.actions.fetch_data import *
+
 
 class BeehivedataTestCase(unittest.TestCase):
 
     def setUp(self):
+        self.tempdir = tempfile.TemporaryDirectory()
         app.testing = True
         self.app = app.test_client()
         self.app_context = app.app_context()
@@ -37,7 +41,16 @@ class BeehivedataTestCase(unittest.TestCase):
         app.config['WTF_CSRF_ENABLED'] = False
 
     def setup_test_data(self):
-        pass
+        db = beehivedata.db.get_db()
+
+        fetch_register(os.path.join(os.path.dirname(__file__), "seed_data/dcat.json"), self.tempdir.name)
+
+        # change file urls to the test data
+        for i in db["files"].find():
+            i["distribution"][0]["downloadURL"] = os.path.join(os.path.dirname(__file__), i["distribution"][0]["downloadURL"])
+            db["files"].replace_one({"_id": i["_id"]}, i)
+
+        process_register(save_dir=self.tempdir.name)
 
     def login(self, username, password):
         return self.app.post('/login', data=dict(
@@ -57,6 +70,7 @@ class BeehivedataTestCase(unittest.TestCase):
         ))
         db.client.close()
         self.app_context.pop()
+        self.tempdir.cleanup()
 
 
 if __name__ == '__main__':
