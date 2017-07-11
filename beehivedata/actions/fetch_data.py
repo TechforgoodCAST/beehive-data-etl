@@ -15,27 +15,43 @@ from ..db import get_db
 from ..assets.swap_funds import SWAP_FUNDS
 
 
-def fetch_url(url, new_file):
+def fetch_url(url, new_file=None):
+    # check if it's a file first
+    if os.path.isfile(url):
+        if new_file is None or new_file == url:
+            return
+
+        # rename the file if needed
+        with open(url, "rb") as f:
+            with open(new_file, "wb") as new_f:
+                new_f.write(f.read())
+        return
+
+    # otherwise download and save
     request = urllib.request.Request(url, headers={
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0"
     })
+    print("Downloading from: %s" % url)
     with urllib.request.urlopen(request) as f:
         with open(new_file, "wb") as new_f:
             new_f.write(f.read())
+            print("Saved as: %s" % new_file)
 
 
-def fetch_register(db, data_register="http://data.threesixtygiving.org/data.json"):
+def fetch_register(filename="http://data.threesixtygiving.org/data.json", save_dir="data"):
     """
     Fetch list of files from the JSON feed of the data register and store them
     in a mongo-db instance
     """
-    temp_file = 'data/dcat.json'
-    print("Downloading from: %s" % data_register)
-    fetch_url(data_register, temp_file)
-    print("Saved as: %s" % temp_file)
+    db = get_db()
+    if os.path.isfile(filename):
+        usefile = filename
+    else:
+        usefile = os.path.join(save_dir, 'dcat.json')
+    fetch_url(filename, usefile)
 
     # open the file and save each record to DB
-    with open(temp_file, encoding='utf8') as g:
+    with open(usefile, encoding='utf8') as g:
         dcat = json.load(g)
         bulk = db.files.initialize_unordered_bulk_op()
         for k, i in enumerate(dcat):
@@ -49,7 +65,8 @@ def fetch_register(db, data_register="http://data.threesixtygiving.org/data.json
         print_mongo_bulk_result(bulk.execute(), "files")
 
 
-def process_register(db, created_since=None, only_funders=None):
+def process_register(created_since=None, only_funders=None, save_dir="data"):
+    db = get_db()
     conditions = {}
 
     # only modified since a certain time
@@ -82,8 +99,8 @@ def process_register(db, created_since=None, only_funders=None):
         for k, d in enumerate(f.get("distribution", [])):
             filename = d.get("downloadURL")
             filetype = filename.split('.')[-1].lower()
-            usefile = 'data/{}-{}.{}'.format(f.get("identifier"), k, filetype)
-            usefile_json = 'data/{}-{}.{}'.format(f.get("identifier"), k, "json")
+            usefile = os.path.join(save_dir, '{}-{}.{}'.format(f.get("identifier"), k, filetype))
+            usefile_json = os.path.join(save_dir, '{}-{}.{}'.format(f.get("identifier"), k, "json"))
             print("Downloading from: %s" % filename)
             try:
                 fetch_url(filename, usefile)
@@ -109,7 +126,7 @@ def process_register(db, created_since=None, only_funders=None):
                 "downloadedOn": datetime.datetime.now()
             }, upsert=True)
 
-            import_file(db, usefile_json, source=d.get("accessURL"), license=f.get("license"))
+            import_file(usefile_json, source=d.get("accessURL"), license=f.get("license"))
 
 
 # from: https://github.com/ThreeSixtyGiving/datagetter/blob/master/get.py#L53
@@ -144,7 +161,9 @@ def convert_spreadsheet(input_path, converted_path, file_type):
     )
 
 
-def import_file(db, filename, inner="grants", source=None, license=None):
+def import_file(filename, inner="grants", source=None, license=None):
+    db = get_db()
+
     if os.path.isfile(filename):
         usefile = filename
         print("Using existing file: %s" % usefile)
@@ -232,14 +251,20 @@ def process_grant(i):
         for r in i["recipientOrganization"]:
             if not r.get("charityNumber") or r["charityNumber"] == "":
                 if r.get("id", "").startswith("GB-CHC-"):
-                    r["charityNumber"] = r["id"].replace("GB-CHC-", "")
+                    r["charityNumber"] = r["id"]
 
             if not r.get("companyNumber") or r["companyNumber"] == "":
                 if r.get("id", "").startswith("GB-COH-"):
-                    r["companyNumber"] = r["id"].replace("GB-COH-", "")
+                    r["companyNumber"] = r["id"]
 
             if r.get("charityNumber") and r.get("charityNumber", "").strip().lower() in ["n/a", "-", "no", ""]:
                 r["charityNumber"] = None
+
+            if r.get("charityNumber"):
+                r["charityNumber"] = r["charityNumber"].replace("GB-CHC-", "")
+
+            if r.get("companyNumber"):
+                r["companyNumber"] = r["companyNumber"].replace("GB-COH-", "")
 
     return i
 
@@ -252,10 +277,9 @@ def print_mongo_bulk_result(result, name="records", messages=[]):
 
 def fetch_data(registry="http://data.threesixtygiving.org/data.json",
                files_since=None, funders=None):
-    db = get_db()
 
     if files_since:
         files_since = dateutil.parser.parse(files_since, ignoretz=True)
 
-    fetch_register(db, registry)
-    process_register(db, files_since, funders)
+    fetch_register(registry)
+    process_register(files_since, funders)

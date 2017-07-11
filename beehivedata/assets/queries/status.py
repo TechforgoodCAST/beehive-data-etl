@@ -59,11 +59,11 @@ def status_query():
 
     return [
         {
-        #     "$match": {
-        #         "awardDate": {"$gt": one_year_before}
-        #         # @TODO: also restrict to latest grants
-        #     }
-        # }, {
+            #     "$match": {
+            #         "awardDate": {"$gt": one_year_before}
+            #         # @TODO: also restrict to latest grants
+            #     }
+            # }, {
             "$group": group
         }, {
             "$project": project
