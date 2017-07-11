@@ -1,0 +1,1045 @@
+{
+    "grants": [
+        {
+            "id": "360G-JRCT-9682",
+            "Reference": 9682,
+            "title": "Grant to Action on Armed Violence",
+            "description": "Investigating the UK's trade in arms with repressive regimes (2010-present)",
+            "currency": "GBP",
+            "amountAwarded": 42994,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "12"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1122057",
+                    "name": "Action on Armed Violence",
+                    "charityNumber": "1122057",
+                    "url": "http://www.aoav.org.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Peace and Security"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9678",
+            "Reference": 9678,
+            "title": "Grant to All-Party Parliamentary Group on Anti-Corruption",
+            "description": "Scrutinising, interrogating and strengthening anti-corruption measures",
+            "currency": "GBP",
+            "amountAwarded": 30000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "36"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "360G-JRCT-ORG:All-Party-Parliamentary-Group-on-Anti-Corruption",
+                    "name": "All-Party Parliamentary Group on Anti-Corruption",
+                    "url": "http://www.anticorruptionappg.org"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Power and Accountability"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9672",
+            "Reference": 9672,
+            "title": "Grant to British Institute of Human Rights",
+            "description": "Core costs",
+            "currency": "GBP",
+            "amountAwarded": 105000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "36"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1101575",
+                    "name": "British Institute of Human Rights",
+                    "charityNumber": "1101575",
+                    "url": "http://www.bihr.org.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Rights and Justice"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9722",
+            "Reference": 9722,
+            "title": "Grant to Campaign for Freedom of Information",
+            "description": "Promoting the effective operation of the Freedom of Information Act",
+            "currency": "GBP",
+            "amountAwarded": 105000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "36"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "360G-JRCT-ORG:Campaign-for-Freedom-of-Information",
+                    "name": "Campaign for Freedom of Information",
+                    "url": "http://www.cfoi.org.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Power and Accountability"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9652",
+            "Reference": 9652,
+            "title": "Grant to CEMVO Scotland",
+            "description": "Ethnic Minority Environmental Network",
+            "currency": "GBP",
+            "amountAwarded": 60000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "24"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-SC-SC034104",
+                    "name": "CEMVO Scotland",
+                    "charityNumber": "SC034104",
+                    "url": "http://www.cemvoscotland.org.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Sustainable Future"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9686",
+            "Reference": 9686,
+            "title": "Grant to Centre for International Studies and Diplomacy, SOAS, University of London",
+            "description": "The Strategic Concept for the Removal of Arms and_x000D_\nProliferation (SCRAP)",
+            "currency": "GBP",
+            "amountAwarded": 66000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "24"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "360G-JRCT-ORG:Centre-for-International-Studies-and-Diplomacy-SOAS-University-of-London",
+                    "name": "Centre for International Studies and Diplomacy, SOAS, University of London",
+                    "url": "http://www.soas.ac.uk/cisd/"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Peace and Security"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9726",
+            "Reference": 9726,
+            "title": "Grant to Commonweal Trust",
+            "description": "Social media and website project",
+            "currency": "GBP",
+            "amountAwarded": 9028,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "12"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1053157",
+                    "name": "Commonweal Trust",
+                    "charityNumber": "1053157",
+                    "url": "http://www.bradford.ac.uk/library/sites-and-collections/commonweal-collection"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Peace and Security"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9712",
+            "Reference": 9712,
+            "title": "Grant to Corruption Watch",
+            "description": "Corporate involvement in grand corruption",
+            "currency": "GBP",
+            "amountAwarded": 60000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "24"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "360G-JRCT-ORG:Corruption-Watch",
+                    "name": "Corruption Watch",
+                    "url": "http://www.cw-uk.org"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Power and Accountability"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9734",
+            "Reference": 9734,
+            "title": "Grant to Detention Action",
+            "description": "Alternatives to detention advocacy",
+            "currency": "GBP",
+            "amountAwarded": 112500,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "36"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1065066",
+                    "name": "Detention Action",
+                    "charityNumber": "1065066",
+                    "url": "http://detentionaction.org.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Rights and Justice"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9624",
+            "Reference": 9624,
+            "title": "Grant to Escapade",
+            "description": "The Carbon Mark",
+            "currency": "GBP",
+            "amountAwarded": 18000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "8"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "360G-JRCT-ORG:Escapade",
+                    "name": "Escapade"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Sustainable Future"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9738",
+            "Reference": 9738,
+            "title": "Grant to European Council on Refugees and Exiles (ECRE)",
+            "description": "Core costs",
+            "currency": "EUR",
+            "amountAwarded": 150000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "36"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "BE-BCE_KBO-0809651278",
+                    "name": "European Council on Refugees and Exiles (ECRE)",
+                    "charityNumber": "0809651278",
+                    "url": "http://www.ecre.org"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Rights and Justice"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9730",
+            "Reference": 9730,
+            "title": "Grant to Inclusive Mosque Initiative",
+            "description": "Inclusive Seminar Series",
+            "currency": "GBP",
+            "amountAwarded": 54340,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "24"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1161730",
+                    "name": "Inclusive Mosque Initiative",
+                    "charityNumber": "1161730",
+                    "url": "http://inclusivemosqueinitiative.org/"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Rights and Justice"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9660",
+            "Reference": 9660,
+            "title": "Grant to Inquest Charitable Trust",
+            "description": "Core costs",
+            "currency": "GBP",
+            "amountAwarded": 100000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "24"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1046650",
+                    "name": "Inquest Charitable Trust",
+                    "charityNumber": "1046650",
+                    "url": "http://inquest.org.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Cross-cutting"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9677",
+            "Reference": 9677,
+            "title": "Grant to Leeds GATE",
+            "description": "Negotiated Stopping",
+            "currency": "GBP",
+            "amountAwarded": 50000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "24"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1123374",
+                    "name": "Leeds GATE",
+                    "charityNumber": "1123374",
+                    "url": "http://leedsgate.co.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Rights and Justice"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9720",
+            "Reference": 9720,
+            "title": "Grant to London Gypsy and Traveller Unit",
+            "description": "Gypsies and Travellers in London - mapping the pathway to equality",
+            "currency": "GBP",
+            "amountAwarded": 50000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "24"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1072111",
+                    "name": "London Gypsy and Traveller Unit",
+                    "charityNumber": "1072111",
+                    "url": "http://www.lgtu.org.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Rights and Justice"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9733",
+            "Reference": 9733,
+            "title": "Grant to Migrant Voice",
+            "description": "Core costs",
+            "currency": "GBP",
+            "amountAwarded": 60000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "24"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1142963",
+                    "name": "Migrant Voice",
+                    "charityNumber": "1142963",
+                    "url": "http://migrantvoice.org"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Rights and Justice"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9705",
+            "Reference": 9705,
+            "title": "Grant to New Economics Foundation",
+            "description": "Power and accountability in the digital economy",
+            "currency": "GBP",
+            "amountAwarded": 59950,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "18"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1055254",
+                    "name": "New Economics Foundation",
+                    "charityNumber": "1055254",
+                    "url": "http://www.neweconomics.org"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Power and Accountability"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9683",
+            "Reference": 9683,
+            "title": "Grant to Peace Education Scotland",
+            "description": "Peace Education Programme - Scotland",
+            "currency": "GBP",
+            "amountAwarded": 48700,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "18"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-SC-SC046853",
+                    "name": "Peace Education Scotland",
+                    "charityNumber": "SC046853",
+                    "url": "http://peaceeducationscotland.org"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Peace and Security"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9702",
+            "Reference": 9702,
+            "title": "Grant to Project 17",
+            "description": "Policy work",
+            "currency": "GBP",
+            "amountAwarded": 58794,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "24"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1152621",
+                    "name": "Project 17",
+                    "charityNumber": "1152621",
+                    "url": "http://www.project17.org.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Rights and Justice"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9680",
+            "Reference": 9680,
+            "title": "Grant to QUNO Geneva",
+            "description": "Recognition and application of the right to conscientious objection to military service",
+            "currency": "CHF",
+            "amountAwarded": 175290,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "36"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "CH-FDJP-103-165-678",
+                    "name": "QUNO Geneva",
+                    "charityNumber": "IDE: CHE-103-165-678",
+                    "url": "http://www.quno.org"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Peace and Security"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9703",
+            "Reference": 9703,
+            "title": "Grant to Research for Action",
+            "description": "A citizen audit of local government debt",
+            "currency": "GBP",
+            "amountAwarded": 33000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "12"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "360G-JRCT-ORG:Research-for-Action",
+                    "name": "Research for Action"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Power and Accountability"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9664",
+            "Reference": 9664,
+            "title": "Grant to Seeds for Change",
+            "description": "Building effective and resilient movements for environmental and social justice",
+            "currency": "GBP",
+            "amountAwarded": 135000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "36"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "360G-JRCT-ORG:Seeds-for-Change",
+                    "name": "Seeds for Change",
+                    "url": "http://www.seedsforchange.org.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Cross-cutting"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9657",
+            "Reference": 9657,
+            "title": "Grant to St Columb's Park Reconciliation Trust",
+            "description": "Compassionate Campaigning",
+            "currency": "GBP",
+            "amountAwarded": 120000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "36"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-NIC-103557",
+                    "name": "St Columb's Park Reconciliation Trust",
+                    "charityNumber": "NIC103557",
+                    "url": "http://www.stcolumbsparkhouse.org"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Northern Ireland"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9627",
+            "Reference": 9627,
+            "title": "Grant to Teach na Failte",
+            "description": "Transitional Initiative",
+            "currency": "GBP",
+            "amountAwarded": 125000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "24"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-REV-XR19159",
+                    "name": "Teach na Failte",
+                    "charityNumber": "XR 19159",
+                    "url": "http://teachnafailte.com/"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Northern Ireland"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9616",
+            "Reference": 9616,
+            "title": "Grant to The Climate Coalition",
+            "description": "Campaign and week of action",
+            "currency": "GBP",
+            "amountAwarded": 75000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "36"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1109973",
+                    "name": "The Climate Coalition",
+                    "charityNumber": "1109973",
+                    "url": "http://www.theclimatecoalition.org"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Sustainable Future"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9635",
+            "Reference": 9635,
+            "title": "Grant to The Kindling Trust",
+            "description": "Developing supply chain co-operation",
+            "currency": "GBP",
+            "amountAwarded": 75000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "36"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "360G-JRCT-ORG:The-Kindling-Trust",
+                    "name": "The Kindling Trust",
+                    "url": "http://www.kindling.org.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Sustainable Future"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9704",
+            "Reference": 9704,
+            "title": "Grant to Tripod: Training for Creative Social Action",
+            "description": "Organising for Power",
+            "currency": "GBP",
+            "amountAwarded": 73249,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "36"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "360G-JRCT-ORG:Tripod:-Training-for-Creative-Social-Action",
+                    "name": "Tripod: Training for Creative Social Action",
+                    "url": "http://tripodtraining.org"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Rights and Justice"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9681",
+            "Reference": 9681,
+            "title": "Grant to University of Birmingham",
+            "description": "Counter-Terrorism Review",
+            "currency": "GBP",
+            "amountAwarded": 81321,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "18"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "360G-JRCT-ORG:University-of-Birmingham",
+                    "name": "University of Birmingham",
+                    "url": "http://www.birmingham.ac.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Peace and Security"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9717",
+            "Reference": 9717,
+            "title": "Grant to Women Against Rape",
+            "description": "End Destitution Campaign",
+            "currency": "GBP",
+            "amountAwarded": 90000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "36"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "360G-JRCT-ORG:Women-Against-Rape",
+                    "name": "Women Against Rape",
+                    "url": "http://womenagainstrape.net"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Rights and Justice"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9629",
+            "Reference": 9629,
+            "title": "Grant to Women's Aid Federation Northern Ireland",
+            "description": "Core costs",
+            "currency": "GBP",
+            "amountAwarded": 110000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "24"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-REV-XN45049",
+                    "name": "Women's Aid Federation Northern Ireland",
+                    "charityNumber": "XN45049",
+                    "url": "http://www.womensaidni.org"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Northern Ireland"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        },
+        {
+            "id": "360G-JRCT-9654",
+            "Reference": 9654,
+            "title": "Grant to Women's Environmental Network",
+            "description": "New Voices - bringing women's voices into mainstream environmental issues",
+            "currency": "GBP",
+            "amountAwarded": 60000,
+            "awardDate": "2017-03-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "duration": "24"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1010397",
+                    "name": "Women's Environmental Network",
+                    "charityNumber": "1010397",
+                    "url": "http://www.wen.org.uk"
+                }
+            ],
+            "grantProgramme": [
+                {
+                    "title": "Sustainable Future"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-210037",
+                    "name": "Joseph Rowntree Charitable Trust"
+                }
+            ],
+            "dateModified": "2017-06-15T00:00:00+00:00"
+        }
+    ]
+}
