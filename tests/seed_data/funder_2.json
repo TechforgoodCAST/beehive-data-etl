@@ -62,9 +62,9 @@
             ],
             "recipientOrganization": [
                 {
-                    "id": "GB-CHC-1109815",
+                    "id": "GB-COH-1109815",
                     "name": "Regional Refugee Forum North East",
-                    "charityNumber": "1109815",
+                    "companyNumber": "1109815",
                     "streetAddress": "Design Works, William Street, Felling",
                     "addressLocality": "Gateshead",
                     "addressRegion": "Tyne and Wear",
