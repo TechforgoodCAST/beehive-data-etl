@@ -16,7 +16,7 @@ jdcal==1.3
 Jinja2==2.9.6
 jsonref==0.1
 MarkupSafe==1.0
-numpy==1.12.1+mkl
+numpy==1.12.1
 openpyxl==2.3.5
 pandas==0.20.3
 py==1.4.34
