@@ -5,6 +5,7 @@ tags.txt
 *.csv
 data/
 archive/
+!beehivedata/assets/countries.csv
 
 # testing data
 tests/data/

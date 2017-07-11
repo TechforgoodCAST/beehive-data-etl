@@ -1,5 +1,5 @@
 from flask import current_app, g
-from pymongo import MongoClient, ASCENDING, DESCENDING
+from pymongo import MongoClient
 from pymongo.errors import ConfigurationError, CollectionInvalid
 
 

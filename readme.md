@@ -14,6 +14,25 @@ Initial setup
 - Fetch any data using `flask fetch_all`
 - Run the server with `flask run`
 
+External libraries used
+-----------------------
+
+(Installed through `requirements.txt`)
+
+- flask
+- https://github.com/imiric/flask-sass
+- flask_login
+- flask_wtf
+- numpy+mkl (for windows use numpy-1.12.1+mkl-cp35-cp35m-win32.whl)
+- pymongo
+- pytest
+- python-dateutil
+- requests
+- scipy (for windows use scipy-0.19.0-cp35-cp35m-win32.whl)
+- sklearn
+- slugify
+- https://github.com/OpenDataServices/flatten-tool
+
 Run development server
 ----------------------
 

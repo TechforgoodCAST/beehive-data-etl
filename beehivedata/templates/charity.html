@@ -19,7 +19,7 @@
       {% for g in grants %}
       <tr>
         <td>
-          <a href="{{ url_for('funder', funder_id=g.get("fundingOrganization", [{}])[0].get("id")) }}">
+          <a href="{{ url_for('api.funder', funder_id=g.get("fundingOrganization", [{}])[0].get("id")) }}">
             {{ g.get("fundingOrganization", [{}])[0].get("name","[Unknown]") }}
           </a>
         </td>
@@ -31,7 +31,7 @@
         </td>
         <td class="right aligned">{{ g.get("awardDate","[Unknown]").strftime("%d/%m/%Y") }}</td>
         <td class="selectable">
-          <a href="{{ url_for('grant', grant_id=g.get("id") ) }}">
+          <a href="{{ url_for('api.grant', grant_id=g.get("id") ) }}">
             More details…
           </a>
         </td>
