@@ -1,0 +1,46 @@
+[
+	{
+		"title":"Millfield House Foundation grants awarded since 2013",
+		"description":"Grants awarded since 2013 to February 2017.",
+		"identifier":"a002400000lfOfMAAU",
+		"license":"https://creativecommons.org/licenses/by/4.0/",
+		"license_name":"Creative Commons Attribution 4.0 International (CC BY 4.0)",
+		"issued":"2017-06-23",
+		"modified":"2017-06-23T16:14:19+0000",
+		"publisher": {
+			"name":"Millfield House Foundation",
+			"website":"http://mhfdn.org.uk",
+			"logo":"http://mhfdn.org.uk/images/uploads/grey-logo.png",
+			"prefix":"360g-mhfdn"
+		},
+		"distribution":[
+			{
+				"downloadURL":"seed_data/funder_1.json",
+				"accessURL":"http://mhfdn.org.uk/grants",
+				"title":"Millfield House Foundation grants awarded since 2013"
+			}
+		]
+	},
+	{
+		"title":"Joseph Rowntree Charitable Trust grants awarded since January 2017",
+		"description":"Grants awarded since January 2017",
+		"identifier":"a002400000lFkbOAAS",
+		"license":"https://creativecommons.org/licenses/by/4.0/",
+		"license_name":"Creative Commons Attribution 4.0 International (CC BY 4.0)",
+		"issued":"2017-06-20",
+		"modified":"2017-06-20T16:17:29+0000",
+		"publisher": {
+			"name":"Joseph Rowntree Charitable Trust",
+			"website":"http://jrct.org.uk/",
+			"logo":"http://www.threesixtygiving.org/wp-content/uploads/JRCT-Logo-Final.jpg",
+			"prefix":"360G-JRCT"
+		},
+		"distribution":[
+			{
+				"downloadURL":"seed_data/funder_2.json",
+				"accessURL":"https://www.jrct.org.uk/grants-awarded",
+				"title":"Joseph Rowntree Charitable Trust grants awarded since January 2017"
+			}
+		]
+	}
+]

@@ -1,0 +1,7 @@
+<div class='ui text container basic segment' id='flash-messages'>
+  {% for message in get_flashed_messages(with_categories=true) %}
+  <div class="ui {{ message[0] }} floating message" align="center">
+      <p>{{ message[1] }}</p>
+  </div>
+  {% endfor %}
+</div>

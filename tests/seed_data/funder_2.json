@@ -1,0 +1,548 @@
+{
+    "grants": [
+        {
+            "id": "360g-mhfdn-YHNE2017",
+            "title": "Youth Homeless North East",
+            "description": "Core funding to advocate for policy change to reduce youth homelessness",
+            "currency": "GBP",
+            "amountAppliedFor": 120000,
+            "amountAwarded": 120000,
+            "amountDisbursed": 0,
+            "awardDate": "2017-02-28T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "startDate": "2017-07-07T00:00:00+00:00",
+                    "endDate": "2020-07-06T00:00:00+00:00"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1172379",
+                    "name": "Youth Homeless North East",
+                    "charityNumber": "1172379",
+                    "streetAddress": "5.1 Broadacre House, Market Street",
+                    "addressLocality": "Newcastle upon Tyne",
+                    "addressRegion": "Tyne and Wear",
+                    "addressCountry": "UK",
+                    "postalCode": "NE1 6HQ",
+                    "description": "Initially named the Regional Youth Homelessness Network (RYHN), Youth Homeless North East (YHNE) was originally established in 2007 by a group of VCS organisations operating in the north east (Centrepoint, Homeless Link, DePaul and Barnardo’s) to provide a regional focus to address youth homelessness through policy and strategy but crucially putting young people at the centre.",
+                    "url": "https://www.yhne.org.uk"
+                }
+            ],
+            "beneficiaryLocation": [
+                {
+                    "name": "NE England",
+                    "geoCodeType": "NE England"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-1158914",
+                    "name": "Millfield House Foundation"
+                }
+            ],
+            "fromOpenCall": "No",
+            "dateModified": "2017-06-02T16:01:21Z",
+            "dataSource": "http://mhfdn.org.uk/grants"
+        },
+        {
+            "id": "360g-mhfdn-RRFNE2015",
+            "title": "Regional Refugee Forum North East",
+            "description": "Core funding",
+            "currency": "GBP",
+            "amountAppliedFor": 120000,
+            "amountAwarded": 120000,
+            "amountDisbursed": 80000,
+            "awardDate": "2015-05-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "startDate": "2015-06-30T00:00:00+00:00",
+                    "endDate": "2018-06-30T00:00:00+00:00"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-COH-1109815",
+                    "name": "Regional Refugee Forum North East",
+                    "companyNumber": "1109815",
+                    "streetAddress": "Design Works, William Street, Felling",
+                    "addressLocality": "Gateshead",
+                    "addressRegion": "Tyne and Wear",
+                    "addressCountry": "UK",
+                    "postalCode": "NE10 0JP",
+                    "description": "We are the independent membership organisation created by and for the North East region’s Refugee-led Community Organisations (RCOs), enabling them to unite and produce their Collective Voice and empowering them to be active agents in change by speaking up for and by themselves to decision makers to influence policy and services that impact on the lives of the whole community of asylum seekers and refugees living across the region.",
+                    "url": "http://www.refugeevoices.org.uk"
+                }
+            ],
+            "beneficiaryLocation": [
+                {
+                    "name": "NE England",
+                    "geoCodeType": "NE England"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-1158914",
+                    "name": "Millfield House Foundation"
+                }
+            ],
+            "fromOpenCall": "No",
+            "dateModified": "2017-06-02T16:01:21Z",
+            "dataSource": "http://mhfdn.org.uk/grants"
+        },
+        {
+            "id": "360g-mhfdn-IPPRN2015",
+            "title": "IPPR North",
+            "description": "Core funding",
+            "currency": "GBP",
+            "amountAppliedFor": 120000,
+            "amountAwarded": 120000,
+            "amountDisbursed": 80000,
+            "awardDate": "2015-11-16T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "startDate": "2015-12-15T00:00:00+00:00",
+                    "endDate": "2018-12-14T00:00:00+00:00"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-800065",
+                    "name": "IPPR North",
+                    "charityNumber": "800065",
+                    "streetAddress": "2nd flr, 3 Hardman Square, Spinning Fields",
+                    "addressLocality": "Manchester",
+                    "addressRegion": "Manchester",
+                    "addressCountry": "UK",
+                    "postalCode": "M3 3EB",
+                    "description": "Our purpose is to conduct and promote research into, and the education of the public in, the economic, social and political sciences, science and technology, the voluntary sector and social enterprise, public services, and industry and commerce.",
+                    "url": "http://www.ippr.org/north"
+                }
+            ],
+            "beneficiaryLocation": [
+                {
+                    "name": "NE England",
+                    "geoCodeType": "NE England"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-1158914",
+                    "name": "Millfield House Foundation"
+                }
+            ],
+            "fromOpenCall": "No",
+            "dateModified": "2017-06-02T16:01:21Z",
+            "dataSource": "http://mhfdn.org.uk/grants"
+        },
+        {
+            "id": "360g-mhfdn-NECPC2015",
+            "title": "NECPC",
+            "description": "Child Poverty Commission",
+            "currency": "GBP",
+            "amountAppliedFor": 82413,
+            "amountAwarded": 72400,
+            "amountDisbursed": 36200,
+            "awardDate": "2015-05-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "startDate": "2015-06-30T00:00:00+00:00",
+                    "endDate": "2017-06-30T00:00:00+00:00"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-REV-X6507",
+                    "name": "Durham University",
+                    "charityNumber": "X6507",
+                    "streetAddress": "ILG, Palatine Centre, Stockton Road",
+                    "addressLocality": "Durham",
+                    "addressRegion": "Durham",
+                    "addressCountry": "UK",
+                    "postalCode": "DH1 3LE",
+                    "description": "University department",
+                    "url": "http://www.ilg.org.uk"
+                }
+            ],
+            "beneficiaryLocation": [
+                {
+                    "name": "NE England",
+                    "geoCodeType": "NE England"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-1158914",
+                    "name": "Millfield House Foundation"
+                }
+            ],
+            "fromOpenCall": "No",
+            "dateModified": "2017-06-02T16:01:21Z",
+            "dataSource": "http://mhfdn.org.uk/grants"
+        },
+        {
+            "id": "360g-mhfdn-NCAB2015",
+            "title": "NCAB",
+            "description": "Research policy post",
+            "currency": "GBP",
+            "amountAppliedFor": 60000,
+            "amountAwarded": 60000,
+            "amountDisbursed": 60000,
+            "awardDate": "2015-05-18T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "startDate": "2015-06-01T00:00:00+00:00",
+                    "endDate": "2017-06-01T00:00:00+00:00"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1135396",
+                    "name": "Citizens Advice Newcastle",
+                    "charityNumber": "1135396",
+                    "companyNumber": "02114435",
+                    "streetAddress": "4th Flr City Library, 33 New Bridge St West",
+                    "addressLocality": "Newcastle upon Tyne",
+                    "addressRegion": "Tyne and Wear",
+                    "addressCountry": "UK",
+                    "postalCode": "NE1 8AX",
+                    "description": "Citizens Advice Newcastle is a local charity providing free, confidential, independent and impartial advice to people who live or work in the City.",
+                    "url": "http://citizensadvice-newcastle.org.uk/"
+                }
+            ],
+            "beneficiaryLocation": [
+                {
+                    "name": "NE England",
+                    "geoCodeType": "NE England"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-1158914",
+                    "name": "Millfield House Foundation"
+                }
+            ],
+            "fromOpenCall": "No",
+            "dateModified": "2017-06-02T16:01:21Z",
+            "dataSource": "http://mhfdn.org.uk/grants"
+        },
+        {
+            "id": "360g-mhfdn-PhilanthropyStory2014",
+            "title": "ACF (later Community Foundation) ",
+            "description": "To research and promote an exhibition showing the philanthropic history of the NE",
+            "currency": "GBP",
+            "amountAppliedFor": 1000,
+            "amountAwarded": 1000,
+            "amountDisbursed": 1000,
+            "awardDate": "2014-05-13T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "startDate": "2014-06-01T00:00:00+00:00",
+                    "endDate": "2019-06-01T00:00:00+00:00"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-700510",
+                    "name": "Community Foundation",
+                    "charityNumber": "GB-CHC-700510",
+                    "streetAddress": "Philanthropy House, Woodbine Road, Gosforth",
+                    "addressLocality": "Newcastle upon Tyne",
+                    "addressRegion": "Tyne and Wear",
+                    "addressCountry": "UK",
+                    "postalCode": "NE3 1DD",
+                    "description": "Our team of over 80 specially trained volunteers and 23 staff offer advice on almost any issue - including money, benefits, housing, immigration, employment, consumer issues, family problems, social care and health services."
+                }
+            ],
+            "beneficiaryLocation": [
+                {
+                    "name": "NE England",
+                    "geoCodeType": "NE England"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-1158914",
+                    "name": "Millfield House Foundation"
+                }
+            ],
+            "fromOpenCall": "No",
+            "dateModified": "2017-06-02T16:01:21Z",
+            "dataSource": "http://mhfdn.org.uk/grants"
+        },
+        {
+            "id": "360g-mhfdn-VONNE2013",
+            "title": "VONNE",
+            "description": "Core funding",
+            "currency": "GBP",
+            "amountAppliedFor": 75000,
+            "amountAwarded": 75000,
+            "amountDisbursed": 75000,
+            "awardDate": "2013-06-21T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "startDate": "2013-06-25T00:00:00+00:00",
+                    "endDate": "2016-06-24T00:00:00+00:00"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1084083",
+                    "name": "Voluntary Organisations Network North east",
+                    "charityNumber": "1084083",
+                    "companyNumber": "04061592",
+                    "streetAddress": "MEA House, Ellison Place",
+                    "addressLocality": "Newcastle upon Tyne",
+                    "addressRegion": "Tyne and Wear",
+                    "addressCountry": "UK",
+                    "postalCode": "NE1 8XS",
+                    "description": "To support and promote a thriving effective sector of charities, voluntary and community groups and social enterprises (VCSE) in the North East of England.",
+                    "url": "https://www.vonne.org.uk"
+                }
+            ],
+            "beneficiaryLocation": [
+                {
+                    "name": "NE England",
+                    "geoCodeType": "NE England"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-1158914",
+                    "name": "Millfield House Foundation"
+                }
+            ],
+            "fromOpenCall": "No",
+            "dateModified": "2017-06-02T16:01:21Z",
+            "dataSource": "http://mhfdn.org.uk/grants"
+        },
+        {
+            "id": "360g-mhfdn-VONNE2016",
+            "title": "VONNE",
+            "description": "Core funding",
+            "currency": "GBP",
+            "amountAppliedFor": 120000,
+            "amountAwarded": 120000,
+            "amountDisbursed": 40000,
+            "awardDate": "2016-06-20T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "startDate": "2016-06-20T00:00:00+00:00",
+                    "endDate": "2019-06-20T00:00:00+00:00"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1084083",
+                    "name": "Voluntary Organisations Network North east",
+                    "charityNumber": "1084083",
+                    "companyNumber": "04061592",
+                    "streetAddress": "MEA House, Ellison Place",
+                    "addressLocality": "Newcastle upon Tyne",
+                    "addressRegion": "Tyne and Wear",
+                    "addressCountry": "UK",
+                    "postalCode": "NE1 8XS",
+                    "description": "To support and promote a thriving effective sector of charities, voluntary and community groups and social enterprises (VCSE) in the North East of England.",
+                    "url": "https://www.vonne.org.uk"
+                }
+            ],
+            "beneficiaryLocation": [
+                {
+                    "name": "NE England",
+                    "geoCodeType": "NE England"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-1158914",
+                    "name": "Millfield House Foundation"
+                }
+            ],
+            "fromOpenCall": "No",
+            "dateModified": "2017-06-02T16:01:21Z",
+            "dataSource": "http://mhfdn.org.uk/grants"
+        },
+        {
+            "id": "360g-mhfdn-YHNE2014",
+            "title": "YHNE",
+            "description": "Core funding",
+            "currency": "GBP",
+            "amountAppliedFor": 105000,
+            "amountAwarded": 105000,
+            "amountDisbursed": 105000,
+            "awardDate": "2014-05-13T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "startDate": "2014-07-08T00:00:00+00:00",
+                    "endDate": "2017-07-05T00:00:00+00:00"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1172379",
+                    "name": "Centrepoint (acting as receiving charity)",
+                    "charityNumber": "1172379",
+                    "streetAddress": "Central House, 25 Camperdown St",
+                    "addressLocality": "London",
+                    "addressRegion": "London",
+                    "addressCountry": "UK",
+                    "postalCode": "E1 8DZ",
+                    "description": "Centrepoint was host organisation for YHNE until late 2016.",
+                    "url": "https://www.yhne.org.uk/"
+                }
+            ],
+            "beneficiaryLocation": [
+                {
+                    "name": "NE England",
+                    "geoCodeType": "NE England"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-1158914",
+                    "name": "Millfield House Foundation"
+                }
+            ],
+            "fromOpenCall": "No",
+            "dateModified": "2017-06-02T16:01:21Z",
+            "dataSource": "http://mhfdn.org.uk/grants"
+        },
+        {
+            "id": "360g-mhfdn-NCVS2014",
+            "title": "Newcastle CVS",
+            "description": "To create a toolkit for VCSOs to ensure they do not discriminate against or stigmatise people in poverty",
+            "currency": "GBP",
+            "amountAppliedFor": 15373,
+            "amountAwarded": 15373,
+            "amountDisbursed": 11873,
+            "awardDate": "2014-05-13T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "startDate": "2014-06-01T00:00:00+00:00",
+                    "endDate": "2015-06-01T00:00:00+00:00"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1125877",
+                    "name": "Newcastle CVS",
+                    "charityNumber": "1125877",
+                    "companyNumber": "06681475",
+                    "streetAddress": "Higham House, Higham Place",
+                    "addressLocality": "Newcastle upon Tyne",
+                    "addressRegion": "Tyne and Wear",
+                    "addressCountry": "UK",
+                    "postalCode": "NE1 8AF",
+                    "description": "Support and development for the VCS in Newcastle",
+                    "url": "http://www.cvsnewcastle.org.uk"
+                }
+            ],
+            "beneficiaryLocation": [
+                {
+                    "name": "NE England",
+                    "geoCodeType": "NE England"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-1158914",
+                    "name": "Millfield House Foundation"
+                }
+            ],
+            "fromOpenCall": "No",
+            "dateModified": "2017-06-02T16:01:21Z",
+            "dataSource": "http://mhfdn.org.uk/grants"
+        },
+        {
+            "id": "360g-mhfdn-NECPC2016",
+            "title": "NECPC",
+            "description": "Child Poverty Commission",
+            "currency": "GBP",
+            "amountAppliedFor": 120000,
+            "amountAwarded": 120000,
+            "amountDisbursed": 40000,
+            "awardDate": "2016-06-20T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "startDate": "2016-09-01T00:00:00+00:00",
+                    "endDate": "2019-08-31T00:00:00+00:00"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-REV-X6507",
+                    "name": "Durham University",
+                    "charityNumber": "X6507",
+                    "streetAddress": "ILG, Palatine Centre, Stockton Road",
+                    "addressLocality": "Durham",
+                    "addressRegion": "Durham",
+                    "addressCountry": "UK",
+                    "postalCode": "DH1 3LE",
+                    "description": "University department",
+                    "url": "http://www.ilg.org.uk"
+                }
+            ],
+            "beneficiaryLocation": [
+                {
+                    "name": "NE England",
+                    "geoCodeType": "NE England"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-1158914",
+                    "name": "Millfield House Foundation"
+                }
+            ],
+            "fromOpenCall": "No",
+            "dateModified": "2017-06-02T16:25:21Z",
+            "dataSource": "http://mhfdn.org.uk/grants"
+        },
+        {
+            "id": "360g-mhfdn-NCAB2017",
+            "title": "NCAB",
+            "description": "Research policy post",
+            "currency": "GBP",
+            "amountAppliedFor": 105000,
+            "amountAwarded": 105000,
+            "amountDisbursed": 0,
+            "awardDate": "2017-06-19T00:00:00+00:00",
+            "plannedDates": [
+                {
+                    "startDate": "2017-09-01T00:00:00+00:00",
+                    "endDate": "2020-06-01T00:00:00+00:00"
+                }
+            ],
+            "recipientOrganization": [
+                {
+                    "id": "GB-CHC-1135396",
+                    "name": "Citizens Advice Newcastle",
+                    "charityNumber": "1135396",
+                    "companyNumber": "02114435",
+                    "streetAddress": "4th Flr City Library, 33 New Bridge St West",
+                    "addressLocality": "Newcastle upon Tyne",
+                    "addressRegion": "Tyne and Wear",
+                    "addressCountry": "UK",
+                    "postalCode": "NE1 8AX",
+                    "description": "Citizens Advice Newcastle is a local charity providing free, confidential, independent and impartial advice to people who live or work in the City.",
+                    "url": "http://citizensadvice-newcastle.org.uk/"
+                }
+            ],
+            "beneficiaryLocation": [
+                {
+                    "name": "NE England",
+                    "geoCodeType": "NE England"
+                }
+            ],
+            "fundingOrganization": [
+                {
+                    "id": "GB-CHC-1158914",
+                    "name": "Millfield House Foundation"
+                }
+            ],
+            "fromOpenCall": "No",
+            "dateModified": "2017-06-02T16:01:21Z",
+            "dataSource": "http://mhfdn.org.uk/grants"
+        }
+    ]
+}

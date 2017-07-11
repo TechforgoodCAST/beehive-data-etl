@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class='ui container basic segment'>
+  <h1 class='ui header'>
+    <a class='logo' href='/' title='Beehive Data'>Beehive Data</a>
+  </h1>
+  <hr>
+  <h2>{{ funders|length }} funders with data</h2>
+  <table class="ui table">
+    {% for funder in funders %}
+    <thead>
+    <tr>
+      <th>{{ funder["funder_name"] }}</th>
+      <th class="right aligned">{{ "{:,.0f}".format(funder.get("count")) }}</th>
+      <th class="right aligned">{{ "{:,.0f}".format(funder.get("sum")) }}</th>
+    </tr>
+  </thead>
+      <tbody>
+      {% for fund in funder["funds"] %}
+        <tr>
+          <td>{{ fund.get("fund_slug") }}</td>
+          <td class="right aligned">{{ "{:,.0f}".format(fund.get("count")) }}</td>
+          <td class="right aligned">{{ "{:,.0f}".format(fund.get("sum")) }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

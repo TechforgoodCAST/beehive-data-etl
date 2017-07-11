@@ -1,0 +1,173 @@
+/*@import semantic-ui/globals/all
+@import semantic-ui/elements/all
+@import semantic-ui/collections/grid
+@import semantic-ui/collections/form
+@import semantic-ui/collections/table
+@import semantic-ui/collections/menu
+@import semantic-ui/views/item
+@import semantic-ui/views/statistic
+@import semantic-ui/modules/transition
+@import semantic-ui/modules/dropdown
+@import semantic-ui/modules/popup
+@import semantic-ui/modules/accordion
+@import semantic-ui/modules/sticky*/
+
+/* Variables
+ * ========================================================================== */
+
+$white: #ffffff;
+$light-grey: #eaeaea;
+$grey: #999999;
+$red: #da5d39;
+$red-hover: #ed684a;
+$red-active: #a6422f;
+$assetPath : "/static/images";
+
+/* Semantic UI Overrides - Form
+ * ========================================================================== */
+body {
+  height: auto;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+hr {
+  border-style: solid;
+  border-color: $light-grey !important;
+  border-width: 1px !important;
+  margin-bottom: 1em;
+}
+
+.radio {
+  padding: 0 4px;
+
+  input {
+    margin-right: 4px;
+  }
+}
+
+.ui.red, .ui.basic.red.button {
+  transition: all 0.25s;
+}
+
+.ui.red {
+  color: $white !important;
+  background-color: $red !important;
+
+  &:hover {
+    background-color: $red-hover !important;
+  }
+
+  &:first-child {
+    @media screen and (max-width: 480px) {
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.ui.basic.red.button {
+  color: $red !important;
+  box-shadow: 0px 0px 0px 1px $red inset !important;
+
+  &:hover {
+    color: $red-hover !important;
+    box-shadow: 0px 0px 0px 1px $red-hover inset !important;
+  }
+}
+
+/* Utility
+ * ========================================================================== */
+
+.hidden {
+  display: none;
+}
+
+.red {
+  color: $red;
+  transition: all 0.25s;
+
+  &:hover {
+    color: $red-hover;
+  }
+}
+
+/* Shared
+ * ========================================================================== */
+
+#logo, #header, #footer {
+  text-align: center;
+}
+
+/* Header
+ * ========================================================================== */
+
+#logo {
+  margin-top: 3em;
+  margin-bottom: 0;
+  padding-bottom: 0.5em;
+}
+
+#header {
+  margin-top: 0;
+}
+
+.logo {
+  display: inline-block;
+  position: relative;
+  width: 200px;
+  height: 52px;
+  background-size: 200px 67px;
+  background: url("#{$assetPath}/logo.svg") no-repeat;
+  left: -12px;
+  text-indent: -9999px;
+
+  &:after {
+    position: absolute;
+    content: "Alpha";
+    color: $grey;
+    font-size: 10px;
+    font-weight: bold;
+    right: -29px;
+    top: 10px;
+    text-indent: 0;
+  }
+}
+
+.icons {
+  width: 30px;
+  height: 30px;
+  background: url("#{$assetPath}/icons.svg") no-repeat;
+  background-size: 90px 30px;
+  display: inline-block;
+  position: relative;
+  top: 7px;
+  margin-right: 4px;
+
+  &.impact {
+    background-position: 0 0;
+  }
+
+  &.decisions {
+    background-position: (-30px) 0;
+  }
+
+  &.tools {
+    background-position: (-60px) 0;
+  }
+}
+
+/* Footer
+ * ========================================================================== */
+
+#footer {
+  margin-bottom: 3em;
+}
+
+/* Charts
+ * ========================================================================== */
+
+#beneficiaries {
+  min-height: 550px;
+}

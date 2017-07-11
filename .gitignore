@@ -1,11 +1,17 @@
-grantnav*.json
-grants.json
-grantnav*.csv
-proposals*.csv
+# data files
 missing.txt
 tags.txt
-
+*.json
+*.csv
+data/
 archive/
+
+# testing data
+tests/data/
+!tests/seed_data/dcat.json
+!tests/seed_data/funder_1.json
+!tests/seed_data/funder_2.json
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+th.rotate {
+  /* Something you can count on */
+  height: 140px;
+  white-space: nowrap;
+}
+
+th.rotate > div {
+  transform:
+    translate(5px, 51px)
+    rotate(270deg);
+  width: 30px;
+}
+th.rotate > div > span {
+  padding: 5px 5px;
+}
+.fund-status-feedback {
+  width: 50px;
+}
+</style>
+<div class='ui container basic segment'>
+  <h1 class='ui header'>
+    <a class='logo' href='/' title='Beehive Data'>Beehive Data</a>
+  </h1>
+  <hr>
+  <h2>{{ funds|length }} funds with data</h2>
+  <table class="ui very compact table">
+    <thead>
+      <tr>
+        <th>Fund</th>
+        {% for f in fields %}
+        <th class="rotate"><div><span>{{f[0]}}</span></div></th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for funder in funds|groupby("funder") %}
+    <tr>
+      <td colspan="{{ fields|length + 1 }}">
+        <h3>{{ funder.grouper }}</h3>
+      </td>
+    </tr>
+    {% for fund in funder.list %}
+      <tr>
+        <td colspan="{{ fields|length + 1 }}">
+          <div style="float: right;">
+            {{ "{0:,.0f}".format(fund["count"]) }} grants |
+            &pound;{{ "{0:,.0f}".format(fund["sum"]) }}
+          </div>
+          <strong>{{ fund["_id"] }}</strong>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        {% for f in fields %}
+        <td class="right aligned">
+          <span class="ui {{ fund[f[0]]['feedback'] }} label fund-status-feedback"
+                title="{{f[0]}}">
+            {{ "{0:.0f}%".format(fund[f[0]]['percent'] * 100) }}
+          </span>
+        </td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

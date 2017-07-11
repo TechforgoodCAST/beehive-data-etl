@@ -1,29 +1,28 @@
-From 360 Giving to Beehive Data
-===============================
+Beehive Data
+============
 
-## 1. Download grantnav and import into Mongo
+Initial setup
+-------------
 
-Use this file: <http://grantnav.threesixtygiving.org/api/grants.json>. Big file:
- ~450Mb.
+- Setup MongoDB and get it running
+- Setup CharityBase and import the data into the database
+- setup virtual environment, and activate it
+- install any needed requirements `pip install -r requirements.txt`
+- install the application package through `pip install -e .`
+- Add an environment variable `FLASK_APP` pointing to `beehivedata.beehivedata`
+- Initialise the database by running `flask init_db`
+- Fetch any data using `flask fetch_all`
+- Run the server with `flask run`
 
-Shown on the [Developer page](http://grantnav.threesixtygiving.org/developers).
+Run development server
+----------------------
 
-Do this by running:
+Run `flask run` from the command line.
 
-```bash
-$ python input.py
-```
+For development/debug mode set `FLASK_DEBUG` environmental variable to `1`.
 
-The command line options for this are:
-
-- `--grantnav`: location of the grantnav JSON file, can be a local file or a URL.
-  Default is <http://grantnav.threesixtygiving.org/api/grants.json>
-- `--mongo-port`: port for acccessing mongo (default `27017`)
-- `--mongo-host`: host for accessing mongo (default `localhost`)
-- `--mongo-db`: name of the database to insert into (default `360giving`)
-- `--limit`: number of records to insert at once (default `10000`)
-
-## 2. Setup `charity-base`
+Setup `charity-base`
+--------------------
 
 Clone from [Github Repository](https://github.com/tithebarn/charity-base).
 [Download the OSCR register](http://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download),
@@ -45,88 +44,78 @@ You'll also need to make sure that the `mainCharity.companyNumber` field has an
 index to make lookups quicker. This is done by running `mongo charity-base --eval "db.charities.createIndex({'mainCharity.companyNumber': 1})"`.
 If you don't do this then the next step will take too long.
 
-## 3. Add classification details and transform into Beehive data structure
 
-Run `output.py`. This iterates through all the grants in the `360giving`.`grants`
-MongoDB collection. Using the `Grant` class in `grant.py` it creates an object
-for each grant.
+Fetch 360 Giving data
+---------------------
+
+This step can either be run in one go using `flask fetch_all`, or in the individual
+steps shown below.
+
+### 1. Download published data and import into Mongo
+
+This command will fetch the [data registry](http://data.threesixtygiving.org/data.json)
+and save it to a mongo database. It then goes through the data registry,
+downloads each file, converts to json (if needed) and save all the grants in
+the database.
+
+Run the command using:
 
 ```bash
-$ python output.py
+$ flask fetch_data
 ```
 
-The `g.process_grant()` function does the following:
+The command can also be run to just fetch the files that have been updated since
+a given date:
 
-1.  Get data about the recipient from the `charity-base`.`charities` MongoDB
-    collection (`Grant.fetch_recipients()`). This also tries to work out the
-    type of organisation, how long they have operated for, and get the latest
-    financial information.
+```bash
+$ flask fetch_data --files-since 2017-01-01
+```
 
-    _Note: this stage allows for multiple recipients, but the end result only
-    outputs the first recipient._
+You can also set it to just download the data for a particular funder, using a
+comma-separated list of the funder prefixes, slugs or names. Eg:
 
-    **@todo**: Add in companies data here too.
+```bash
+$ flask fetch_data --funders 360G-ocf
+```
 
-2.  Produce a list of beneficiaries for the grant (`Grant.get_beneficiaries()`).
-    This is based on the list found in the `Grant.ben_categories` variable. The
-    list is generated in two ways:
+The command line options for this are:
 
-    1. Through mapping the Charity Commission and OSCR beneficiary categories
-    for the recipient organisation to the Grant.ben_categories. These mappings
-    are found in `Grant.cc_to_beehive` and `Grant.oscr_to_beehive`.
+- `--files-since`: fetch only files updated after this date (in `YYYY-MM-DD` format, default all files)
+- `--funders`: only fetch these funders (list of funder prefixes separated by comma, default all funders)
+- `--registry`: where to find the data registry (default `http://data.threesixtygiving.org/data.json`)
 
-    2. Through applying a series of regular expressions to the title and
-    description of the grant. These regular expressions are found in `Grant.ben_regexes`.
-    If a regular expression matches then that beneficiary category is added to
-    the grant.
+### 2. Update organisation and charity details
 
-3.  Fill in the `affect_people` and `affect_other` variables using
-    `Grant.get_affected()`.
+These two steps update the organisations in the data. They are run using:
 
-4.  Get a list of the age ranges that the grant relates to using
-    `Grant.get_ages()`. This is done in two ways:
+```bash
+$ flask update_organisations
+$ flask update_charity
+```
 
-    1. Through applying a series of regular expressions for keywords (like "child"
-    "elderly", etc) to the grant title and description. These are found in
-    `Grant.age_regexes` and they are transformed into age ranges based on
-    `Grant.age_bens`.
+`update_organisations` tries to guess the organisation type of the recipient
+organisation and apply the Beehive codes to it.
 
-    2. Through applying a regular expression that looks for strings like "5-15
-    years" in the grant description, and extracting the resulting start and end
-    ages.
+`update_charities` gets data about the recipient from the `charity-base`.`charities`
+MongoDB collection. It then tries to work out the type of organisation, how long
+they have operated for, and get the latest financial information.
 
-    These two results are transformed into the Beehive age categories (found in
-    `Grant.age_categories` through looking at overlap in the age ranges.
+_Note: this stage allows for multiple recipients, but the end result only
+outputs the first recipient._
 
-5.  Attempt to classify the genders intended to benefit from the grant. This
-    uses a series of regexes (in `Grant.gender_regexes`) to look for grants that
-    mention ("men", "women" or "transgender"). If only one of those categories
-    are selected then it is chosen, otherwise the field is "All genders".
+**@todo**: Add in companies data here too.
+
+The `update_charity.py` script has `--host`, `--port`, `--db` which are used
+to connect to the charitybase database (the defaults are the same as the
+charitybase defaults).
+
+### 3. Update beneficiaries
+
+Using regexes and other techniques, try to identify the beneficiaries of each
+grant, including the age range and gender.
+
+```bash
+$ flask update_beneficiaries
+```
 
 **@todo**: Add location classification details.
-
-After the `Grant.process_grant()` is run the grant is ready to be output in the
-[correct structure for `beehive-data`](https://beehive-data.api-docs.io/v1/grants/NL6w7tWRLTM2vhdSE).
-This is done using `Grant.beehive_output()`.
-
-The only non-formatting change that happens at the output stage is to pass the
-funder and grant programme through `Grant.get_grant_programme()` which uses
-`Grant.swap_funds` to change the name of some of the grant programmes in the
-data to make them more useful. Not all funders and funds are included - any not
-found in `Grant.swap_funds` are passed through as-is.
-
-The command line options for `output.py` are:
-
-- `--mongo-port`: port for acccessing mongo (default `27017`)
-- `--mongo-host`: host for accessing mongo (default `localhost`)
-- `--grant-db`: name of the database holding 360 giving data (default `360giving`)
-- `--charity-db`: name of the database holding charity data from `charity-base` (default `charity-base`)
-- `--output-db`: name of the database to output data in correct format (default `beehive-data`)
-- `--limit`: number of records to insert at once (default `10000`)
-
-## 4. Import into Beehive data
-
-Options:
-
-- Rake task? From JSON output by this process?
-- Convert above to ruby code and integrate into `beehive-data`.
