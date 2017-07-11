@@ -178,5 +178,6 @@ def update_charity(charitybase_db={"port": 27017, "host": "localhost", "db": "ch
         bulk.find({'_id': grant["_id"]}).replace_one(grant)
 
     print_mongo_bulk_result(bulk.execute(), "grants", messages=[
+        "** Updating Charities **",
         "{:,.0f} charities not found".format(missing_charities)
     ])

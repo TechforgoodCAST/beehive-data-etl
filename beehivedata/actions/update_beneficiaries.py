@@ -56,7 +56,6 @@ def update_beneficiaries():
         grant["beehive"].setdefault("gender", "All genders")
         grant["beehive"].setdefault("affect_people", False)
         grant["beehive"].setdefault("affect_other", False)
-
         desc = grant.get("title", "") + " " + grant.get("description", "")
 
         # add beneficiaries
@@ -102,4 +101,4 @@ def update_beneficiaries():
 
         bulk.find({'_id': grant["_id"]}).replace_one(grant)
 
-    print_mongo_bulk_result(bulk.execute(), "grants", [])
+    print_mongo_bulk_result(bulk.execute(), "grants", ["** Updating beneficiaries **"])

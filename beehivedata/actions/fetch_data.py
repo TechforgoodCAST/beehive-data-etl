@@ -62,7 +62,7 @@ def fetch_register(filename="http://data.threesixtygiving.org/data.json", save_d
 
             bulk.find({'_id': i["_id"]}).upsert().replace_one(i)
 
-        print_mongo_bulk_result(bulk.execute(), "files", [])
+        print_mongo_bulk_result(bulk.execute(), "files", ["** Fetching register **"])
 
 
 def process_register(created_since=None, only_funders=None, save_dir="data"):
@@ -192,7 +192,7 @@ def import_file(filename, inner="grants", source=None, license=None):
         }
         bulk.find({'_id': i["_id"]}).upsert().replace_one(i)
 
-    print_mongo_bulk_result(bulk.execute(), "grants", [])
+    print_mongo_bulk_result(bulk.execute(), "grants", ["** Importing file **"])
 
 
 def process_grant(i):
