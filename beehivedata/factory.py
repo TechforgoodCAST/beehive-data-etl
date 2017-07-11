@@ -1,5 +1,5 @@
 import os
-from flask import Flask, g
+from flask import Flask, g, current_app
 from flaskext.sass import sass
 import click
 from pymongo.errors import DuplicateKeyError
@@ -17,6 +17,7 @@ from .actions.fetch_data import fetch_data
 from .actions.update_organisations import update_organisations
 from .actions.update_charity import update_charity
 from .actions.update_beneficiaries import update_beneficiaries
+from .actions.update_geography import update_geography
 
 
 def create_app(config=None):
@@ -42,7 +43,7 @@ def create_app(config=None):
 
     register_blueprints(app)
     register_cli(app)
-    # register_teardowns(app)
+    register_teardowns(app)
     login_manager.init_app(app)
 
     sass(app, input_dir='assets/scss', output_dir='css')
@@ -91,6 +92,10 @@ def register_cli(app):
     def update_beneficiaries_command():
         update_beneficiaries()
 
+    @app.cli.command("update_geography")
+    def update_geography_command():
+        update_geography()
+
     @app.cli.command("fetch_all")
     @click.option('--registry', default="http://data.threesixtygiving.org/data.json", help="URL to download the data registry from")
     @click.option('--files-since', default=None, help="Look only for files modified since this date (in format YYYY-MM-DD)")
@@ -100,9 +105,10 @@ def register_cli(app):
     @click.option('--db', default="charity-base", help="charity-base mongo database name")
     def fetch_all_command(registry, files_since, funders, host, port, db):
         fetch_data_command(registry, files_since, funders)
-        update_organisations()
-        update_charity({"host": host, "port": port, "db": db})
-        update_beneficiaries()
+        update_organisations_command()
+        update_charity_command(host, port, db)
+        update_beneficiaries_command()
+        update_geography_command()
 
     @app.cli.command("register_user")
     @click.argument('email')
@@ -115,9 +121,14 @@ def register_cli(app):
             print("User already present in DB.")
 
 
-# def register_teardowns(app):
-#     @app.teardown_appcontext
-#     def close_db(error):
-#         """Closes the database again at the end of the request."""
-#         if hasattr(g, 'sqlite_db'):
-#             g.sqlite_db.close()
+def register_teardowns(app):
+    @app.teardown_appcontext
+    def close_db(error):
+        """Closes the database again at the end of the request."""
+        if hasattr(g, 'db'):
+            g.db.client.close()
+            current_app.logger.info("Disconnected from '%s' mongo database [host: %s, port: %s]" % (
+                g.db.name,
+                g.db.client.address[0],
+                g.db.client.address[1]
+            ))

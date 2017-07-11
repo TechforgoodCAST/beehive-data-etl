@@ -1,4 +1,6 @@
+import os
 from ..beneficiaries import ben_categories
+from ...actions.update_geography import get_countries
 
 DISTRIBUTIONS = {
     "duration_awarded_months_distribution": [
@@ -118,6 +120,10 @@ DISTRIBUTIONS = {
         (0, {"position": 2, "label": "One or more local areas"}),
         (1, {"position": 3, "label": "One or more regions"}),
         (3, {"position": 4, "label": "Across many countries"})
+    ],
+    "country_distribution": [
+        (c["alpha2"], {"name": c["name"], "alpha2": c["alpha2"]})
+        for c in get_countries(os.path.join(os.path.dirname(__file__), '..', 'countries.csv'))
     ]
 }
 DISTRIBUTIONS["volunteers_distribution"] = DISTRIBUTIONS["employees_distribution"]
@@ -435,8 +441,7 @@ def process_fund_summary(results):
             results[d] = new_d
         results[d] = process_distribution(results[d], d, results["grant_count"])
 
-    results["sources"] = {s["license"]: s["source"] for s in results["sources"]}
-
+    results["sources"] = {s["license"]: s.get("source") for s in results.get("sources", {})}
     return results
 
 
@@ -451,6 +456,9 @@ def process_distribution(distribution, dist_name, total=None):
             "count": i["count"],
             "sum": i["sum"]
         } for i in distribution]
+
+    elif dist_name == "country_distribution":
+        distribution = [i for i in distribution if i["count"] > 0]
 
     if not total:
         total = sum([a["count"] for a in distribution])
