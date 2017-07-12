@@ -10,6 +10,10 @@ from beehivedata.beehivedata import app
 from beehivedata.login import register_user, User
 import beehivedata.db
 from beehivedata.actions.fetch_data import *
+from beehivedata.actions.update_beneficiaries import *
+from beehivedata.actions.update_charity import *
+from beehivedata.actions.update_geography import *
+from beehivedata.actions.update_organisations import *
 
 
 class BeehivedataTestCase(unittest.TestCase):
@@ -47,6 +51,8 @@ class BeehivedataTestCase(unittest.TestCase):
             self.db["files"].replace_one({"_id": i["_id"]}, i)
 
         process_register(save_dir=self.tempdir.name)
+        update_organisations()
+        update_beneficiaries()
 
     def login(self, username, password):
         return self.app.post('/login', data=dict(

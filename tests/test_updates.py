@@ -7,6 +7,7 @@ from beehivedata.actions.update_organisations import *
 import beehivedata.db
 import os
 import datetime
+import unittest
 
 
 class ImportTestCase(BeehivedataTestCase):
@@ -60,3 +61,11 @@ class ImportTestCase(BeehivedataTestCase):
 
         grant = self.db["grants"].find_one({"_id": "360g-mhfdn-YHNE2017"})
         assert len(grant["beehive"]["ages"]) == 2
+
+    @unittest.skip("Not yet written")
+    def test_update_country(self):
+        pass
+
+    @unittest.skip("Not yet written")
+    def test_update_charity(self):
+        pass

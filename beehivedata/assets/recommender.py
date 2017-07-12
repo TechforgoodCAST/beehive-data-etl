@@ -108,8 +108,7 @@ class Recommender:
         funders_df = pd.DataFrame(funders_data)
         funders_df.set_index('fund_slug', inplace=True)
 
-        # @TODO: this gives a deprecation warning
-        parsed_user_input = [user_input.get(c, 0) for c in funders_df.columns]
+        parsed_user_input = [[user_input.get(c, 0) for c in funders_df.columns]]
 
         distances = pairwise_distances(parsed_user_input, funders_df, metric='cosine', n_jobs=1)
         return pd.Series(1 - distances[0], index=funders_df.index).sort_values(ascending=False).to_dict()

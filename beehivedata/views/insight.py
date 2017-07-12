@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from flask_login import login_required
 
 from ..db import get_db
 from ..assets.recommender import Recommender
@@ -7,7 +8,7 @@ insight = Blueprint('insight', __name__)
 
 
 @insight.route('/beneficiaries', methods=['POST'])
-# @auth.login_required
+@login_required
 def insight_beneficiaries():
     recommender = Recommender(db=get_db())
     data = request.json['data']
@@ -16,7 +17,7 @@ def insight_beneficiaries():
 
 
 @insight.route('/amounts', methods=['POST'])
-# @auth.login_required
+@login_required
 def insight_amounts():
     recommender = Recommender(db=get_db())
     data = request.json['data']['amount']
@@ -25,7 +26,7 @@ def insight_amounts():
 
 
 @insight.route('/durations', methods=['POST'])
-# @auth.login_required
+@login_required
 def insight_durations():
     recommender = Recommender(db=get_db())
     data = request.json['data']['duration']
@@ -34,7 +35,7 @@ def insight_durations():
 
 
 @insight.route('/all', methods=['POST'])
-# @auth.login_required
+@login_required
 def insight_all():
     recommender = Recommender(db=get_db())
     bens = recommender.check_beneficiaries(request.json['data'].get("beneficiaries", {}))
