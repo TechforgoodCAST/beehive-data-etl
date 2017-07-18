@@ -303,6 +303,16 @@ def process_grant(i):
                         if i.get("amountAwarded") < v:
                             grantprogramme = fund_amounts["funds"][k]
 
+        # swap fund name based classification details
+        # based on a particular pattern in the SWAP_FUNDS variable
+        if isinstance(SWAP_FUNDS[funder], dict)  \
+           and SWAP_FUNDS[funder].get("classifications.title"):
+            fund_classifications = SWAP_FUNDS[funder].get("classifications.title")
+            grant_classifications = [c.get("title") for c in i.get("classifications", [])]
+            intersection = set.intersection(set(fund_classifications), set(grant_classifications))
+            if len(intersection) == 1:
+                grantprogramme = list(intersection)[0]
+
     # slugify the funder and grant programme
     funder = slugify(funder)
     i["fundingOrganization"][0]["slug"] = funder
