@@ -73,10 +73,11 @@ def register_cli(app):
     @click.option('--registry', default="http://data.threesixtygiving.org/data.json", help="URL to download the data registry from")
     @click.option('--files-since', default=None, help="Look only for files modified since this date (in format YYYY-MM-DD)")
     @click.option('--funders', default=None, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
-    def fetch_data_command(registry, files_since, funders):
+    @click.option('--skip-funders', default=None, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
+    def fetch_data_command(registry, files_since, funders, skip_funders):
         if funders:
             funders = funders.split(",")
-        fetch_data(registry, files_since, funders)
+        fetch_data(registry, files_since, funders, skip_funders)
 
     @app.cli.command("update_organisations")
     def update_organisations_command():
@@ -101,11 +102,12 @@ def register_cli(app):
     @click.option('--registry', default="http://data.threesixtygiving.org/data.json", help="URL to download the data registry from")
     @click.option('--files-since', default=None, help="Look only for files modified since this date (in format YYYY-MM-DD)")
     @click.option('--funders', default=None, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
+    @click.option('--skip-funders', default=None, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
     @click.option('--host', default="localhost", help="Host for the charity-base mongo database")
     @click.option('--port', default=27017, type=int, help="Port for the charity-base mongo database")
     @click.option('--db', default="charity-base", help="charity-base mongo database name")
-    def fetch_all_command(registry, files_since, funders, host, port, db):
-        fetch_data_command(registry, files_since, funders)
+    def fetch_all_command(registry, files_since, funders, skip_funders, host, port, db):
+        fetch_data_command(registry, files_since, funders, skip_funders)
         update_organisations_command()
         update_charity_command(host, port, db)
         update_beneficiaries_command()
