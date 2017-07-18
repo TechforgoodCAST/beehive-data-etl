@@ -14,6 +14,7 @@ def connect_db():
     else:
         client = MongoClient(current_app.config["MONGODB_HOST"], current_app.config["MONGODB_PORT"])
         db = client[current_app.config["MONGODB_DB"]]
+    client.admin.command('ismaster')
     current_app.logger.info("Connected to '%s' mongo database [host: %s, port: %s]" % (
         db.name,
         client.address[0],
