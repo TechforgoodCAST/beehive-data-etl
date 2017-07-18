@@ -44,13 +44,13 @@ def fetch_url(url, new_file=None, filetype=None):
     # check if it's a file first
     if os.path.isfile(url):
         if new_file is None or new_file == url:
-            return
+            return (url, filetype)
 
         # rename the file if needed
         with open(url, "rb") as f:
             with open(new_file, "wb") as new_f:
                 new_f.write(f.read())
-        return
+        return (new_file, filetype)
 
     # otherwise download and save
     request = urllib.request.Request(url, headers={
