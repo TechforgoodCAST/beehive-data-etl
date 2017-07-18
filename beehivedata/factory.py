@@ -77,6 +77,8 @@ def register_cli(app):
     def fetch_data_command(registry, files_since, funders, skip_funders):
         if funders:
             funders = funders.split(",")
+        if skip_funders:
+            skip_funders = skip_funders.split(",")
         fetch_data(registry, files_since, funders, skip_funders)
 
     @app.cli.command("update_organisations")
@@ -107,11 +109,15 @@ def register_cli(app):
     @click.option('--port', default=27017, type=int, help="Port for the charity-base mongo database")
     @click.option('--db', default="charity-base", help="charity-base mongo database name")
     def fetch_all_command(registry, files_since, funders, skip_funders, host, port, db):
-        fetch_data_command(registry, files_since, funders, skip_funders)
-        update_organisations_command()
-        update_charity_command(host, port, db)
-        update_beneficiaries_command()
-        update_geography_command()
+        if funders:
+            funders = funders.split(",")
+        if skip_funders:
+            skip_funders = skip_funders.split(",")
+        fetch_data(registry, files_since, funders, skip_funders)
+        update_organisations()
+        update_charity({"host": host, "port": port, "db": db})
+        update_beneficiaries()
+        update_geography()
 
     @app.cli.command("register_user")
     @click.argument('email')
