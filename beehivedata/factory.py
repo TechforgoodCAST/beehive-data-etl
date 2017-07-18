@@ -119,6 +119,16 @@ def register_cli(app):
         update_beneficiaries()
         update_geography()
 
+    @app.cli.command("update_all")
+    @click.option('--host', default="localhost", help="Host for the charity-base mongo database")
+    @click.option('--port', default=27017, type=int, help="Port for the charity-base mongo database")
+    @click.option('--db', default="charity-base", help="charity-base mongo database name")
+    def update_all_command(host, port, db):
+        update_organisations()
+        update_charity({"host": host, "port": port, "db": db})
+        update_beneficiaries()
+        update_geography()
+
     @app.cli.command("register_user")
     @click.argument('email')
     @click.argument('password')
