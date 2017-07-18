@@ -2,6 +2,7 @@ from __future__ import print_function
 import json
 import os
 import urllib.request
+from urllib.parse import urlparse
 import dateutil.parser
 import datetime
 import tempfile
@@ -14,18 +15,42 @@ from flask import current_app
 from ..db import get_db
 from ..assets.swap_funds import SWAP_FUNDS
 
+CONTENT_TYPES = {
+    "application/json": "json",
+    "text/csv": "csv",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+    "application/vnd.ms-excel": "xls",
+}
 
-def fetch_url(url, new_file=None):
+ACCEPTABLE_LICENSES = [
+    "https://creativecommons.org/licenses/by/4.0/",
+    "http://www.opendefinition.org/licenses/odc-pddl",
+    "https://creativecommons.org/publicdomain/zero/1.0/",
+    "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/",
+    "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "",
+]
+
+
+def get_filetype(url):
+    parts = urlparse(url)
+    filetype = parts.path.split('.')[-1].lower()
+    if filetype in ["json", "csv", "xlsx", "xls"]:
+        return filetype
+    return None
+
+
+def fetch_url(url, new_file=None, filetype=None):
     # check if it's a file first
     if os.path.isfile(url):
         if new_file is None or new_file == url:
-            return
+            return (url, filetype)
 
         # rename the file if needed
         with open(url, "rb") as f:
             with open(new_file, "wb") as new_f:
                 new_f.write(f.read())
-        return
+        return (new_file, filetype)
 
     # otherwise download and save
     request = urllib.request.Request(url, headers={
@@ -33,9 +58,17 @@ def fetch_url(url, new_file=None):
     })
     print("Downloading from: %s" % url)
     with urllib.request.urlopen(request) as f:
+        if filetype is None:
+            if f.getheader("Content-Type") in CONTENT_TYPES:
+                filetype = CONTENT_TYPES[f.getheader("Content-Type")]
+                print("Guessing filetype as {}".format(filetype))
+                new_file += "." + filetype
+
         with open(new_file, "wb") as new_f:
             new_f.write(f.read())
             print("Saved as: %s" % new_file)
+
+        return (new_file, filetype)
 
 
 def fetch_register(filename="http://data.threesixtygiving.org/data.json", save_dir="data"):
@@ -48,7 +81,7 @@ def fetch_register(filename="http://data.threesixtygiving.org/data.json", save_d
         usefile = filename
     else:
         usefile = os.path.join(save_dir, 'dcat.json')
-    fetch_url(filename, usefile)
+    fetch_url(filename, usefile, "json")
 
     # open the file and save each record to DB
     with open(usefile, encoding='utf8') as g:
@@ -65,9 +98,15 @@ def fetch_register(filename="http://data.threesixtygiving.org/data.json", save_d
         print_mongo_bulk_result(bulk.execute(), "files", ["** Fetching register **"])
 
 
-def process_register(created_since=None, only_funders=None, save_dir="data"):
+def process_register(created_since=None, only_funders=None, skip_funders=None, save_dir="data"):
     db = get_db()
     conditions = {}
+    results = {
+        "files_imported": [],
+        "grants_imported": 0,
+        "unacceptable_license": [],
+        "download_failed": []
+    }
 
     # only modified since a certain time
     if created_since:
@@ -77,34 +116,58 @@ def process_register(created_since=None, only_funders=None, save_dir="data"):
     # only including particular funders
     if only_funders:
         if isinstance(only_funders, list):
-            conditions["$or"] = [
-                {"publisher.prefix": {"$in": only_funders}},
-                {"publisher.name": {"$in": only_funders}},
-                {"publisher.slug": {"$in": only_funders}},
-            ]
+            only_funders = {"$in": only_funders}
+        conditions["$or"] = [
+            {"publisher.prefix": only_funders},
+            {"publisher.name": only_funders},
+            {"publisher.slug": only_funders},
+        ]
+
+    if skip_funders:
+        if isinstance(skip_funders, list):
+            skip_funders = {"$nin": skip_funders}
         else:
-            conditions["$or"] = [
-                {"publisher.prefix": only_funders},
-                {"publisher.name": only_funders},
-                {"publisher.slug": only_funders},
-            ]
+            skip_funders = {"$ne": skip_funders}
+        conditions["$and"] = [
+            {"publisher.prefix": skip_funders},
+            {"publisher.name": skip_funders},
+            {"publisher.slug": skip_funders},
+        ]
 
     files = db.files.find(conditions)
     print("Found {} files to import".format(files.count()))
     print()
 
     for f in files:
-        print("Importing data: {} (files: {})".format(f.get("publisher", {}).get("name"), len(f.get("distribution", []))))
+        print("Importing from publisher: {} (files: {})".format(
+            f.get("publisher", {}).get("name"),
+            len(f.get("distribution", []))
+        ))
         print("Data license: {}".format(f.get("license", "[Unknown]")))
+
+        # Check license
+        if f.get("license", "") not in ACCEPTABLE_LICENSES:
+            print()
+            print("*****************")
+            print("COULD NOT USE")
+            print("REASON: Invalid license {}".format(f.get("license", "[Unknown]")))
+            print("*****************")
+            print()
+            results["unacceptable_license"].append(
+                (f.get("publisher", {}).get("name"), f.get("license", "[Unknown]"))
+            )
+            continue
+
         for k, d in enumerate(f.get("distribution", [])):
             filename = d.get("downloadURL")
-            filetype = filename.split('.')[-1].lower()
-            usefile = os.path.join(save_dir, '{}-{}.{}'.format(f.get("identifier"), k, filetype))
+            filetype = get_filetype(filename)
+            usefile = os.path.join(save_dir, '{}-{}'.format(f.get("identifier"), k))
+            if filetype:
+                usefile += "." + filetype
             usefile_json = os.path.join(save_dir, '{}-{}.{}'.format(f.get("identifier"), k, "json"))
-            print("Downloading from: %s" % filename)
             try:
-                fetch_url(filename, usefile)
-            except urllib.error.HTTPError as e:
+                (usefile, filetype) = fetch_url(filename, usefile, filetype)
+            except (urllib.error.HTTPError, urllib.error.URLError) as e:
                 print()
                 print("*****************")
                 print("DOWNLOAD FAILED")
@@ -112,21 +175,38 @@ def process_register(created_since=None, only_funders=None, save_dir="data"):
                 print("REASON: {}".format(str(e)))
                 print("*****************")
                 print()
+                results["download_failed"].append(
+                    (f.get("publisher", {}).get("name"), filename, str(e))
+                )
                 continue
-            print("Saved as: %s" % usefile)
 
             if filetype != "json":
                 convert_spreadsheet(usefile, usefile_json, filetype)
                 os.remove(usefile)
                 print("Converted to json: {}".format(usefile_json))
-            print()
 
             db.downloads.replace_one({"_id": filename}, {
                 "downloadFile": usefile_json,
                 "downloadedOn": datetime.datetime.now()
             }, upsert=True)
 
-            import_file(usefile_json, source=d.get("accessURL"), license=f.get("license"))
+            grants_imported = import_file(usefile_json, source=d.get("accessURL"), license=f.get("license"))
+            results["files_imported"].append(usefile_json)
+            results["grants_imported"] += grants_imported
+            print()
+
+    # log result of exercise
+    messages = [
+        "{:,.0f} files successfully imported".format(len(results["files_imported"])),
+        "{:,.0f} grants successfully imported".format(results["grants_imported"]),
+        "{:,.0f} files skipped due to incompatible license:".format(len(results["unacceptable_license"]))
+    ]
+    for i in results["unacceptable_license"]:
+        messages.append("  - {} [{}]".format(i[0], i[1]))
+    messages.append("{:,.0f} files skipped due to download failing:".format(len(results["download_failed"])))
+    for i in results["download_failed"]:
+        messages.append("  - {} [{}] Error: {}".format(i[0], i[1], i[2]))
+    current_app.logger.info("\r\n".join(messages))
 
 
 # from: https://github.com/ThreeSixtyGiving/datagetter/blob/master/get.py#L53
@@ -170,7 +250,7 @@ def import_file(filename, inner="grants", source=None, license=None):
     else:
         usefile = "data/grants.json"
         print("Downloading from: %s" % filename)
-        fetch_url(filename, usefile)
+        fetch_url(filename, usefile, "json")
         print("Saved as: %s" % usefile)
 
     with open(usefile, encoding='utf8') as g:
@@ -192,7 +272,9 @@ def import_file(filename, inner="grants", source=None, license=None):
         }
         bulk.find({'_id': i["_id"]}).upsert().replace_one(i)
 
-    print_mongo_bulk_result(bulk.execute(), "grants", ["** Importing file **"])
+    result = bulk.execute()
+    print_mongo_bulk_result(result, "grants", ["** Importing file **"])
+    return max([result["n" + i] for i in ["Inserted", "Matched", "Modified", "Upserted"]])
 
 
 def process_grant(i):
@@ -276,10 +358,10 @@ def print_mongo_bulk_result(result, name="records", messages=[]):
 
 
 def fetch_data(registry="http://data.threesixtygiving.org/data.json",
-               files_since=None, funders=None):
+               files_since=None, funders=None, skip_funders=None):
 
     if files_since:
         files_since = dateutil.parser.parse(files_since, ignoretz=True)
 
     fetch_register(registry)
-    process_register(files_since, funders)
+    process_register(files_since, funders, skip_funders)
