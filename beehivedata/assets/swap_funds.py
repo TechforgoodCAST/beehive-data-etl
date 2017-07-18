@@ -76,5 +76,14 @@ SWAP_FUNDS = {
             "amounts": [10000],
             "funds": ["Small grants", "Large grants"]
         }
+    },
+    "Esmée Fairbairn Foundation": {
+        "classifications.title": [
+            "Arts",
+            "Food",
+            "Children and young people",
+            "Environment",
+            "Social change",
+        ]
     }
 }

@@ -40,6 +40,12 @@ def get_filetype(url):
     return None
 
 
+def parse_date(datestr):
+    if "/" in datestr:
+        return dateutil.parser.parse(datestr, ignoretz=True, dayfirst=True)
+    return dateutil.parser.parse(datestr, ignoretz=True)
+
+
 def fetch_url(url, new_file=None, filetype=None):
     # check if it's a file first
     if os.path.isfile(url):
@@ -89,8 +95,8 @@ def fetch_register(filename="http://data.threesixtygiving.org/data.json", save_d
         bulk = db.files.initialize_unordered_bulk_op()
         for k, i in enumerate(dcat):
             i["_id"] = i["identifier"]
-            i["modified"] = dateutil.parser.parse(i["modified"], ignoretz=True)
-            i["issued"] = dateutil.parser.parse(i["issued"], ignoretz=True)
+            i["modified"] = parse_date(i["modified"])
+            i["issued"] = parse_date(i["issued"])
             i["publisher"]["slug"] = slugify(i["publisher"]["name"])
 
             bulk.find({'_id': i["_id"]}).upsert().replace_one(i)
@@ -279,11 +285,15 @@ def import_file(filename, inner="grants", source=None, license=None):
 
 def process_grant(i):
 
+    # clean up the fundingOrganization name
+    for f in i.get("fundingOrganization", []):
+        f["name"] = f.get("name").strip()
+    funder = i["fundingOrganization"][0]["name"]
+
     # work out fund slug
     i.setdefault("grantProgramme", [{}])
     # default grant programme is "main fund"
     grantprogramme = i.get("grantProgramme", [{}])[0].get("title", "Main Fund")
-    funder = i["fundingOrganization"][0]["name"]
 
     # check whether we're swapping the fund name
     if funder in SWAP_FUNDS:
@@ -303,6 +313,16 @@ def process_grant(i):
                         if i.get("amountAwarded") < v:
                             grantprogramme = fund_amounts["funds"][k]
 
+        # swap fund name based classification details
+        # based on a particular pattern in the SWAP_FUNDS variable
+        if isinstance(SWAP_FUNDS[funder], dict)  \
+           and SWAP_FUNDS[funder].get("classifications.title"):
+            fund_classifications = SWAP_FUNDS[funder].get("classifications.title")
+            grant_classifications = [c.get("title") for c in i.get("classifications", [])]
+            intersection = set.intersection(set(fund_classifications), set(grant_classifications))
+            if len(intersection) == 1:
+                grantprogramme = list(intersection)[0]
+
     # slugify the funder and grant programme
     funder = slugify(funder)
     i["fundingOrganization"][0]["slug"] = funder
@@ -313,12 +333,12 @@ def process_grant(i):
     # transform dates
     for d in ["awardDate", "dateModified"]:
         if d in i and isinstance(i[d], str):
-            i[d] = dateutil.parser.parse(i[d], ignoretz=True, dayfirst=True)
+            i[d] = parse_date(i[d])
     if "plannedDates" in i:
         for pd in i["plannedDates"]:
             for d in ["endDate", "startDate"]:
                 if d in pd and isinstance(pd[d], str):
-                    pd[d] = dateutil.parser.parse(pd[d], ignoretz=True, dayfirst=True)
+                    pd[d] = parse_date(pd[d])
             if "duration" in pd and isinstance(pd["duration"], str):
                 if pd["duration"] == "Undefined":
                     pd["duration"] = None
@@ -361,7 +381,7 @@ def fetch_data(registry="http://data.threesixtygiving.org/data.json",
                files_since=None, funders=None, skip_funders=None):
 
     if files_since:
-        files_since = dateutil.parser.parse(files_since, ignoretz=True)
+        files_since = parse_date(files_since)
 
     fetch_register(registry)
     process_register(files_since, funders, skip_funders)
