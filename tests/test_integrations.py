@@ -20,8 +20,8 @@ class IntegrationsTestCase(BeehivedataTestCase):
         data = json.loads(rv.data.decode('utf8'))
 
         assert len(data['grant_examples']) == 3
-        assert data['grant_count'] == 4
-        assert [g for g in data['beneficiary_distribution'] if g['sort'] == 'poverty'][0]['count'] == 1
+        assert data['grant_count'] == 12
+        assert [g for g in data['beneficiary_distribution'] if g['sort'] == 'poverty'][0]['count'] == 3
 
     def test_amounts(self):
         rv = self.app.get('/v1/integrations/amounts')

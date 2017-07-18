@@ -41,3 +41,7 @@ class ImportTestCase(BeehivedataTestCase):
         assert grant["fund_slug"] == "millfield-house-foundation-main-fund"
         assert isinstance(grant["awardDate"], datetime.datetime)
         assert grant["recipientOrganization"][0]["charityNumber"] == "700510"
+
+        # check date parsing
+        grant = self.db["grants"].find_one({"_id": "360g-mhfdn-YHNE2017"})
+        assert grant["awardDate"] == datetime.datetime(2017, 5, 11)
