@@ -279,11 +279,15 @@ def import_file(filename, inner="grants", source=None, license=None):
 
 def process_grant(i):
 
+    # clean up the fundingOrganization name
+    for f in i.get("fundingOrganization", []):
+        f["name"] = f.get("name").strip()
+    funder = i["fundingOrganization"][0]["name"]
+
     # work out fund slug
     i.setdefault("grantProgramme", [{}])
     # default grant programme is "main fund"
     grantprogramme = i.get("grantProgramme", [{}])[0].get("title", "Main Fund")
-    funder = i["fundingOrganization"][0]["name"]
 
     # check whether we're swapping the fund name
     if funder in SWAP_FUNDS:
