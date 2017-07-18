@@ -48,7 +48,12 @@ SWAP_FUNDS = {
         "Invest South": "Invest",
         "XA8 - Community": "Community",
         "XA4 - Community": "Community",
-        "Invest North": "Invest"
+        "Invest North": "Invest",
+        "01 Enable North": "Enable",
+        "02 Enable South": "Enable",
+        "03 Invest North": "Invest",
+        "04 Invest South": "Invest",
+        "08 National Programme": "National Programme",
     },
     "Virgin Money Foundation": {
         "North East Fund 2016": "North East Fund",
