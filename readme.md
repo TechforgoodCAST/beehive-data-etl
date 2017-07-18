@@ -1,6 +1,11 @@
 Beehive Data
 ============
 
+Status
+------
+
+[![CircleCI](https://circleci.com/gh/TechforgoodCAST/beehive-data-etl.svg?style=svg&circle-token=375a079d309e74528c5e5600d3646bc20c881f50)](https://circleci.com/gh/TechforgoodCAST/beehive-data-etl)
+
 Initial setup
 -------------
 
