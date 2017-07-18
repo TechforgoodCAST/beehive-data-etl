@@ -1,6 +1,8 @@
 import os
 from ..beneficiaries import ben_categories
 from ...actions.update_geography import get_countries
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 DISTRIBUTIONS = {
     "duration_awarded_months_distribution": [
@@ -131,12 +133,16 @@ DISTRIBUTIONS["volunteers_distribution"] = DISTRIBUTIONS["employees_distribution
 AMOUNT_STEP = 5000
 
 
-def fund_summary_query(fund_slug, one_year_before):
+def fund_summary_query(fund_slug, one_year_before=None):
+    today = datetime.now()
+    if one_year_before is None:
+        one_year_before = latest_date - relativedelta(months=12)
     return [
         {
             "$match": {
                 "fund_slug": fund_slug,
-                "awardDate": {"$gt": one_year_before}
+                "awardDate": {"$gt": one_year_before},
+                "awardDate": {"$lt": today}
             }
         }, {
             "$facet": {
