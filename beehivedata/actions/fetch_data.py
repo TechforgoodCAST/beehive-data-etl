@@ -17,7 +17,9 @@ from ..assets.swap_funds import SWAP_FUNDS
 
 CONTENT_TYPES = {
     "application/json": "json",
-    "text/csv": "csv"
+    "text/csv": "csv",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+    "application/vnd.ms-excel": "xls",
 }
 
 ACCEPTABLE_LICENSES = [
@@ -99,6 +101,12 @@ def fetch_register(filename="http://data.threesixtygiving.org/data.json", save_d
 def process_register(created_since=None, only_funders=None, skip_funders=None, save_dir="data"):
     db = get_db()
     conditions = {}
+    results = {
+        "files_imported": [],
+        "grants_imported": 0,
+        "unacceptable_license": [],
+        "download_failed": []
+    }
 
     # only modified since a certain time
     if created_since:
@@ -145,6 +153,9 @@ def process_register(created_since=None, only_funders=None, skip_funders=None, s
             print("REASON: Invalid license {}".format(f.get("license", "[Unknown]")))
             print("*****************")
             print()
+            results["unacceptable_license"].append(
+                (f.get("publisher", {}).get("name"), f.get("license", "[Unknown]"))
+            )
             continue
 
         for k, d in enumerate(f.get("distribution", [])):
@@ -156,7 +167,7 @@ def process_register(created_since=None, only_funders=None, skip_funders=None, s
             usefile_json = os.path.join(save_dir, '{}-{}.{}'.format(f.get("identifier"), k, "json"))
             try:
                 (usefile, filetype) = fetch_url(filename, usefile, filetype)
-            except urllib.error.HTTPError as e:
+            except (urllib.error.HTTPError, urllib.error.URLError) as e:
                 print()
                 print("*****************")
                 print("DOWNLOAD FAILED")
@@ -164,20 +175,38 @@ def process_register(created_since=None, only_funders=None, skip_funders=None, s
                 print("REASON: {}".format(str(e)))
                 print("*****************")
                 print()
+                results["download_failed"].append(
+                    (f.get("publisher", {}).get("name"), filename, str(e))
+                )
                 continue
 
             if filetype != "json":
                 convert_spreadsheet(usefile, usefile_json, filetype)
                 os.remove(usefile)
                 print("Converted to json: {}".format(usefile_json))
-            print()
 
             db.downloads.replace_one({"_id": filename}, {
                 "downloadFile": usefile_json,
                 "downloadedOn": datetime.datetime.now()
             }, upsert=True)
 
-            import_file(usefile_json, source=d.get("accessURL"), license=f.get("license"))
+            grants_imported = import_file(usefile_json, source=d.get("accessURL"), license=f.get("license"))
+            results["files_imported"].append(usefile_json)
+            results["grants_imported"] += grants_imported
+            print()
+
+    # log result of exercise
+    messages = [
+        "{:,.0f} files successfully imported".format(len(results["files_imported"])),
+        "{:,.0f} grants successfully imported".format(results["grants_imported"]),
+        "{:,.0f} files skipped due to incompatible license:".format(len(results["unacceptable_license"]))
+    ]
+    for i in results["unacceptable_license"]:
+        messages.append("  - {} [{}]".format(i[0], i[1]))
+    messages.append("{:,.0f} files skipped due to download failing:".format(len(results["download_failed"])))
+    for i in results["download_failed"]:
+        messages.append("  - {} [{}] Error: {}".format(i[0], i[1], i[2]))
+    current_app.logger.info("\r\n".join(messages))
 
 
 # from: https://github.com/ThreeSixtyGiving/datagetter/blob/master/get.py#L53
@@ -243,7 +272,9 @@ def import_file(filename, inner="grants", source=None, license=None):
         }
         bulk.find({'_id': i["_id"]}).upsert().replace_one(i)
 
-    print_mongo_bulk_result(bulk.execute(), "grants", ["** Importing file **"])
+    result = bulk.execute()
+    print_mongo_bulk_result(result, "grants", ["** Importing file **"])
+    return max([result["n" + i] for i in ["Inserted", "Matched", "Modified", "Upserted"]])
 
 
 def process_grant(i):
