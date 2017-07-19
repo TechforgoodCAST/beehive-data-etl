@@ -21,11 +21,35 @@ th.rotate > div > span {
 }
 </style>
 <div class='ui container basic segment'>
-  <h1 class='ui header'>
+  <h1 class='ui dividing header'>
     <a class='logo' href='/' title='Beehive Data'>Beehive Data</a>
   </h1>
-  <hr>
-  <h2>{{ funds|length }} funds from {{ funders|length }} funders with data</h2>
+  <div class="ui statistics">
+    <div class="statistic">
+      <div class="value">
+        {{ funders|length }}
+      </div>
+      <div class="label">
+        Funders
+      </div>
+    </div>
+    <div class="statistic">
+      <div class="value">
+        {{ funds|length }}
+      </div>
+      <div class="label">
+        Funds
+      </div>
+    </div>
+    <div class="statistic">
+      <div class="value">
+        {{ "{0:,.0f}".format(grants) }}
+      </div>
+      <div class="label">
+        Grants
+      </div>
+    </div>
+  </div>
   <table class="ui very compact table">
     <thead>
       <tr>

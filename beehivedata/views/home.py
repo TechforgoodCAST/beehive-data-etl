@@ -24,4 +24,5 @@ def status():
     funds = db.grants.aggregate(status_query())
     funds = [process_fund(f) for f in funds]
     funders = set([f["funder"] for f in funds])
-    return render_template('status.html', funds=list(funds), fields=FIELDS_TO_CHECK, funders=funders)
+    grants = sum([f["count"] for f in funds])
+    return render_template('status.html', funds=list(funds), fields=FIELDS_TO_CHECK, funders=funders, grants=grants)
