@@ -92,5 +92,15 @@ SWAP_FUNDS = {
             "Environment",
             "Social change",
         ]
+    },
+    "The David & Elaine Potter Foundation": {
+        "Civil Society - Human Rights": "Civil Society",
+        "Civil Society - Governance": "Civil Society",
+        "Civil Society - Law & Rehabilitation": "Civil Society",
+    },
+    "The Baring Foundation": {
+        "STVS Advice Strategy": "STVS",
+        "STVS Advice Provider": "STVS",
+        "STVS General": "STVS",
     }
 }
