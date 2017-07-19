@@ -1,6 +1,11 @@
 Beehive Data
 ============
 
+Status
+------
+
+[![CircleCI](https://circleci.com/gh/TechforgoodCAST/beehive-data-etl.svg?style=svg&circle-token=375a079d309e74528c5e5600d3646bc20c881f50)](https://circleci.com/gh/TechforgoodCAST/beehive-data-etl)
+
 Initial setup
 -------------
 
@@ -19,19 +24,20 @@ External libraries used
 
 (Installed through `requirements.txt`)
 
-- flask
-- https://github.com/imiric/flask-sass
-- flask_login
-- flask_wtf
-- numpy+mkl (for windows use numpy-1.12.1+mkl-cp35-cp35m-win32.whl)
-- pymongo
-- pytest
-- python-dateutil
-- requests
-- scipy (for windows use scipy-0.19.0-cp35-cp35m-win32.whl)
-- sklearn
-- slugify
-- https://github.com/OpenDataServices/flatten-tool
+- [flask](http://flask.pocoo.org/)
+- [flass-sass](https://github.com/imiric/flask-sass) - no pypi package
+- [flask_login](https://flask-login.readthedocs.io/en/latest/)
+- [flask_wtf](https://flask-wtf.readthedocs.io/en/stable/)
+- [gunicorn](http://gunicorn.org/) - for deployed version
+- [numpy](http://www.numpy.org/) (for windows use [numpy-1.12.1+mkl-cp35-cp35m-win32.whl](http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy))
+- [pymongo](https://api.mongodb.com/python/current/)
+- [pytest](https://docs.pytest.org/en/latest/)
+- [python-dateutil](https://dateutil.readthedocs.io/en/stable/)
+- [requests](http://docs.python-requests.org/en/master/)
+- [scipy](https://www.scipy.org/) (for windows use [scipy-0.19.0-cp35-cp35m-win32.whl](http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy))
+- [sklearn](http://scikit-learn.org/stable/)
+- [slugify](https://github.com/un33k/python-slugify)
+- [flatten-tool](https://github.com/OpenDataServices/flatten-tool) - no pypi package
 
 Run development server
 ----------------------
@@ -68,7 +74,8 @@ Fetch 360 Giving data
 ---------------------
 
 This step can either be run in one go using `flask fetch_all`, or in the individual
-steps shown below.
+steps shown below. You can also run all the update procedures without fetching
+new data by running `flask update_all`
 
 ### 1. Download published data and import into Mongo
 
@@ -113,7 +120,9 @@ $ flask update_charity
 ```
 
 `update_organisations` tries to guess the organisation type of the recipient
-organisation and apply the Beehive codes to it.
+organisation and apply the Beehive codes to it. It also processes the grant
+according to the function in `fetch_data`, so it can be useful to rerun if
+you don't want to fetch all the data again
 
 `update_charities` gets data about the recipient from the `charity-base`.`charities`
 MongoDB collection. It then tries to work out the type of organisation, how long
@@ -124,9 +133,8 @@ outputs the first recipient._
 
 **@todo**: Add in companies data here too.
 
-The `update_charity.py` script has `--host`, `--port`, `--db` which are used
-to connect to the charitybase database (the defaults are the same as the
-charitybase defaults).
+The `update_charity` script has `--host`, `--port`, `--db` which are used
+to connect to the charitybase database (the defaults are `localhost:3306/charities`).
 
 ### 3. Update beneficiaries
 
@@ -137,4 +145,38 @@ grant, including the age range and gender.
 $ flask update_beneficiaries
 ```
 
-**@todo**: Add location classification details.
+### 4. Update geography
+
+Using regexes and other techniques, try to identify the countries served by
+each grant.
+
+```bash
+$ flask update_geography
+```
+
+Deploy to Heroku
+----------------
+
+The site is designed to be deployed using Heroku. You'll need to run a mongodb
+instance and make the [connection URI](https://docs.mongodb.com/manual/reference/connection-string/)
+available as a config variable `MONGODB_URI`.
+
+
+Run tests
+---------
+
+The site uses `pytest` to run the tests. The test database will be created with
+a different database name, and then destroyed at the end of every test.
+
+The tests use seed data from `tests/seed_data` which is based on actual 360giving
+data. Some of the files have been changed to give a wider range of test scenarios.
+
+The tests are run by running:
+
+```bash
+$ python -m pytest tests
+```
+
+The deployed version of the site also has [circleci](https://circleci.com/) integration meaning the tests are run after every github commit. The current test status is:
+
+[![CircleCI](https://circleci.com/gh/TechforgoodCAST/beehive-data-etl.svg?style=svg&circle-token=375a079d309e74528c5e5600d3646bc20c881f50)](https://circleci.com/gh/TechforgoodCAST/beehive-data-etl)

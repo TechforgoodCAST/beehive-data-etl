@@ -141,8 +141,10 @@ def fund_summary_query(fund_slug, one_year_before=None):
         {
             "$match": {
                 "fund_slug": fund_slug,
-                "awardDate": {"$gt": one_year_before},
-                "awardDate": {"$lt": today}
+                "awardDate": {
+                    "$gt": one_year_before,
+                    "$lt": today
+                },
             }
         }, {
             "$facet": {

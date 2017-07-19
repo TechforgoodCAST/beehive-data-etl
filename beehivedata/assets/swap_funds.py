@@ -1,5 +1,6 @@
 SWAP_FUNDS = {
     "Oxfordshire Community Foundation": "",
+    "Community Foundation for Surrey": "",
     "BBC Children in Need": {
         "zPositive Destinations": "Positive Destinations",
         "zFun and Friendship": "Fun and Friendship"
@@ -71,6 +72,12 @@ SWAP_FUNDS = {
         "Project Sponsorship 2015/16": "Project Sponsorship",
         "Open Grants round 2015/16": "Open Grants",
     },
+    "Paul Hamlyn Foundation": {
+        "split_on": {
+            "split": "\\",
+            "take": 0
+        }
+    },
     "R S Macdonald Charitable Trust": {
         "fund_amounts": {
             "amounts": [10000],
@@ -85,5 +92,15 @@ SWAP_FUNDS = {
             "Environment",
             "Social change",
         ]
+    },
+    "The David & Elaine Potter Foundation": {
+        "Civil Society - Human Rights": "Civil Society",
+        "Civil Society - Governance": "Civil Society",
+        "Civil Society - Law & Rehabilitation": "Civil Society",
+    },
+    "The Baring Foundation": {
+        "STVS Advice Strategy": "STVS",
+        "STVS Advice Provider": "STVS",
+        "STVS General": "STVS",
     }
 }
