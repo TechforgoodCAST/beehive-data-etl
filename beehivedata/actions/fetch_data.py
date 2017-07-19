@@ -293,7 +293,8 @@ def process_grant(i):
     # work out fund slug
     i.setdefault("grantProgramme", [{}])
     # default grant programme is "main fund"
-    grantprogramme = i.get("grantProgramme", [{}])[0].get("title", "Main Fund")
+    grantprogramme = i["grantProgramme"][0].get("title", "Main Fund")
+    i["grantProgramme"][0]["title_original"] = i["grantProgramme"][0].get("title")
 
     # check whether we're swapping the fund name
     if funder in SWAP_FUNDS:
@@ -313,7 +314,7 @@ def process_grant(i):
                         if i.get("amountAwarded") < v:
                             grantprogramme = fund_amounts["funds"][k]
 
-        # swap fund name based classification details
+        # swap fund name based on classification details
         # based on a particular pattern in the SWAP_FUNDS variable
         if isinstance(SWAP_FUNDS[funder], dict)  \
            and SWAP_FUNDS[funder].get("classifications.title"):
@@ -323,9 +324,19 @@ def process_grant(i):
             if len(intersection) == 1:
                 grantprogramme = list(intersection)[0]
 
+        # swap fund name based on spliting the existing grantprogramme
+        # based on a particular pattern in the SWAP_FUNDS variable
+        if isinstance(SWAP_FUNDS[funder], dict)  \
+           and SWAP_FUNDS[funder].get("split_on"):
+            split_on = SWAP_FUNDS[funder].get("split_on")
+            grantprogramme = grantprogramme.split(split_on["split"])
+            if len(grantprogramme) > split_on["take"]:
+                grantprogramme = grantprogramme[split_on["take"]]
+
     # slugify the funder and grant programme
     funder = slugify(funder)
     i["fundingOrganization"][0]["slug"] = funder
+    i["grantProgramme"][0]["title"] = grantprogramme
     grantprogramme = slugify(grantprogramme)
     i["grantProgramme"][0]["slug"] = grantprogramme
     i["fund_slug"] = "{}-{}".format(funder, grantprogramme)

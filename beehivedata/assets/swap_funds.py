@@ -1,5 +1,6 @@
 SWAP_FUNDS = {
     "Oxfordshire Community Foundation": "",
+    "Community Foundation for Surrey": "",
     "BBC Children in Need": {
         "zPositive Destinations": "Positive Destinations",
         "zFun and Friendship": "Fun and Friendship"
@@ -70,6 +71,12 @@ SWAP_FUNDS = {
         "Joint Funding 2014/15": "Joint funding",
         "Project Sponsorship 2015/16": "Project Sponsorship",
         "Open Grants round 2015/16": "Open Grants",
+    },
+    "Paul Hamlyn Foundation": {
+        "split_on": {
+            "split": "\\",
+            "take": 0
+        }
     },
     "R S Macdonald Charitable Trust": {
         "fund_amounts": {
