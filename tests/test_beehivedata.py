@@ -32,6 +32,13 @@ class BeehivedataTestCase(unittest.TestCase):
                 current_app.config[i] = current_app.config.get(i.replace("MONGODB_", "MONGODB_TEST_"))
 
         current_app.config["MONGODB_DB"] = current_app.config.get("MONGODB_TEST_DB")
+
+        # check if we're using a live database
+        db = beehivedata.db.get_db()
+        if "test" not in db.name:
+            raise ValueError("Database name should contain \"test\" [could be live database]")
+            return
+
         beehivedata.db.init_db()
         self.db = beehivedata.db.get_db()
         self.setup_test_user()
