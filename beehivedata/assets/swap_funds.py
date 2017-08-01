@@ -1,5 +1,16 @@
 SWAP_FUNDS = {
-    "Oxfordshire Community Foundation": "",
+    "Oxfordshire Community Foundation": {
+        "swap_all": "Main Fund",
+        "fund_amounts": {
+            "amounts": [1500, 10000, 50000],
+            "funds": [
+                "Small and Vital",
+                "Delivering Impact",
+                "Step Change",
+                "Ambition"
+            ]
+        }
+    },
     "Community Foundation for Surrey": "",
     "BBC Children in Need": {
         "zPositive Destinations": "Positive Destinations",

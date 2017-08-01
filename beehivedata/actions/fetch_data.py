@@ -300,6 +300,8 @@ def process_grant(i):
     if funder in SWAP_FUNDS:
         if SWAP_FUNDS[funder] == "":
             grantprogramme = "Main Fund"
+        elif "swap_all" in SWAP_FUNDS[funder]:
+            grantprogramme = SWAP_FUNDS[funder]["swap_all"]
         elif grantprogramme in SWAP_FUNDS[funder]:
             grantprogramme = SWAP_FUNDS[funder][grantprogramme]
 
@@ -313,6 +315,7 @@ def process_grant(i):
                     for k, v in enumerate(fund_amounts["amounts"]):
                         if i.get("amountAwarded") < v:
                             grantprogramme = fund_amounts["funds"][k]
+                            break
 
         # swap fund name based on classification details
         # based on a particular pattern in the SWAP_FUNDS variable
