@@ -70,6 +70,9 @@ def update_beneficiaries():
         # make sure we've got no duplicates
         grant["beehive"]["beneficiaries"] = list(set(grant["beehive"]["beneficiaries"]))
 
+        # add themes
+        grant["beehive"]["themes"] = classify_grant(desc, theme_regexes)
+
         # get genders
         regex_genders = classify_grant(desc, gender_regexes)
         genders = []

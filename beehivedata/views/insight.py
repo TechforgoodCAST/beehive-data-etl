@@ -3,6 +3,8 @@ from flask_login import login_required
 
 from ..db import get_db
 from ..assets.recommender import Recommender
+from ..assets.beneficiaries import theme_regexes
+from ..actions.update_beneficiaries import classify_grant
 
 insight = Blueprint('insight', __name__)
 
@@ -47,3 +49,13 @@ def insight_all():
         "amounts": amounts.get(f, 0),
         "durations": durations.get(f, 0),
     } for f in funds})
+
+
+@insight.route('/theme', methods=['POST'])
+@login_required
+def insight_theme():
+    desc = request.json['data'].get("description", "")
+    themes = classify_grant(desc, theme_regexes)
+    return jsonify({
+        "themes": themes
+    })
