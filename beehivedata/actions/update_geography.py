@@ -4,7 +4,7 @@ import csv
 import os
 
 from ..db import get_db
-from .fetch_data import print_mongo_bulk_result
+from .fetch_data import print_mongo_bulk_result, get_grant_conditions
 
 
 def get_countries(csvfile="assets/countries.csv"):
@@ -14,7 +14,7 @@ def get_countries(csvfile="assets/countries.csv"):
     return countries
 
 
-def update_geography():
+def update_geography(funders=None, skip_funders=None):
     db = get_db()
 
     bulk = db.grants.initialize_unordered_bulk_op()
@@ -27,7 +27,7 @@ def update_geography():
         )) for country in all_countries
     }
 
-    for grant in db.grants.find():
+    for grant in db.grants.find(get_grant_conditions(funders, skip_funders)):
         grant.setdefault("beehive", {})
         desc = grant.get("title", "") + " " + grant.get("description", "")
 

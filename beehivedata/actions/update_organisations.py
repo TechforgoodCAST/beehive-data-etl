@@ -3,15 +3,15 @@ import dateutil.relativedelta
 import re
 
 from ..db import get_db
-from .fetch_data import print_mongo_bulk_result, process_grant
+from .fetch_data import print_mongo_bulk_result, process_grant, get_grant_conditions
 
 
-def update_organisations():
+def update_organisations(funders=None, skip_funders=None):
     db = get_db()
 
     bulk = db.grants.initialize_unordered_bulk_op()
 
-    for grant in db.grants.find():
+    for grant in db.grants.find(get_grant_conditions(funders, skip_funders)):
         grant.setdefault("beehive", {})
         grant = process_grant(grant)
         for r in grant["recipientOrganization"]:

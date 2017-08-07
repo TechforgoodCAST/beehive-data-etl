@@ -31,6 +31,8 @@ ACCEPTABLE_LICENSES = [
     "",
 ]
 
+DEFAULT_REGISTRY = "http://data.threesixtygiving.org/data.json"
+
 
 def get_filetype(url):
     parts = urlparse(url)
@@ -77,7 +79,7 @@ def fetch_url(url, new_file=None, filetype=None):
         return (new_file, filetype)
 
 
-def fetch_register(filename="http://data.threesixtygiving.org/data.json", save_dir="data"):
+def fetch_register(filename=DEFAULT_REGISTRY, save_dir="data"):
     """
     Fetch list of files from the JSON feed of the data register and store them
     in a mongo-db instance
@@ -104,15 +106,28 @@ def fetch_register(filename="http://data.threesixtygiving.org/data.json", save_d
         print_mongo_bulk_result(bulk.execute(), "files", ["** Fetching register **"])
 
 
-def process_register(created_since=None, only_funders=None, skip_funders=None, save_dir="data"):
+def fetch_new(filename=DEFAULT_REGISTRY, save_dir="data"):
+    """
+    Find the registry and display any new funders, along with their slug and
+    the license for the data
+    """
     db = get_db()
+    existing_files = db.files.find(projection={"_id": True})
+    existing_files = [i["_id"] for i in existing_files]
+    fetch_register(filename, save_dir)
+    messages = ["** Finding new files **"]
+    for i in db.files.find():
+        if i["_id"] not in existing_files:
+            messages.append("{} [{}] (Modified: {})".format(i["publisher"]["name"],
+                                                            i["license"],
+                                                            i["modified"].date().isoformat()
+                                                            ))
+    current_app.logger.info("\r\n".join(messages))
+
+
+def get_conditions(created_since=None, only_funders=None, skip_funders=None):
+
     conditions = {}
-    results = {
-        "files_imported": [],
-        "grants_imported": 0,
-        "unacceptable_license": [],
-        "download_failed": []
-    }
 
     # only modified since a certain time
     if created_since:
@@ -139,6 +154,45 @@ def process_register(created_since=None, only_funders=None, skip_funders=None, s
             {"publisher.name": skip_funders},
             {"publisher.slug": skip_funders},
         ]
+
+    return conditions
+
+
+def get_grant_conditions(only_funders=None, skip_funders=None):
+
+    conditions = {}
+
+    # only including particular funders
+    if only_funders:
+        if isinstance(only_funders, list):
+            only_funders = {"$in": only_funders}
+        conditions["$or"] = [
+            {"fundingOrganization.name": only_funders},
+            {"fundingOrganization.slug": only_funders},
+        ]
+
+    if skip_funders:
+        if isinstance(skip_funders, list):
+            skip_funders = {"$nin": skip_funders}
+        else:
+            skip_funders = {"$ne": skip_funders}
+        conditions["$and"] = [
+            {"fundingOrganization.name": skip_funders},
+            {"fundingOrganization.slug": skip_funders},
+        ]
+
+    return conditions
+
+
+def process_register(created_since=None, only_funders=None, skip_funders=None, save_dir="data"):
+    db = get_db()
+    conditions = get_conditions(created_since, only_funders, skip_funders)
+    results = {
+        "files_imported": [],
+        "grants_imported": 0,
+        "unacceptable_license": [],
+        "download_failed": []
+    }
 
     files = db.files.find(conditions)
     print("Found {} files to import".format(files.count()))
