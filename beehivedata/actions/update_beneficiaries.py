@@ -3,7 +3,7 @@ import re
 
 from ..db import get_db
 from ..assets.beneficiaries import *
-from .fetch_data import print_mongo_bulk_result
+from .fetch_data import print_mongo_bulk_result, get_grant_conditions
 
 
 def classify_grant(desc, regexes):
@@ -44,12 +44,12 @@ def age_to_category(ages):
     return list(cats.values())
 
 
-def update_beneficiaries():
+def update_beneficiaries(funders=None, skip_funders=None):
     db = get_db()
 
     bulk = db.grants.initialize_unordered_bulk_op()
 
-    for grant in db.grants.find():
+    for grant in db.grants.find(get_grant_conditions(funders, skip_funders)):
         grant.setdefault("beehive", {})
         grant["beehive"].setdefault("beneficiaries", [])
         grant["beehive"].setdefault("ages", [])
@@ -69,6 +69,9 @@ def update_beneficiaries():
 
         # make sure we've got no duplicates
         grant["beehive"]["beneficiaries"] = list(set(grant["beehive"]["beneficiaries"]))
+
+        # add themes
+        grant["beehive"]["themes"] = classify_grant(desc, theme_regexes)
 
         # get genders
         regex_genders = classify_grant(desc, gender_regexes)

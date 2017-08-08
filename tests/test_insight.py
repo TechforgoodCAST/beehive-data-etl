@@ -65,6 +65,25 @@ class InsightTestCase(BeehivedataTestCase):
         data = json.loads(rv.data.decode('utf8'))
         assert data['joseph-rowntree-charitable-trust-northern-ireland'] > 0
 
+    def test_theme(self):
+        data = {"data": {"description": "We're hoping to play tennis with disabled young people"}}
+        rv = self.app.post('/insight/theme',
+                           data=json.dumps(data),
+                           content_type='application/json'
+                           )
+        assert rv.status_code == 401
+
+        rv = self.login("test@example.com", 'test')
+        assert b'Logged in successfully' in rv.data
+
+        rv = self.app.post('/insight/theme',
+                           data=json.dumps(data),
+                           content_type='application/json'
+                           )
+        assert rv.status_code == 200
+        data = json.loads(rv.data.decode('utf8'))
+        assert "Disability" in data['themes']
+
     def test_insight_all(self):
         data = {"data": {
             'duration': 24,

@@ -7,6 +7,7 @@ from ..db import get_db
 from ..assets.queries.fund_summary import fund_summary_query, process_fund_summary
 from ..assets.queries.amounts import amounts_query
 from ..assets.queries.durations import durations_query
+from ..assets.queries.themes import themes_query
 
 integrations = Blueprint('integrations', __name__)
 
@@ -25,6 +26,14 @@ def durations():
     db = get_db()
     durations = db.grants.aggregate(durations_query())
     return jsonify(list(durations))
+
+
+@integrations.route('/themes')
+@login_required
+def themes():
+    db = get_db()
+    themes = db.grants.aggregate(themes_query())
+    return jsonify(list(themes))
 
 
 @integrations.route('/fund_summary/<fund_slug>')

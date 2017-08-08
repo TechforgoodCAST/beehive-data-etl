@@ -13,7 +13,7 @@ from .views.api import api
 from .views.home import home
 from .views.user import user
 
-from .actions.fetch_data import fetch_data
+from .actions.fetch_data import fetch_data, fetch_new
 from .actions.update_organisations import update_organisations
 from .actions.update_charity import update_charity
 from .actions.update_beneficiaries import update_beneficiaries
@@ -61,6 +61,12 @@ def register_blueprints(app):
     return None
 
 
+def split_funders(ctx, param, value):
+    if value:
+        return value.split(",")
+    return value
+
+
 def register_cli(app):
 
     @app.cli.command('initdb')
@@ -69,65 +75,74 @@ def register_cli(app):
         init_db()
         print('Initialized the database.')
 
+    @app.cli.command("find_new")
+    @click.option('--registry', default="http://data.threesixtygiving.org/data.json", help="URL to download the data registry from")
+    def find_new_command(registry):
+        """find any new funders"""
+        fetch_new(registry)
+
     @app.cli.command("fetch_data")
     @click.option('--registry', default="http://data.threesixtygiving.org/data.json", help="URL to download the data registry from")
     @click.option('--files-since', default=None, help="Look only for files modified since this date (in format YYYY-MM-DD)")
-    @click.option('--funders', default=None, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
-    @click.option('--skip-funders', default=None, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
+    @click.option('--funders', default=None, callback=split_funders, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
+    @click.option('--skip-funders', default=None, callback=split_funders, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
     def fetch_data_command(registry, files_since, funders, skip_funders):
-        if funders:
-            funders = funders.split(",")
-        if skip_funders:
-            skip_funders = skip_funders.split(",")
         fetch_data(registry, files_since, funders, skip_funders)
 
     @app.cli.command("update_organisations")
-    def update_organisations_command():
-        update_organisations()
+    @click.option('--files-since', default=None, help="Look only for files modified since this date (in format YYYY-MM-DD)")
+    @click.option('--funders', default=None, callback=split_funders, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
+    @click.option('--skip-funders', default=None, callback=split_funders, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
+    def update_organisations_command(funders, skip_funders):
+        update_organisations(funders, skip_funders)
 
     @app.cli.command("update_charity")
     @click.option('--host', default="localhost", help="Host for the charity-base mongo database")
     @click.option('--port', default=27017, type=int, help="Port for the charity-base mongo database")
     @click.option('--db', default="charity-base", help="charity-base mongo database name")
-    def update_charity_command(host, port, db):
-        update_charity({"host": host, "port": port, "db": db})
+    @click.option('--funders', default=None, callback=split_funders, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
+    @click.option('--skip-funders', default=None, callback=split_funders, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
+    def update_charity_command(host, port, db, funders, skip_funders):
+        update_charity({"host": host, "port": port, "db": db}, funders, skip_funders)
 
     @app.cli.command("update_beneficiaries")
-    def update_beneficiaries_command():
-        update_beneficiaries()
+    @click.option('--funders', default=None, callback=split_funders, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
+    @click.option('--skip-funders', default=None, callback=split_funders, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
+    def update_beneficiaries_command(funders, skip_funders):
+        update_beneficiaries(funders, skip_funders)
 
     @app.cli.command("update_geography")
-    def update_geography_command():
-        update_geography()
+    @click.option('--funders', default=None, callback=split_funders, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
+    @click.option('--skip-funders', default=None, callback=split_funders, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
+    def update_geography_command(funders, skip_funders):
+        update_geography(funders, skip_funders)
 
     @app.cli.command("fetch_all")
     @click.option('--registry', default="http://data.threesixtygiving.org/data.json", help="URL to download the data registry from")
     @click.option('--files-since', default=None, help="Look only for files modified since this date (in format YYYY-MM-DD)")
-    @click.option('--funders', default=None, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
-    @click.option('--skip-funders', default=None, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
+    @click.option('--funders', default=None, callback=split_funders, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
+    @click.option('--skip-funders', default=None, callback=split_funders, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
     @click.option('--host', default="localhost", help="Host for the charity-base mongo database")
     @click.option('--port', default=27017, type=int, help="Port for the charity-base mongo database")
     @click.option('--db', default="charity-base", help="charity-base mongo database name")
     def fetch_all_command(registry, files_since, funders, skip_funders, host, port, db):
-        if funders:
-            funders = funders.split(",")
-        if skip_funders:
-            skip_funders = skip_funders.split(",")
         fetch_data(registry, files_since, funders, skip_funders)
-        update_organisations()
-        update_charity({"host": host, "port": port, "db": db})
-        update_beneficiaries()
-        update_geography()
+        update_organisations(funders, skip_funders)
+        update_charity({"host": host, "port": port, "db": db}, funders, skip_funders)
+        update_beneficiaries(funders, skip_funders)
+        update_geography(funders, skip_funders)
 
     @app.cli.command("update_all")
+    @click.option('--funders', default=None, callback=split_funders, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
+    @click.option('--skip-funders', default=None, callback=split_funders, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
     @click.option('--host', default="localhost", help="Host for the charity-base mongo database")
     @click.option('--port', default=27017, type=int, help="Port for the charity-base mongo database")
     @click.option('--db', default="charity-base", help="charity-base mongo database name")
-    def update_all_command(host, port, db):
-        update_organisations()
-        update_charity({"host": host, "port": port, "db": db})
-        update_beneficiaries()
-        update_geography()
+    def update_all_command(funders, skip_funders, host, port, db):
+        update_organisations(funders, skip_funders)
+        update_charity({"host": host, "port": port, "db": db}, funders, skip_funders)
+        update_beneficiaries(funders, skip_funders)
+        update_geography(funders, skip_funders)
 
     @app.cli.command("register_user")
     @click.argument('email')

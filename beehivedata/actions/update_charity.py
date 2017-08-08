@@ -7,7 +7,7 @@ from ..db import get_db
 from ..assets.cc_aoo import CC_AOO_CODES
 from ..assets.beneficiaries import *
 from .update_beneficiaries import classify_grant
-from .fetch_data import print_mongo_bulk_result
+from .fetch_data import print_mongo_bulk_result, get_grant_conditions
 
 # convert charity commission classification categories to beehive ones
 cc_to_beehive = {
@@ -43,7 +43,7 @@ def clean_charity_number(regno):
     return regno
 
 
-def update_charity(charitybase_db={"port": 27017, "host": "localhost", "db": "charity-base"}):
+def update_charity(charitybase_db={"port": 27017, "host": "localhost", "db": "charity-base"}, funders=None, skip_funders=None):
 
     db = get_db()
     client = MongoClient(charitybase_db["host"], charitybase_db["port"])
@@ -58,7 +58,10 @@ def update_charity(charitybase_db={"port": 27017, "host": "localhost", "db": "ch
 
     bulk = db.grants.initialize_unordered_bulk_op()
 
-    for grant in db.grants.find({"recipientOrganization": {"$elemMatch": {"charityNumber": {"$exists": True}}}}):
+    conditions = get_grant_conditions(funders, skip_funders)
+    conditions["recipientOrganization"] = {"$elemMatch": {"charityNumber": {"$exists": True}}}
+
+    for grant in db.grants.find(conditions):
         grant.setdefault("beehive", {})
         for r in grant["recipientOrganization"]:
             charityNumber = clean_charity_number(r["charityNumber"])
