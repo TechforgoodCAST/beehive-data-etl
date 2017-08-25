@@ -3,6 +3,7 @@ from ..beneficiaries import ben_categories
 from ...actions.update_geography import get_countries
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
+import calendar
 
 DISTRIBUTIONS = {
     "duration_awarded_months_distribution": [
@@ -238,6 +239,27 @@ def fund_summary_query(fund_slug, one_year_before=None):
                     }
                 }],
 
+                # Distribution by month awarded
+                "award_month_year_distribution": [{
+                    "$group": {
+                        "_id": {"$dateToString": {
+                            "date": "$awardDate",
+                            "format": "%Y-%m-01"
+                        }},
+                        "count": {"$sum": 1},
+                        "sum": {"$sum": "$amountAwarded"},
+                    }
+                }, {
+                    "$sort": {"_id": 1}
+                }, {
+                    "$project": {
+                        "_id": 0,
+                        "label": "$_id",
+                        "count": "$count",
+                        "sum": "$sum",
+                    }
+                }],
+
                 # Distribution by organisation type
                 "org_type_distribution": [{
                     "$group": {
@@ -396,6 +418,7 @@ def fund_summary_query(fund_slug, one_year_before=None):
                 "duration_awarded_months_max": {"$arrayElemAt": ["$aggregates.duration_awarded_months_max", 0]},
                 "duration_awarded_months_distribution": "$duration_awarded_months_distribution",
                 "award_month_distribution": "$award_month_distribution",
+                "award_month_year_distribution": "$award_month_year_distribution",
                 "org_type_distribution": "$org_type_distribution",
                 "operating_for_distribution": "$operating_for_distribution",
                 "income_distribution": "$income_distribution",
@@ -413,13 +436,14 @@ def fund_summary_query(fund_slug, one_year_before=None):
     ]
 
 
-def process_fund_summary(results):
+def process_fund_summary(results, convert_dates=False):
 
     # process distributions
     distributions = [
         "amount_awarded_distribution",
         "duration_awarded_months_distribution",
         "award_month_distribution",
+        "award_month_year_distribution",
         "org_type_distribution",
         "operating_for_distribution",
         "income_distribution",
@@ -449,6 +473,12 @@ def process_fund_summary(results):
             results[d] = new_d
         results[d] = process_distribution(results[d], d, results["grant_count"])
 
+    if convert_dates:
+        for d in ["period_end", "period_start"]:
+            results[d] = datetime.strptime(results[d], "%Y-%m-%d")
+        for g in results["grant_examples"]:
+            g["award_date"] = datetime.strptime(g["award_date"], "%Y-%m-%d")
+
     results["sources"] = {s["license"]: s.get("source") for s in results.get("sources", {})}
     return results
 
@@ -467,6 +497,9 @@ def process_distribution(distribution, dist_name, total=None):
 
     elif dist_name == "country_distribution":
         distribution = [i for i in distribution if i["count"] > 0]
+
+    elif dist_name == "award_month_distribution":
+        distribution = [dict(d, label=calendar.month_name[d["month"]]) for d in distribution]
 
     if not total:
         total = sum([a["count"] for a in distribution])

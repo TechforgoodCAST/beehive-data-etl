@@ -36,9 +36,7 @@ def themes():
     return jsonify(list(themes))
 
 
-@integrations.route('/fund_summary/<fund_slug>')
-@login_required
-def fund_summary(fund_slug=None):
+def get_fund_data(fund_slug=None, convert_dates=False):
     db = get_db()
     latest_date = list(db.grants.aggregate([
         {"$match": {
@@ -57,5 +55,11 @@ def fund_summary(fund_slug=None):
 
     grants = db.grants.aggregate(fund_summary_query(fund_slug, one_year_before))
     fund_summary = list(grants)[0]
-    fund_summary = process_fund_summary(fund_summary)
-    return jsonify(fund_summary)
+    fund_summary = process_fund_summary(fund_summary, convert_dates)
+    return fund_summary
+
+
+@integrations.route('/fund_summary/<fund_slug>')
+@login_required
+def fund_summary(fund_slug=None):
+    return jsonify(get_fund_data(fund_slug))

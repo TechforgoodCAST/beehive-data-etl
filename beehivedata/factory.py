@@ -3,6 +3,8 @@ from flask import Flask, g, current_app
 from flaskext.sass import sass
 import click
 from pymongo.errors import DuplicateKeyError
+from num2words import num2words
+import inflection
 
 from .db import init_db, close_db
 from .login import login_manager, register_user
@@ -45,6 +47,7 @@ def create_app(config=None):
     register_blueprints(app)
     register_cli(app)
     register_teardowns(app)
+    register_template_filter(app)
     login_manager.init_app(app)
 
     sass(app, input_dir='assets/scss', output_dir='css')
@@ -153,6 +156,32 @@ def register_cli(app):
             print("User created.")
         except DuplicateKeyError:
             print("User already present in DB.")
+
+
+def register_template_filter(app):
+
+    # custom jinja2 filter for getting chart data
+    @app.template_filter()
+    def chart_data(value, label="count"):
+        return [d[label] for d in value]
+
+    # custom jinja2 filter for getting chart labels
+    @app.template_filter()
+    def chart_label(value):
+        return chart_data(value, "label")
+
+
+    @app.template_filter()
+    def format_number(value, plural=None, word_before=10, ordinal=False, num_format=",.0f"):
+        if word_before:
+            if value <= word_before:
+                value = num2words(value, ordinal)
+        if isinstance(value, int):
+            value = "{:{num_format}}".format(value, num_format=num_format)
+        if plural:
+            return "{} {}".format(value, inflection.pluralize(plural))
+        else:
+            return value
 
 
 def register_teardowns(app):

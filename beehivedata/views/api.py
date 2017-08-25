@@ -3,6 +3,7 @@ from pymongo import ASCENDING, DESCENDING
 
 from ..db import get_db
 from ..assets.queries.funders import funders_query
+from .integrations import get_fund_data
 
 api = Blueprint('api', __name__)
 
@@ -59,3 +60,9 @@ def funder(funder_id=None):
     grants = db.grants.find({'fundingOrganization.id': funder_id})\
                .sort("awardDate", DESCENDING)
     return jsonify(list(grants))
+
+
+@api.route('/fund/<fund_slug>.html')
+def fund(fund_slug=None):
+    fund_info = get_fund_data(fund_slug, convert_dates=True)
+    return render_template('fund.html', fund=fund_info)
