@@ -72,6 +72,15 @@ def fetch_url(url, new_file=None, filetype=None):
                 print("Guessing filetype as {}".format(filetype))
                 new_file += "." + filetype
 
+            elif f.getheader("Content-Disposition"):
+                import cgi
+                v, p = cgi.parse_header(f.getheader('Content-Disposition'))
+                if "filename" in p:
+                    filename = p['filename'].split(".")
+                    filetype = filename[-1]
+                    print("Guessing filetype as {}".format(filetype))
+                    new_file += "." + filetype
+
         with open(new_file, "wb") as new_f:
             new_f.write(f.read())
             print("Saved as: %s" % new_file)
