@@ -171,7 +171,6 @@ def register_template_filter(app):
     def chart_label(value):
         return chart_data(value, "label")
 
-
     @app.template_filter()
     def format_number(value, plural=None, word_before=10, ordinal=False, num_format=",.0f"):
         if word_before:
