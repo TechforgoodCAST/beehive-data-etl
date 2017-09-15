@@ -158,6 +158,16 @@ def register_cli(app):
         except DuplicateKeyError:
             print("User already present in DB.")
 
+    @app.cli.command("fetch_charities")
+    @click.option("--ccew", default="http://data.charitycommission.gov.uk/", help="URL of page containing Charity Commission data")
+    @click.option("--ccni", default="http://www.charitycommissionni.org.uk/charity-search/?q=&include=Linked&include=Removed&exportCSV=1", help="CSV of Northern Ireland Charity Commission data")
+    @click.option("--oscr", default=None, help="ZIP file containing Scottish charity data")
+    def fetch_charities_command(ccew, ccni, oscr):
+        if oscr:
+            fetch_oscr(oscr)
+        fetch_ccew(ccew)
+        fetch_ccni(ccni)
+
 
 def register_template_filter(app):
 
@@ -170,7 +180,6 @@ def register_template_filter(app):
     @app.template_filter()
     def chart_label(value):
         return chart_data(value, "label")
-
 
     @app.template_filter()
     def format_number(value, plural=None, word_before=10, ordinal=False, num_format=",.0f"):
