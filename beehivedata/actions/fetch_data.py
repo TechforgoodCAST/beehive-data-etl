@@ -115,7 +115,7 @@ def fetch_register(filename=DEFAULT_REGISTRY, save_dir="data"):
         print_mongo_bulk_result(bulk.execute(), "files", ["** Fetching register **"])
 
 
-def fetch_new(filename=DEFAULT_REGISTRY, save_dir="data"):
+def fetch_new(filename=DEFAULT_REGISTRY, created_since=None, save_dir="data"):
     """
     Find the registry and display any new funders, along with their slug and
     the license for the data
@@ -125,12 +125,17 @@ def fetch_new(filename=DEFAULT_REGISTRY, save_dir="data"):
     existing_files = [i["_id"] for i in existing_files]
     fetch_register(filename, save_dir)
     messages = ["** Finding new files **"]
-    for i in db.files.find():
-        if i["_id"] not in existing_files:
-            messages.append("{} [{}] (Modified: {})".format(i["publisher"]["name"],
-                                                            i["license"],
-                                                            i["modified"].date().isoformat()
-                                                            ))
+    print(created_since)
+    for i in db.files.find().sort("modified"):
+        if created_since:
+            if i["modified"] < dateutil.parser.parse(created_since):
+                continue
+        elif i["_id"] in existing_files:
+            continue
+        messages.append("{} [{}] (Modified: {})".format(i["publisher"]["name"],
+                                                        i["license"],
+                                                        i["modified"].date().isoformat()
+                                                        ))
     current_app.logger.info("\r\n".join(messages))
 
 

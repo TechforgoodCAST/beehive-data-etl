@@ -80,9 +80,10 @@ def register_cli(app):
 
     @app.cli.command("find_new")
     @click.option('--registry', default="http://data.threesixtygiving.org/data.json", help="URL to download the data registry from")
-    def find_new_command(registry):
+    @click.option('--files-since', default=None, help="Look only for files modified since this date (in format YYYY-MM-DD)")
+    def find_new_command(registry, files_since):
         """find any new funders"""
-        fetch_new(registry)
+        fetch_new(registry, files_since)
 
     @app.cli.command("fetch_data")
     @click.option('--registry', default="http://data.threesixtygiving.org/data.json", help="URL to download the data registry from")
