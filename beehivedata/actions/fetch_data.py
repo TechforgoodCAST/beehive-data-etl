@@ -28,6 +28,7 @@ ACCEPTABLE_LICENSES = [
     "https://creativecommons.org/publicdomain/zero/1.0/",
     "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/",
     "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "https://creativecommons.org/licenses/by-sa/4.0/"
     "",
 ]
 
