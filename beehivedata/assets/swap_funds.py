@@ -11,6 +11,10 @@ SWAP_FUNDS = {
             ]
         }
     },
+    "Essex Community Foundation": {
+        "swap_all": "General Rolling Programme",
+        "Youth Social Action Fund": "Youth Social Action Fund"
+    },
     "Community Foundation for Surrey": "",
     "BBC Children in Need": {
         "zPositive Destinations": "Positive Destinations",
