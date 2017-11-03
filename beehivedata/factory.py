@@ -16,6 +16,7 @@ from .views.home import home
 from .views.user import user
 
 from .actions.fetch_data import fetch_data, fetch_new
+from .actions.fetch_charity_data import fetch_oscr, fetch_ccew, fetch_ccni, import_oscr, import_ccew, import_ccni
 from .actions.update_organisations import update_organisations
 from .actions.update_charity import update_charity
 from .actions.update_beneficiaries import update_beneficiaries
@@ -161,12 +162,17 @@ def register_cli(app):
     @app.cli.command("fetch_charities")
     @click.option("--ccew", default="http://data.charitycommission.gov.uk/", help="URL of page containing Charity Commission data")
     @click.option("--ccni", default="http://www.charitycommissionni.org.uk/charity-search/?q=&include=Linked&include=Removed&exportCSV=1", help="CSV of Northern Ireland Charity Commission data")
-    @click.option("--oscr", default=None, help="ZIP file containing Scottish charity data")
+    @click.option("--oscr", default="https://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download", help="Page containing Scottish charity data")
     def fetch_charities_command(ccew, ccni, oscr):
-        if oscr:
-            fetch_oscr(oscr)
+        fetch_oscr(oscr)
         fetch_ccew(ccew)
         fetch_ccni(ccni)
+
+    @app.cli.command("import_charities")    
+    def import_charities_command():
+        import_ccew()
+        import_oscr()
+        import_ccni()
 
 
 def register_template_filter(app):
