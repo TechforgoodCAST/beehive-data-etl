@@ -48,6 +48,14 @@ def parse_date(datestr):
     return dateutil.parser.parse(datestr, ignoretz=True)
 
 
+def replace_keys(d):
+    new = {}
+    for k, v in d.items():
+        if isinstance(v, dict):
+            v = replace_keys(v)
+        new[k.replace('.', '-')] = v
+    return new
+
 def fetch_url(url, new_file=None, filetype=None):
     # check if it's a file first
     if os.path.isfile(url):
@@ -346,12 +354,20 @@ def import_file(filename, inner="grants", source=None, license=None):
         }
         bulk.find({'_id': i["_id"]}).upsert().replace_one(i)
 
-    result = bulk.execute()
+    try:
+        result = bulk.execute()
+    except pymongo.errors.BulkWriteError as bwe:
+        print(bwe.details)
+        print(bwe.details['writeErrors'])
+        raise
     print_mongo_bulk_result(result, "grants", ["** Importing file **"])
     return max([result["n" + i] for i in ["Inserted", "Matched", "Modified", "Upserted"]])
 
 
 def process_grant(i):
+
+    # remove any dots from mongodb names
+    i = replace_keys(i)
 
     # clean up the fundingOrganization name
     for f in i.get("fundingOrganization", []):

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, jsonify
 from flask_login import login_required
 
 from ..db import get_db
@@ -26,3 +26,11 @@ def status():
     funders = set([f["funder"] for f in funds])
     grants = sum([f["count"] for f in funds])
     return render_template('status.html', funds=list(funds), fields=FIELDS_TO_CHECK, funders=funders, grants=grants)
+
+
+@home.route('/datasets')
+def datasets():
+    db = get_db()
+    files = db.files.find()
+    return render_template('datasets.html', files=list(files))
+    #jsonify(list(files))

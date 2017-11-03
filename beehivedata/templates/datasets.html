@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block scripts %}
+<!-- <link rel="stylesheet" media="all" href="https://cdn.datatables.net/1.10.16/css/dataTables.semanticui.min.css" /> -->
+<link rel="stylesheet" media="all" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<!-- <script src="https://cdn.datatables.net/1.10.16/js/dataTables.semanticui.min.js"></script> -->
+<script>
+  $(document).ready(function () {
+    $('#files').DataTable({
+      "order": [[3, "desc"]]
+    });
+  });
+</script>
+{% endblock %}
+{% block content %}
+<style>
+th.rotate {
+  /* Something you can count on */
+  height: 140px;
+  white-space: nowrap;
+}
+
+th.rotate > div {
+  transform:
+    translate(5px, 51px)
+    rotate(270deg);
+  width: 30px;
+}
+th.rotate > div > span {
+  padding: 5px 5px;
+}
+.fund-status-feedback {
+  width: 50px;
+}
+</style>
+<div class='ui container basic segment'>
+  <h1 class='ui dividing header'>
+    <a class='logo' href='/' title='Beehive Data'>Beehive Data</a>
+  </h1>
+  <div class="ui statistics">
+    <div class="statistic">
+      <div class="value">
+        {{ files|groupby('publisher.name')|length }}
+      </div>
+      <div class="label">
+        Publishers
+      </div>
+    </div>
+    <div class="statistic">
+      <div class="value">
+        {{ files|length }}
+      </div>
+      <div class="label">
+        Files
+      </div>
+    </div>
+  </div>
+  <table class="ui very compact table" id="files">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Publisher</th>
+        <th>Title</th>
+        <th>Issued</th>
+        <th>License</th>
+        <th>Downloads</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for file in files %}
+      <tr>
+        <td>{{ file._id }}</td>
+        <td>
+          <strong>
+          {% if file.publisher.website != "" %}
+            <a href="{{ file.publisher.website }}" target="_blank">{{ file.publisher.name }}</a>
+          {% else %}
+            {{ file.publisher.name }}
+          {% endif %}
+          </strong>
+        </td>
+        <td>
+          {{ file.title }}<br>
+          <small>{{ file.description }}</small>
+        </td>
+        <td>{{ file.issued.strftime("%Y-%m-%d") }}</td>
+        <td><a href="{{ file.license }}" target="_blank">{{ file.license_name }}</a></td>
+        <td>
+          <ul>
+            {% for d in file.distribution %}
+            <li><a href="{{ d.accessURL }}" target="_blank">Info</a> | <a href="{{ d.downloadURL }}">Data</a></li>
+            {% endfor %}
+          </ul>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
