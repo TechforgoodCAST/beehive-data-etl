@@ -295,7 +295,68 @@ def import_ccew():
                     "income": row[3],
                     "expend": row[4],
                 }
-            
+
+    # go through the partb file
+    with open(os.path.join(ccew_folder, "extract_partb.csv"), encoding="latin1") as a:
+        csvreader = csv.reader(a)
+        for row in csvreader:
+            if len(row) < 2 or row[0].strip()=="":
+                continue
+            row = clean_row(row, int_fields=list(range(4, 43)), date_order="YMD")
+            charity_id = row[0]
+            if charity_id not in charities:
+                charities[charity_id] = {}
+            fyend = datetime.datetime.strptime(row[3][0:19], "%Y-%m-%d %H:%M:%S")
+            if row[3] or row[4]:
+                partb = {
+                    "fyend": fyend,
+                    "fystart": datetime.datetime.strptime(row[2][0:19], "%Y-%m-%d %H:%M:%S"),
+                    "inc_leg": row[4],
+                    "inc_end": row[5],
+                    "inc_vol": row[6],
+                    "inc_fr": row[7],
+                    "inc_char": row[8],
+                    "inc_invest": row[9],
+                    "inc_other": row[10],
+                    "inc_total": row[11],
+                    "invest_gain": row[12],
+                    "asset_gain": row[13],
+                    "pension_gain": row[14],
+                    "exp_vol": row[15],
+                    "exp_trade": row[16],
+                    "exp_invest": row[17],
+                    "exp_grant": row[18],
+                    "exp_charble": row[19],
+                    "exp_gov": row[20],
+                    "exp_other": row[21],
+                    "exp_total": row[22],
+                    "exp_support": row[23],
+                    "exp_dep": row[24],
+                    "reserves": row[25],
+                    "asset_open": row[26],
+                    "asset_close": row[27],
+                    "fixed_assets": row[28],
+                    "open_assets": row[29],
+                    "invest_assets": row[30],
+                    "cash_assets": row[31],
+                    "current_assets": row[32],
+                    "credit_1": row[33],
+                    "credit_long": row[34],
+                    "pension_assets": row[35],
+                    "total_assets": row[36],
+                    "funds_end": row[37],
+                    "funds_restrict": row[38],
+                    "funds_unrestrict": row[39],
+                    "funds_total": row[40],
+                    "employees": row[41],
+                    "volunteers": row[42],
+                    "cons_acc": row[43]=="Y",
+                    "charity_acc": row[44]=="Y"
+                }
+                if fyend.date().strftime("%Y%m%d") not in charities[charity_id]:
+                    charities[charity_id][fyend.date().strftime("%Y%m%d")] = {}
+                charities[charity_id][fyend.date().strftime("%Y%m%d")].update(partb)
+
     for i in charities:
         update = {"finances": charities[i]}
         years = [int(k) for k in charities[i].keys()]
@@ -307,7 +368,8 @@ def import_ccew():
         bulk.find({'_id': i}).update({"$set": update})
             
     print_mongo_bulk_result(bulk.execute(), "charities", [
-                            "** Importing CCEW data from extract_financial.csv **"])
+                            "** Importing CCEW data from extract_financial.csv **",
+                            "** Importing CCEW data from extract_partb.csv **"])
     bulk = db.charities.initialize_unordered_bulk_op()
 
     # go through the registration file
@@ -331,7 +393,7 @@ def import_ccew():
         reg_years = sorted(charities[i], key=lambda k: k["regdate"])
         bulk.find({'_id': i}).update({"$set": {
                 "date_registered": reg_years[0]["regdate"],
-                "date_removed": reg_years[0]["remdate"],
+                "date_removed": reg_years[-1]["remdate"],
             }})
 
     print_mongo_bulk_result(bulk.execute(), "charities", [
