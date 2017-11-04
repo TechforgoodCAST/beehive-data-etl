@@ -273,7 +273,12 @@ def process_register(created_since=None, only_funders=None, skip_funders=None, s
                 "downloadedOn": datetime.datetime.now()
             }, upsert=True)
 
-            grants_imported = import_file(usefile_json, source=d.get("accessURL"), license=f.get("license"))
+            source = {
+                "accessURL": d.get("accessURL"),
+                "id": f["_id"]
+            }
+
+            grants_imported = import_file(usefile_json, source=source, license=f.get("license"))
             results["files_imported"].append(usefile_json)
             results["grants_imported"] += grants_imported
             print()
@@ -351,16 +356,12 @@ def import_file(filename, inner="grants", source=None, license=None):
         i["_id"] = i["id"]
         i["dataset"] = {
             "license": license,
-            "source": source
+            "source": source["accessURL"],
+            "id": source["id"]
         }
         bulk.find({'_id': i["_id"]}).upsert().replace_one(i)
 
-    try:
-        result = bulk.execute()
-    except pymongo.errors.BulkWriteError as bwe:
-        print(bwe.details)
-        print(bwe.details['writeErrors'])
-        raise
+    result = bulk.execute()
     print_mongo_bulk_result(result, "grants", ["** Importing file **"])
     return max([result["n" + i] for i in ["Inserted", "Matched", "Modified", "Upserted"]])
 
