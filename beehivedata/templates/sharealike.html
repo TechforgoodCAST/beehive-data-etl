@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+th.rotate {
+  /* Something you can count on */
+  height: 140px;
+  white-space: nowrap;
+}
+
+th.rotate > div {
+  transform:
+    translate(5px, 51px)
+    rotate(270deg);
+  width: 30px;
+}
+th.rotate > div > span {
+  padding: 5px 5px;
+}
+.fund-status-feedback {
+  width: 50px;
+}
+</style>
+<div class='ui container basic segment'>
+  <h1 class='ui dividing header'>
+    <a class='logo' href='/' title='Beehive Data'>Beehive Data</a>
+  </h1>
+  <h2>Sharealike data</h2>
+  <p>The following data has been used under a <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons 
+    Share-Alike license</a>. In accordance with the terms of this license
+    we are releasing our cleaned and adapted data under the same license.</p>
+  <div class="ui statistics">
+    <div class="statistic">
+      <div class="value">
+        {{ files|groupby('publisher.name')|length }}
+      </div>
+      <div class="label">
+        Publishers
+      </div>
+    </div>
+    <div class="statistic">
+      <div class="value">
+        {{ files|length }}
+      </div>
+      <div class="label">
+        Files
+      </div>
+    </div>
+  </div>
+  <ul>
+     {% for file in files %}
+     <li>{{ file.publisher.name }} - <a href="/datasets/{{ file._id}}.json">{{ file.title }}</a> [json]</li>
+     {% endfor %}
+  </ul>
+</div>
+{% endblock %}

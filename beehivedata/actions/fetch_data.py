@@ -28,6 +28,7 @@ ACCEPTABLE_LICENSES = [
     "https://creativecommons.org/publicdomain/zero/1.0/",
     "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/",
     "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "https://creativecommons.org/licenses/by-sa/4.0/"
     "",
 ]
 
@@ -47,6 +48,14 @@ def parse_date(datestr):
         return dateutil.parser.parse(datestr, ignoretz=True, dayfirst=True)
     return dateutil.parser.parse(datestr, ignoretz=True)
 
+
+def replace_keys(d):
+    new = {}
+    for k, v in d.items():
+        if isinstance(v, dict):
+            v = replace_keys(v)
+        new[k.replace('.', '-')] = v
+    return new
 
 def fetch_url(url, new_file=None, filetype=None):
     # check if it's a file first
@@ -264,7 +273,12 @@ def process_register(created_since=None, only_funders=None, skip_funders=None, s
                 "downloadedOn": datetime.datetime.now()
             }, upsert=True)
 
-            grants_imported = import_file(usefile_json, source=d.get("accessURL"), license=f.get("license"))
+            source = {
+                "accessURL": d.get("accessURL"),
+                "id": f["_id"]
+            }
+
+            grants_imported = import_file(usefile_json, source=source, license=f.get("license"))
             results["files_imported"].append(usefile_json)
             results["grants_imported"] += grants_imported
             print()
@@ -342,7 +356,8 @@ def import_file(filename, inner="grants", source=None, license=None):
         i["_id"] = i["id"]
         i["dataset"] = {
             "license": license,
-            "source": source
+            "source": source["accessURL"],
+            "id": source["id"]
         }
         bulk.find({'_id': i["_id"]}).upsert().replace_one(i)
 
@@ -352,6 +367,9 @@ def import_file(filename, inner="grants", source=None, license=None):
 
 
 def process_grant(i):
+
+    # remove any dots from mongodb names
+    i = replace_keys(i)
 
     # clean up the fundingOrganization name
     for f in i.get("fundingOrganization", []):
@@ -368,10 +386,10 @@ def process_grant(i):
     if funder in SWAP_FUNDS:
         if SWAP_FUNDS[funder] == "":
             grantprogramme = "Main Fund"
-        elif "swap_all" in SWAP_FUNDS[funder]:
-            grantprogramme = SWAP_FUNDS[funder]["swap_all"]
         elif grantprogramme in SWAP_FUNDS[funder]:
             grantprogramme = SWAP_FUNDS[funder][grantprogramme]
+        elif "swap_all" in SWAP_FUNDS[funder]:
+            grantprogramme = SWAP_FUNDS[funder]["swap_all"]
 
         # swap fund name based on grant amount
         # based on a particular pattern in the SWAP_FUNDS variable
