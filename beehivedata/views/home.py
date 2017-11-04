@@ -33,4 +33,18 @@ def datasets():
     db = get_db()
     files = db.files.find()
     return render_template('datasets.html', files=list(files))
-    #jsonify(list(files))
+
+
+@home.route('/datasets/<fileid>.json')
+def dataset(fileid):
+    db = get_db()
+    grants = db.grants.find({'dataset.id': fileid})
+    return jsonify({"grants": list(grants)})
+
+
+@home.route('/sharealike_data')
+def sharealike():
+    db = get_db()
+    files = db.files.find(
+        {"license": "https://creativecommons.org/licenses/by-sa/4.0/"})
+    return render_template('sharealike.html', files=list(files))
