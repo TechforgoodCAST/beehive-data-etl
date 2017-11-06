@@ -199,9 +199,15 @@ def fetch_ccew(ccew):
                 print("[CCEW] write %s" % csv_filename)
 
 
+# get charity commission area of operation mapping file
+def fetch_ccew_aoo(aoo_file):
+    print("[CCEW] Using url: %s" % aoo_file)
+    download_file(aoo_file, os.path.join('data', 'ccew_aoo.csv'))
+    print("[CCEW] AOO mapping downloaded")
+
+
 def import_ccew():
     db = get_db()
-    bulk = db.charities.initialize_unordered_bulk_op()
     ccew_folder = os.path.join("data", "ccew")
 
     # first reset some initial data
@@ -212,7 +218,21 @@ def import_ccew():
         "active": False
     }})
 
+    # then run imports for specific tables
+    import_ccew_charity(ccew_folder)
+    import_ccew_main_charity(ccew_folder)
+    import_ccew_classification(ccew_folder)
+    import_ccew_financial(ccew_folder)
+    import_ccew_registration(ccew_folder)
+    import_ccew_objects(ccew_folder)
+    import_ccew_geography(ccew_folder)
+
+
+def import_ccew_charity(ccew_folder):
     # go through the main charity file
+    db = get_db()
+    bulk = db.charities.initialize_unordered_bulk_op()
+
     with open(os.path.join(ccew_folder, "extract_charity.csv"), encoding="latin1") as a:
         csvreader = csv.reader(a)
         for row in csvreader:
@@ -235,9 +255,13 @@ def import_ccew():
 
     print_mongo_bulk_result(bulk.execute(), "charities", [
                             "** Importing CCEW data from extract_charity.csv **"])
+
+
+def import_ccew_main_charity(ccew_folder):
+    # go through the main_charity file
+    db = get_db()
     bulk = db.charities.initialize_unordered_bulk_op()
 
-    # go through the main_charity file
     with open(os.path.join(ccew_folder, "extract_main_charity.csv"), encoding="latin1") as a:
         csvreader = csv.reader(a)
         for row in csvreader:
@@ -255,9 +279,13 @@ def import_ccew():
 
     print_mongo_bulk_result(bulk.execute(), "charities", [
                             "** Importing CCEW data from extract_main_charity.csv **"])
+
+
+def import_ccew_classification(ccew_folder):
+    # go through the classification file
+    db = get_db()
     bulk = db.charities.initialize_unordered_bulk_op()
 
-    # go through the classification file
     with open(os.path.join(ccew_folder, "extract_class_ref.csv"), encoding="latin1") as a:
         csvreader = csv.reader(a)
         class_ref = {}
@@ -285,9 +313,13 @@ def import_ccew():
 
     print_mongo_bulk_result(bulk.execute(), "classes", [
                             "** Importing CCEW data from extract_class.csv **"])
+
+
+def import_ccew_financial(ccew_folder):
+    # go through the finances file
+    db = get_db()
     bulk = db.charities.initialize_unordered_bulk_op()
 
-    # go through the finances file
     with open(os.path.join(ccew_folder, "extract_financial.csv"), encoding="latin1") as a:
         csvreader = csv.reader(a)
         charities = {}
@@ -375,15 +407,25 @@ def import_ccew():
             latest_year = max(years)
             update["income"] = charities[i][str(latest_year)]["income"]
             update["expend"] = charities[i][str(latest_year)]["expend"]
+            update["employees"] = charities[i][str(latest_year)].get("employees")
+            update["volunteers"] = charities[i][str(
+                latest_year)].get("volunteers")
+            update["grants_made"] = charities[i][str(
+                latest_year)].get("exp_grant")
             update["fye"] = charities[i][str(latest_year)]["fyend"]
+        update["finances"] = [update["finances"][i] for i in sorted(update["finances"].keys())]
         bulk.find({'_id': i}).update({"$set": update})
             
     print_mongo_bulk_result(bulk.execute(), "charities", [
                             "** Importing CCEW data from extract_financial.csv **",
                             "** Importing CCEW data from extract_partb.csv **"])
+
+
+def import_ccew_registration(ccew_folder):
+    # go through the registration file
+    db = get_db()
     bulk = db.charities.initialize_unordered_bulk_op()
 
-    # go through the registration file
     with open(os.path.join(ccew_folder, "extract_registration.csv"), encoding="latin1") as a:
         csvreader = csv.reader(a)
         charities = {}
@@ -409,9 +451,13 @@ def import_ccew():
 
     print_mongo_bulk_result(bulk.execute(), "charities", [
                             "** Importing CCEW data from extract_registration.csv **"])
+
+
+def import_ccew_objects(ccew_folder):
+    # go through the objects file
+    db = get_db()
     bulk = db.charities.initialize_unordered_bulk_op()
 
-    # go through the objects file
     with open(os.path.join(ccew_folder, "extract_objects.csv"), encoding="latin1") as a:
         csvreader = csv.reader(a, escapechar="\\", doublequote=False)
         charities = {}
@@ -438,6 +484,41 @@ def import_ccew():
 
     print_mongo_bulk_result(bulk.execute(), "charities", [
                             "** Importing CCEW data from extract_objects.csv **"])
+
+
+def import_ccew_geography(ccew_folder):
+    # go through the geography file
+    db = get_db()
+    bulk = db.charities.initialize_unordered_bulk_op()
+
+    with open(os.path.join("data", "ccew_aoo.csv")) as a:
+        csvreader = csv.DictReader(a, escapechar="\\", doublequote=False)
+        aoo = {}
+        for row in csvreader:
+            row["iso3166_1"] = row.pop("ISO3166-1", None)
+            row["iso3166_2_GB"] = row.pop("ISO3166-2:GB", None)
+            aoo[(row["aootype"], row["aookey"])] = row
+
+    with open(os.path.join(ccew_folder, "extract_charity_aoo.csv"), encoding="latin1") as a:
+        csvreader = csv.reader(a, escapechar="\\", doublequote=False)
+        charities = {}
+        for row in csvreader:
+            if len(row) < 2 or row[0].strip()=="":
+                continue
+            row = clean_row(row)
+            charity_id = row[0]
+            if charity_id not in charities:
+                charities[charity_id] = []
+            area_id = (row[1], row[2])
+            if area_id not in aoo:
+                print("Area %s not found" % area_id)
+            charities[charity_id].append(aoo[area_id])
+
+    for i in charities:
+        bulk.find({'_id': i}).update({"$set": {"areas": charities[i]}})
+
+    print_mongo_bulk_result(bulk.execute(), "charities", [
+                            "** Importing CCEW data from extract_charity_aoo.csv **"])
 
 
 CCNI_FIELD_MAP = {
