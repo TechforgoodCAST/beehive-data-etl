@@ -5,7 +5,12 @@
     <a class='logo' href='/' title='Beehive Data'>Beehive Data</a>
   </h1>
   <hr>
-  <h2>{{ grants|length }} grants to <strong>{{ charity }}</strong></h2>
+  <h2>{{ charity["name"] }}</h2>
+  <ul>
+    <li><strong>Registered:</strong> {{ charity["date_registered"].strftime("%d/%m/%Y") }}</li>
+    <li><strong>Latest income:</strong> £{{ "{:,.0f}".format(charity["income"]) }} (year ending {{ charity["fye"].strftime("%d/%m/%Y") }})</li>
+  </ul>
+  <h3>{{ grants|length }} grants</h3>
   <table class="ui table">
     <thead>
       <tr>
