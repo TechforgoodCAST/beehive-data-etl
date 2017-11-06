@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, request
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from flask_login import login_required
@@ -63,3 +63,25 @@ def get_fund_data(fund_slug=None, convert_dates=False):
 @login_required
 def fund_summary(fund_slug=None):
     return jsonify(get_fund_data(fund_slug))
+
+
+@integrations.route('/funders')
+@login_required
+def funds():
+    db = get_db()
+
+    conditions = {
+        "grants_made": {"$gte": 100000},
+        "activities": "MAKES GRANTS TO ORGANISATIONS",
+        "active": True
+    }
+
+    if request.values.get("country"):
+        conditions["areas.iso3166_1"] = {"$in": request.values.get("country").split(",")}
+
+    for i in ["beneficiaries", "activities", "purpose"]:
+        if request.values.get(i):
+            conditions[i] = {"$in": request.values.get(i).split(",")}
+
+    grant_makers = db.charities.find(conditions, sort=[("grants_made", -1)], limit=50)
+    return jsonify(list(grant_makers))
