@@ -83,11 +83,22 @@ def fetch_oscr(oscr):
     oscr_folder = os.path.join("data", "oscr")
 
     FORM_ID = "#uxSiteForm"
+    TERMS_AND_CONDITIONS_TEXT = "ContentPlaceHolderDefault_WebsiteContent_ctl05_CharityRegDownload_10_lblTermsConditions"
     TERMS_AND_CONDITIONS_CHECKBOX = "ctl00$ctl00$ctl00$ContentPlaceHolderDefault$WebsiteContent$ctl05$CharityRegDownload_10$cbTermsConditions"
 
     browser = mechanicalsoup.StatefulBrowser()
     print("[OSCR] Using url: %s" % oscr)
     browser.open(oscr)
+
+    # get the terms and conditions box
+    page = browser.get_current_page()
+    tandcs = page.find(id=TERMS_AND_CONDITIONS_TEXT)
+    print("[OSCR] To continue accept the following terms and conditions")
+    print(tandcs.text)
+    accept = input("[OSCR] Do you accept the terms and conditions? (y/n) ")
+    if accept[0].strip().lower()!="y":
+        print("[OSCR] Did not download OSCR data as terms and conditions not accepted")
+        return
 
     browser.select_form(FORM_ID)
     browser[TERMS_AND_CONDITIONS_CHECKBOX] = True
