@@ -102,13 +102,10 @@ def register_cli(app):
         update_organisations(funders, skip_funders)
 
     @app.cli.command("update_charity")
-    @click.option('--host', default="localhost", help="Host for the charity-base mongo database")
-    @click.option('--port', default=27017, type=int, help="Port for the charity-base mongo database")
-    @click.option('--db', default="charity-base", help="charity-base mongo database name")
     @click.option('--funders', default=None, callback=split_funders, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
     @click.option('--skip-funders', default=None, callback=split_funders, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
-    def update_charity_command(host, port, db, funders, skip_funders):
-        update_charity({"host": host, "port": port, "db": db}, funders, skip_funders)
+    def update_charity_command(funders, skip_funders):
+        update_charity(funders, skip_funders)
 
     @app.cli.command("update_beneficiaries")
     @click.option('--funders', default=None, callback=split_funders, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
@@ -127,25 +124,19 @@ def register_cli(app):
     @click.option('--files-since', default=None, help="Look only for files modified since this date (in format YYYY-MM-DD)")
     @click.option('--funders', default=None, callback=split_funders, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
     @click.option('--skip-funders', default=None, callback=split_funders, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
-    @click.option('--host', default="localhost", help="Host for the charity-base mongo database")
-    @click.option('--port', default=27017, type=int, help="Port for the charity-base mongo database")
-    @click.option('--db', default="charity-base", help="charity-base mongo database name")
-    def fetch_all_command(registry, files_since, funders, skip_funders, host, port, db):
+    def fetch_all_command(registry, files_since, funders, skip_funders):
         fetch_data(registry, files_since, funders, skip_funders)
         update_organisations(funders, skip_funders)
-        update_charity({"host": host, "port": port, "db": db}, funders, skip_funders)
+        update_charity(funders, skip_funders)
         update_beneficiaries(funders, skip_funders)
         update_geography(funders, skip_funders)
 
     @app.cli.command("update_all")
     @click.option('--funders', default=None, callback=split_funders, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
     @click.option('--skip-funders', default=None, callback=split_funders, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
-    @click.option('--host', default="localhost", help="Host for the charity-base mongo database")
-    @click.option('--port', default=27017, type=int, help="Port for the charity-base mongo database")
-    @click.option('--db', default="charity-base", help="charity-base mongo database name")
-    def update_all_command(funders, skip_funders, host, port, db):
+    def update_all_command(funders, skip_funders):
         update_organisations(funders, skip_funders)
-        update_charity({"host": host, "port": port, "db": db}, funders, skip_funders)
+        update_charity(funders, skip_funders)
         update_beneficiaries(funders, skip_funders)
         update_geography(funders, skip_funders)
 

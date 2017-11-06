@@ -11,13 +11,13 @@ from .fetch_data import print_mongo_bulk_result, get_grant_conditions
 
 # convert charity commission classification categories to beehive ones
 cc_to_beehive = {
-    105: "poverty",
-    108: "religious",
-    111: "animals",
-    203: "disabilities",
-    204: "ethnic",
-    205: "organisations",
-    207: "public",
+    "THE PREVENTION OR RELIEF OF POVERTY": "poverty",
+    "RELIGIOUS ACTIVITIES": "religious",
+    "ANIMALS": "animals",
+    "PEOPLE WITH DISABILITIES": "disabilities",
+    "PEOPLE OF A PARTICULAR ETHNIC OR RACIAL ORIGIN": "ethnic",
+    "OTHER CHARITIES OR VOLUNTARY BODIES": "organisations",
+    "THE GENERAL PUBLIC/MANKIND": "public",
 }
 
 # convert OSCR classification categories to beehive ones
@@ -43,16 +43,9 @@ def clean_charity_number(regno):
     return regno
 
 
-def update_charity(charitybase_db={"port": 27017, "host": "localhost", "db": "charity-base"}, funders=None, skip_funders=None):
+def update_charity(funders=None, skip_funders=None):
 
     db = get_db()
-    client = MongoClient(charitybase_db["host"], charitybase_db["port"])
-    cdb = client[charitybase_db["db"]]
-    current_app.logger.info("Connected to '%s' mongo database [host: %s, port: %s]" % (
-        cdb.name,
-        client.address[0],
-        client.address[1]
-    ))
 
     missing_charities = 0
 
@@ -68,7 +61,7 @@ def update_charity(charitybase_db={"port": 27017, "host": "localhost", "db": "ch
             if not charityNumber or charityNumber == "":
                 continue
 
-            charity = cdb.charities.find_one({"charityNumber": charityNumber})
+            charity = db.charities.find_one({"_id": charityNumber})
             r.setdefault("beehive", {})
             r["beehive"].setdefault("beneficiaries", [])
 
@@ -80,75 +73,31 @@ def update_charity(charitybase_db={"port": 27017, "host": "localhost", "db": "ch
             r["charityStatus"] = "found"
 
             # work out how long charity was operating for
-            r["regDate"] = charity.get("registration", [{}])[0].get("regDate")
+            r["regDate"] = charity.get("date_registered")
             if r["regDate"]:
                 grant["beehive"]["operating_for"] = float((grant["awardDate"] - r["regDate"]).days) / 365
 
             # get financial data
-            max_i = None
-            use_i = None
-            for i in charity.get("financial", []):
-                if not i.get("fyEnd"):
-                    continue
-                if not i.get("fyStart"):
-                    i["fyStart"] = i["fyEnd"] - dateutil.relativedelta.relativedelta(months=12)
-
-                if i["income"] and i["spending"]:
-                    if grant["awardDate"] <= i["fyEnd"] and grant["awardDate"] >= i["fyStart"]:
-                        use_i = i["fyEnd"]
-                    if max_i is None or i["fyEnd"] > max_i:
-                        max_i = i["fyEnd"]
-
-            if use_i is None:
-                use_i = max_i
-
-            for i in charity.get("financial", []):
-                if i["fyEnd"] == use_i:
-                    grant["beehive"]["financial_fye"] = str(i["fyEnd"])
-                    grant["beehive"]["income"] = i["income"]
-                    grant["beehive"]["spending"] = i["spending"]
-
-            # get employee and volunteer data
-            max_i = None
-            use_i = None
-            for i in charity.get("partB", []):
-                if not i.get("fyEnd"):
-                    continue
-                if not i.get("fyStart"):
-                    i["fyStart"] = i["fyEnd"] - dateutil.relativedelta.relativedelta(months=12)
-
-                if i.get("people"):
-                    if grant["awardDate"] <= i["fyEnd"] and grant["awardDate"] >= i["fyStart"]:
-                        use_i = i["fyEnd"]
-                    if max_i is None or i["fyEnd"] > max_i:
-                        max_i = i["fyEnd"]
-
-            if use_i is None:
-                use_i = max_i
-
-            for i in charity.get("partB", []):
-                if i["fyEnd"] == use_i:
-                    grant["beehive"]["partb_fye"] = str(i["fyEnd"])
-                    grant["beehive"]["employees"] = i.get("people", {}).get("employees")
-                    grant["beehive"]["volunteers"] = i.get("people", {}).get("volunteers")
+            grant["beehive"]["financial_fye"] = charity.get("fye")
+            grant["beehive"]["income"] = charity.get("income")
+            grant["beehive"]["spending"] = charity.get("expend")
+            grant["beehive"]["employees"] = charity.get("employees")
+            grant["beehive"]["volunteers"] = charity.get("volunteers")
 
             # add beneficiary data to recipient organisation
 
-            # Charity Commission beneficiaries
-            for c in charity.get("class", []):
-                if c in cc_to_beehive:
-                    r["beehive"]["beneficiaries"].append(cc_to_beehive[c])
-
-            # OSCR beneficiaries
-            for i in charity.get("beta", {}):
-                for c in charity.get("beta", {})[i]:
+            # Charity Commission & oscr beneficiaries
+            for i in ["beneficiaries", "activities", "purpose"]:
+                for c in charity.get(i, []):
+                    if c in cc_to_beehive:
+                        r["beehive"]["beneficiaries"].append(cc_to_beehive[c])
                     if c in oscr_to_beehive:
                         r["beehive"]["beneficiaries"].append(oscr_to_beehive[c])
 
             # regex on objects
-            for o in charity.get("objects", []):
-                if o:
-                    r["beehive"]["beneficiaries"] += classify_grant(o, ben_regexes)
+            if charity.get("objects"):
+                r["beehive"]["beneficiaries"] += classify_grant(
+                    charity.get("objects"), ben_regexes)
 
             r["beehive"]["beneficiaries"] = list(set(r["beehive"]["beneficiaries"]))
 
@@ -156,21 +105,21 @@ def update_charity(charitybase_db={"port": 27017, "host": "localhost", "db": "ch
             r["beehive"]["countries"] = []
             r["beehive"]["districts"] = []
             r["beehive"]["multi_national"] = False
-            for i in charity.get("areaOfOperation", []):
+            for i in charity.get("areas", []):
                 area = None
                 for a in CC_AOO_CODES:
-                    if a[0] == i["aooType"] and a[1] == i["aooKey"]:
+                    if a[0] == i["aootype"] and a[1] == i["aookey"]:
                         area = a
 
                 if not area:
                     continue
 
-                if i["aooType"] == "D":
-                    r["beehive"]["countries"].append(area[7])
-                elif i["aooType"] == "E":
+                if i["aootype"] == "D":
+                    r["beehive"]["countries"].append(i["iso3166_1"])
+                elif i["aootype"] == "E":
                     r["beehive"]["multi_national"] = True
-                elif area[6]:
-                    r["beehive"]["districts"].append(area[6])
+                elif i["iso3166_2_GB"]:
+                    r["beehive"]["districts"].append(i["iso3166_2_GB"])
 
             if len(r["beehive"]["districts"]) > 0 and len(r["beehive"]["countries"]) == 0:
                 r["beehive"]["countries"] = ["GB"]
