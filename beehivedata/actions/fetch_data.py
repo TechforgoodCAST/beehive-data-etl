@@ -162,6 +162,7 @@ def get_conditions(created_since=None, only_funders=None, skip_funders=None):
         if isinstance(only_funders, list):
             only_funders = {"$in": only_funders}
         conditions["$or"] = [
+            {"_id": only_funders},
             {"publisher.prefix": only_funders},
             {"publisher.name": only_funders},
             {"publisher.slug": only_funders},
@@ -173,6 +174,7 @@ def get_conditions(created_since=None, only_funders=None, skip_funders=None):
         else:
             skip_funders = {"$ne": skip_funders}
         conditions["$and"] = [
+            {"_id": skip_funders},
             {"publisher.prefix": skip_funders},
             {"publisher.name": skip_funders},
             {"publisher.slug": skip_funders},

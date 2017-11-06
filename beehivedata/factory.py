@@ -16,6 +16,7 @@ from .views.home import home
 from .views.user import user
 
 from .actions.fetch_data import fetch_data, fetch_new
+from .actions.fetch_charity_data import fetch_oscr, fetch_ccew, fetch_ccew_aoo, fetch_ccni, import_oscr, import_ccew, import_ccni
 from .actions.update_organisations import update_organisations
 from .actions.update_charity import update_charity
 from .actions.update_beneficiaries import update_beneficiaries
@@ -157,6 +158,23 @@ def register_cli(app):
             print("User created.")
         except DuplicateKeyError:
             print("User already present in DB.")
+
+    @app.cli.command("fetch_charities")
+    @click.option("--ccew", default="http://data.charitycommission.gov.uk/", help="URL of page containing Charity Commission data")
+    @click.option("--ccni", default="http://www.charitycommissionni.org.uk/charity-search/?q=&include=Linked&include=Removed&exportCSV=1", help="CSV of Northern Ireland Charity Commission data")
+    @click.option("--oscr", default="https://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download", help="Page containing Scottish charity data")
+    @click.option("--ccew-aoo", default="https://gist.githubusercontent.com/drkane/8973fd75009f502f28aacfdc396b40d2/raw/be43860d1cbddfb9f653c8866ecbbe83273993a8/cc-aoo-gss-iso.csv", help="CSV with mapping from Charity Commission to ISO/GSS codes")
+    def fetch_charities_command(ccew, ccni, oscr, ccew_aoo):
+        fetch_oscr(oscr)
+        fetch_ccew(ccew)
+        fetch_ccew_aoo(ccew_aoo)
+        fetch_ccni(ccni)
+
+    @app.cli.command("import_charities")    
+    def import_charities_command():
+        import_ccew()
+        import_oscr()
+        import_ccni()
 
 
 def register_template_filter(app):
