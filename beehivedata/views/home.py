@@ -48,4 +48,38 @@ def sources():
     sharealike_files = db.files.find(
         {"license": "https://creativecommons.org/licenses/by-sa/4.0/"})
     sources = db.files.find()
-    return render_template('sources.html', sources=list(sources), sharealike_files=list(sharealike_files))
+    charities = db.charities.aggregate([
+        {"$group": {"_id": "$source", "count": {"$sum": 1}}}
+    ])
+    charities = list(charities)
+    num_charities = sum([c["count"] for c in charities])
+
+    regulators = [
+        {
+            "name": "Charity Commission for England and Wales",
+            "source": "http://data.charitycommission.gov.uk/",
+            "license": {
+                "name": "Open Government Licence v3.0",
+                "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+            }
+        },
+        {
+            "name": "Office of the Scottish Charity Regulator",
+            "source": "https://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download",
+            "license": {
+                "name": "Open Government Licence v2.0",
+                "url": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/",
+            }
+        },
+        {
+            "name": "Charity Commission Northern Ireland",
+            "source": "http://www.charitycommissionni.org.uk/charity-search/"
+        },
+    ]
+    for r in regulators:
+        r["charities"] = sum([c["count"] for c in charities if c["_id"] == r["name"]])
+
+    return render_template('sources.html', sources=list(sources), 
+                                           sharealike_files=list(sharealike_files), 
+                                           num_charities=num_charities,
+                                           regulators=regulators)

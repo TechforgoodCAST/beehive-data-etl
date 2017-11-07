@@ -115,19 +115,25 @@ th.rotate > div > span {
         Regulators
       </div>
     </div>
+    <div class="statistic">
+      <div class="value">
+        {{ "{:,.0f}".format(num_charities) }}
+      </div>
+      <div class="label">
+        Charities
+      </div>
+    </div>
   </div>
   <ul>
+    {% for r in regulators %}
     <li>
-      <strong><a href="http://data.charitycommission.gov.uk/">Charity Commission for England and Wales</a></strong> 
-      [<a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a>]
+      <strong><a href="{{ r["source"] }}">{{ r["name"] }}</a></strong> 
+      {% if r.get("license"): %}
+      [<a href="{{ r["license"]["url"] }}">{{ r["license"]["name"] }}</a>] 
+      {% endif %}
+      ({{ "{:,.0f}".format(r["charities"]) }} charities)
     </li>
-    <li>
-      <strong><a href="https://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download">Office of the Scottish Charity Regulator</a></strong> 
-      [<a href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/">Open Government Licence v2.0</a>]
-    </li>
-    <li>
-      <strong><a href="http://www.charitycommissionni.org.uk/charity-search/">Charity Commission for Northern Ireland</a></strong> 
-    </li>
+    {% endfor %}
   </ul>
 </div>
 {% endblock %}
