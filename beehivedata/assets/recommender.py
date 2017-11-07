@@ -97,7 +97,8 @@ class Recommender:
 
         for fund in self.get_amounts():
             if len(set(fund.get(field, []))) > 1:
-                kde = scipy.stats.gaussian_kde(fund[field], bandwidth)
+                d = [f for f in fund[field] if isinstance(f, int)]
+                kde = scipy.stats.gaussian_kde(d, bandwidth)
                 result[fund["fund_slug"]] = kde.integrate_box_1d(min_request, max_request)
             else:
                 result[fund["fund_slug"]] = 0

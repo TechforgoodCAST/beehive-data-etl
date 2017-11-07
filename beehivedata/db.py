@@ -32,7 +32,7 @@ def init_db():
         db.client.address[1]
     ))
 
-    for c in ["grants", "downloads", "files", current_app.config['USERS_COLLECTION']]:
+    for c in ["grants", "downloads", "files", current_app.config['USERS_COLLECTION'], "charities"]:
         try:
             db.create_collection(c)
         except CollectionInvalid:
@@ -41,6 +41,7 @@ def init_db():
     db.grants.create_index("recipientOrganization.charityNumber")
     db.grants.create_index("recipientOrganization.companyNumber")
     db.grants.create_index("recipientOrganization.id")
+    db.charities.create_index("source")
     db[current_app.config['USERS_COLLECTION']].create_index("email", unique=True)
 
 

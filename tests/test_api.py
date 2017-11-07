@@ -8,7 +8,7 @@ class ApiTestCase(BeehivedataTestCase):
         rv = self.app.get('/v1/charity/1122057')
         data = json.loads(rv.data.decode('utf8'))
         assert len(data) == 1
-        assert data[0]["recipientOrganization"][0]["charityNumber"] == "1122057"
+        assert data["grants"][0]["recipientOrganization"][0]["charityNumber"] == "1122057"
 
     def test_charity_html(self):
         rv = self.app.get('/v1/charity/1122057.html')

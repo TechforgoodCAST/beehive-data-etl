@@ -28,6 +28,7 @@ ACCEPTABLE_LICENSES = [
     "https://creativecommons.org/publicdomain/zero/1.0/",
     "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/",
     "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "https://creativecommons.org/licenses/by-sa/4.0/"
     "",
 ]
 
@@ -47,6 +48,14 @@ def parse_date(datestr):
         return dateutil.parser.parse(datestr, ignoretz=True, dayfirst=True)
     return dateutil.parser.parse(datestr, ignoretz=True)
 
+
+def replace_keys(d):
+    new = {}
+    for k, v in d.items():
+        if isinstance(v, dict):
+            v = replace_keys(v)
+        new[k.replace('.', '-')] = v
+    return new
 
 def fetch_url(url, new_file=None, filetype=None):
     # check if it's a file first
@@ -71,6 +80,15 @@ def fetch_url(url, new_file=None, filetype=None):
                 filetype = CONTENT_TYPES[f.getheader("Content-Type")]
                 print("Guessing filetype as {}".format(filetype))
                 new_file += "." + filetype
+
+            elif f.getheader("Content-Disposition"):
+                import cgi
+                v, p = cgi.parse_header(f.getheader('Content-Disposition'))
+                if "filename" in p:
+                    filename = p['filename'].split(".")
+                    filetype = filename[-1]
+                    print("Guessing filetype as {}".format(filetype))
+                    new_file += "." + filetype
 
         with open(new_file, "wb") as new_f:
             new_f.write(f.read())
@@ -106,7 +124,7 @@ def fetch_register(filename=DEFAULT_REGISTRY, save_dir="data"):
         print_mongo_bulk_result(bulk.execute(), "files", ["** Fetching register **"])
 
 
-def fetch_new(filename=DEFAULT_REGISTRY, save_dir="data"):
+def fetch_new(filename=DEFAULT_REGISTRY, created_since=None, save_dir="data"):
     """
     Find the registry and display any new funders, along with their slug and
     the license for the data
@@ -116,12 +134,17 @@ def fetch_new(filename=DEFAULT_REGISTRY, save_dir="data"):
     existing_files = [i["_id"] for i in existing_files]
     fetch_register(filename, save_dir)
     messages = ["** Finding new files **"]
-    for i in db.files.find():
-        if i["_id"] not in existing_files:
-            messages.append("{} [{}] (Modified: {})".format(i["publisher"]["name"],
-                                                            i["license"],
-                                                            i["modified"].date().isoformat()
-                                                            ))
+    print(created_since)
+    for i in db.files.find().sort("modified"):
+        if created_since:
+            if i["modified"] < dateutil.parser.parse(created_since):
+                continue
+        elif i["_id"] in existing_files:
+            continue
+        messages.append("{} [{}] (Modified: {})".format(i["publisher"]["name"],
+                                                        i["license"],
+                                                        i["modified"].date().isoformat()
+                                                        ))
     current_app.logger.info("\r\n".join(messages))
 
 
@@ -139,6 +162,7 @@ def get_conditions(created_since=None, only_funders=None, skip_funders=None):
         if isinstance(only_funders, list):
             only_funders = {"$in": only_funders}
         conditions["$or"] = [
+            {"_id": only_funders},
             {"publisher.prefix": only_funders},
             {"publisher.name": only_funders},
             {"publisher.slug": only_funders},
@@ -150,6 +174,7 @@ def get_conditions(created_since=None, only_funders=None, skip_funders=None):
         else:
             skip_funders = {"$ne": skip_funders}
         conditions["$and"] = [
+            {"_id": skip_funders},
             {"publisher.prefix": skip_funders},
             {"publisher.name": skip_funders},
             {"publisher.slug": skip_funders},
@@ -250,7 +275,12 @@ def process_register(created_since=None, only_funders=None, skip_funders=None, s
                 "downloadedOn": datetime.datetime.now()
             }, upsert=True)
 
-            grants_imported = import_file(usefile_json, source=d.get("accessURL"), license=f.get("license"))
+            source = {
+                "accessURL": d.get("accessURL"),
+                "id": f["_id"]
+            }
+
+            grants_imported = import_file(usefile_json, source=source, license=f.get("license"))
             results["files_imported"].append(usefile_json)
             results["grants_imported"] += grants_imported
             print()
@@ -328,7 +358,8 @@ def import_file(filename, inner="grants", source=None, license=None):
         i["_id"] = i["id"]
         i["dataset"] = {
             "license": license,
-            "source": source
+            "source": source["accessURL"],
+            "id": source["id"]
         }
         bulk.find({'_id': i["_id"]}).upsert().replace_one(i)
 
@@ -338,6 +369,9 @@ def import_file(filename, inner="grants", source=None, license=None):
 
 
 def process_grant(i):
+
+    # remove any dots from mongodb names
+    i = replace_keys(i)
 
     # clean up the fundingOrganization name
     for f in i.get("fundingOrganization", []):
@@ -354,10 +388,10 @@ def process_grant(i):
     if funder in SWAP_FUNDS:
         if SWAP_FUNDS[funder] == "":
             grantprogramme = "Main Fund"
-        elif "swap_all" in SWAP_FUNDS[funder]:
-            grantprogramme = SWAP_FUNDS[funder]["swap_all"]
         elif grantprogramme in SWAP_FUNDS[funder]:
             grantprogramme = SWAP_FUNDS[funder][grantprogramme]
+        elif "swap_all" in SWAP_FUNDS[funder]:
+            grantprogramme = SWAP_FUNDS[funder]["swap_all"]
 
         # swap fund name based on grant amount
         # based on a particular pattern in the SWAP_FUNDS variable

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, jsonify
 from flask_login import login_required
 
 from ..db import get_db
@@ -26,3 +26,72 @@ def status():
     funders = set([f["funder"] for f in funds])
     grants = sum([f["count"] for f in funds])
     return render_template('status.html', funds=list(funds), fields=FIELDS_TO_CHECK, funders=funders, grants=grants)
+
+
+@home.route('/datasets')
+def datasets():
+    db = get_db()
+    files = db.files.find()
+    return render_template('datasets.html', files=list(files))
+
+
+@home.route('/datasets/<fileid>.json')
+def dataset(fileid):
+    db = get_db()
+    grants = db.grants.find({'dataset.id': fileid})
+    return jsonify({"grants": list(grants)})
+
+
+@home.route('/sources')
+def sources():
+    db = get_db()
+    sharealike_files = db.files.find(
+        {"license": "https://creativecommons.org/licenses/by-sa/4.0/"})
+    
+    sources = db.files.find(sort=[("publisher.name", 1)])
+    source_counts = db.grants.aggregate([
+        {"$group": {"_id": "$dataset.id", "count": {"$sum": 1}}}
+    ])
+    source_count_d = {}
+    total_grants = 0
+    for i in source_counts:
+        source_count_d[i["_id"]] = i["count"]
+        total_grants += i["count"]
+
+    charities = db.charities.aggregate([
+        {"$group": {"_id": "$source", "count": {"$sum": 1}}}
+    ])
+    charities = list(charities)
+    num_charities = sum([c["count"] for c in charities])
+
+    regulators = [
+        {
+            "name": "Charity Commission for England and Wales",
+            "source": "http://data.charitycommission.gov.uk/",
+            "license": {
+                "name": "Open Government Licence v3.0",
+                "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+            }
+        },
+        {
+            "name": "Office of the Scottish Charity Regulator",
+            "source": "https://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download",
+            "license": {
+                "name": "Open Government Licence v2.0",
+                "url": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/",
+            }
+        },
+        {
+            "name": "Charity Commission Northern Ireland",
+            "source": "http://www.charitycommissionni.org.uk/charity-search/"
+        },
+    ]
+    for r in regulators:
+        r["charities"] = sum([c["count"] for c in charities if c["_id"] == r["name"]])
+
+    return render_template('sources.html', sources=list(sources), 
+                                           source_count=source_count_d,
+                                           num_grants=total_grants,
+                                           sharealike_files=list(sharealike_files), 
+                                           num_charities=num_charities,
+                                           regulators=regulators)

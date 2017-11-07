@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js" integrity="sha256-SiHXR50l06UwJvHhFY4e5vzwq75vEHH+8fFNpkXePr0=" crossorigin="anonymous"></script>
+<script>Chart.defaults.global.maintainAspectRatio = false;</script>
+{% endblock %}
+
+{% macro chart(slug, data, width="100px", height="250px", chart_type="bar", options={}) -%}
+  <canvas id="{{slug}}" style="width: {{width}}; height: {{height}};"></canvas>
+  <script>
+  var {{slug}}_ctx = document.getElementById("{{slug}}").getContext('2d');
+  var {{slug}}_chart = new Chart({{slug}}_ctx, {
+    type: '{{chart_type}}',
+    data: {
+      labels: {{ data|chart_label|tojson|safe }},
+      datasets: [{
+        label: "Number of grants",
+        data: {{ data|chart_data|tojson|safe }}
+      }]
+    },
+    options: {{options|tojson|safe}}
+  })
+  </script>
+{%- endmacro %}
+
+{% macro period(start, end, format="%B %Y") -%}
+  {% if end.strftime(format) == start.strftime(format) %}
+  in {{end.strftime(format)}}.
+  {% else %}
+  between {{start.strftime(format)}} and {{end.strftime(format)}}.
+  {% endif %}
+{%- endmacro %}
+
+{%- macro grant(g, link=false) -%}
+{%- if link -%}<a href="#">{%- endif -%}
+&pound;{{ "{:,.0f}".format(g["amount"]) }} to <strong>{{g["recipient"]}}</strong> in {{ g["award_date"].strftime("%B %Y") }}
+{%- if link -%}</a>{%- endif -%}
+{%- endmacro -%}
+
+{% block content %}
+<div class='ui container basic segment'>
+  <h1 class='ui header'>
+    <a class='logo' href='/' title='Beehive Data'>Beehive Data</a>
+  </h1>
+  <hr>
+  <h2>Fund summary for {{fund["fund_slug"]}}</h2>
+  <p>
+    Made {{ fund["grant_count"]|format_number(plural="grant") }} in
+    {{ period(fund["period_start"], fund["period_end"]) }}
+  </p>
+
+  {% if fund["grant_count"] < fund["grant_examples"]|length %}
+  <h3>Grants made</h3>
+  <ul>
+    {% for g in fund["grant_examples"] -%}
+    <li>{{ grant(g) }}</li>
+    {%- endfor %}
+  </ul>
+  {% else %}
+
+  <h3>Examples of grants made</h3>
+  <ul>
+    {% for g in fund["grant_examples"] -%}
+    <li>{{ grant(g) }}</li>
+    {% endfor -%}
+  </ul>
+
+  <h3>When were grants made?</h3>
+  <p>Based on the date awarded</p>
+  <div style="max-height: 250px;">
+    {% set chart_options = {'scales':{'xAxes':[{"type": "time", "time": {"display": "month"}}]}} %}
+    {{ chart("award_month_year_distribution", fund["award_month_year_distribution"], chart_type="bar", options=chart_options) }}
+  </div>
+
+  {% endif %}
+
+
+  <div style="max-height: 250px;">
+    {{ chart("org_type_distribution", fund["org_type_distribution"]) }}
+  </div>
+  <div style="max-height: 250px;">
+    {{ chart("beneficiary_distribution", fund["beneficiary_distribution"]) }}
+  </div>
+  <div style="max-height: 250px;">
+    {{ chart("employees_distribution", fund["employees_distribution"]) }}
+  </div>
+  <pre>{{fund|tojson(indent=4)}}</pre>
+</div>
+{% endblock %}

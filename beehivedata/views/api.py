@@ -3,6 +3,7 @@ from pymongo import ASCENDING, DESCENDING
 
 from ..db import get_db
 from ..assets.queries.funders import funders_query
+from .integrations import get_fund_data
 
 api = Blueprint('api', __name__)
 
@@ -13,7 +14,9 @@ def charity(charity_no):
     db = get_db()
     grants = db.grants.find({'recipientOrganization.charityNumber': charity_no})\
                .sort("awardDate", DESCENDING)
-    return jsonify(list(grants))
+    charity = db.charities.find_one({"_id": charity_no}) or {}
+    charity["grants"] = list(grants)
+    return jsonify(charity)
 
 
 @api.route('/charity/<charity_no>.html')
@@ -21,12 +24,14 @@ def charity_html(charity_no):
     db = get_db()
     grants = db.grants.find({'recipientOrganization.charityNumber': charity_no})\
                .sort("awardDate", DESCENDING)
+    charity = db.charities.find_one({"_id": charity_no})
     grants = list(grants)
-    charity = charity_no
-    names = [g.get("recipientOrganization", [{}])[0].get("name") for g in grants]
-    names = [n for n in names if n is not None]
-    if len(names) > 0:
-        charity = names[0]
+    if not charity:
+        charity = {"_id": charity_no}
+        names = [g.get("recipientOrganization", [{}])[0].get("name") for g in grants]
+        names = [n for n in names if n is not None]
+        if len(names) > 0:
+            charity["name"] = names[0]
     return render_template('charity.html', grants=grants, charity=charity)
 
 
@@ -59,3 +64,9 @@ def funder(funder_id=None):
     grants = db.grants.find({'fundingOrganization.id': funder_id})\
                .sort("awardDate", DESCENDING)
     return jsonify(list(grants))
+
+
+@api.route('/fund/<fund_slug>.html')
+def fund(fund_slug=None):
+    fund_info = get_fund_data(fund_slug, convert_dates=True)
+    return render_template('fund.html', fund=fund_info)
