@@ -10,13 +10,13 @@ Initial setup
 -------------
 
 - Setup MongoDB and get it running
-- Setup CharityBase and import the data into the database
 - setup virtual environment, and activate it
 - install any needed requirements `pip install -r requirements.txt`
 - install the application package through `pip install -e .`
 - Add an environment variable `FLASK_APP` pointing to `beehivedata.beehivedata`
 - Initialise the database by running `flask init_db`
-- Fetch any data using `flask fetch_all`
+- Fetch charity data by running `flask fetch_charities` and then `flask import_charities`
+- Fetch any grants data using `flask fetch_all`
 - Run the server with `flask run`
 
 External libraries used
@@ -38,6 +38,8 @@ External libraries used
 - [sklearn](http://scikit-learn.org/stable/)
 - [slugify](https://github.com/un33k/python-slugify)
 - [flatten-tool](https://github.com/OpenDataServices/flatten-tool) - no pypi package
+- [titlecase](https://pypi.python.org/pypi/titlecase)
+- [mechanicalsoup](https://github.com/MechanicalSoup/MechanicalSoup)
 
 Run development server
 ----------------------
@@ -46,28 +48,17 @@ Run `flask run` from the command line.
 
 For development/debug mode set `FLASK_DEBUG` environmental variable to `1`.
 
-Setup `charity-base`
---------------------
+Fetch charity data
+------------------
 
-Clone from [Github Repository](https://github.com/tithebarn/charity-base).
-[Download the OSCR register](http://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download),
-and then run commands to add Charity Commission and OSCR data to MongoDB:
+Charity data can be downloaded using the `flask fetch_charities` command, and then
+imported into mongodb by running `flask import_charities`. The data comes from:
 
-```bash
-$ npm install
-$ node data/download-register.js --year 2016 --month 09 --out ./data/cc-register.zip
-$ node data/zip-to-csvs.js --in ./data/cc-register.zip --out ./data/cc-register-csvs --type cc
-$ node data/zip-to-csvs.js --in ./data/CharityExport-17-Mar-2017.zip --out ./data/oscr-register-csvs --type oscr
-$ node data/csvs-to-mongo.js --in ./data/oscr-register-csvs --dbName oscr-register --type oscr
-$ node data/csvs-to-mongo.js --in ./data/cc-register-csvs/RegPlusExtract_March_2017 --dbName cc-register --type cc
-$ node data/merge-extracts.js --batchSize 5000
-$ mongo charity-base --eval "db.charities.createIndex({'mainCharity.companyNumber': 1})" # create index on companyNumber
-$ node supplement.js --scrapeBatchSize 5 # optional
-```
+- [Charity Commission for England and Wales](http://data.charitycommission.gov.uk/)
+- [OSCR](https://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download)
+- [CCNI](http://www.charitycommissionni.org.uk/charity-search/)
 
-You'll also need to make sure that the `mainCharity.companyNumber` field has an
-index to make lookups quicker. This is done by running `mongo charity-base --eval "db.charities.createIndex({'mainCharity.companyNumber': 1})"`.
-If you don't do this then the next step will take too long.
+When fetching data on Scottish charities you'll need to agree to the terms and conditions.
 
 
 Fetch 360 Giving data
@@ -124,7 +115,7 @@ organisation and apply the Beehive codes to it. It also processes the grant
 according to the function in `fetch_data`, so it can be useful to rerun if
 you don't want to fetch all the data again
 
-`update_charities` gets data about the recipient from the `charity-base`.`charities`
+`update_charities` gets data about the recipient from the `charities`
 MongoDB collection. It then tries to work out the type of organisation, how long
 they have operated for, and get the latest financial information.
 
@@ -132,9 +123,6 @@ _Note: this stage allows for multiple recipients, but the end result only
 outputs the first recipient._
 
 **@todo**: Add in companies data here too.
-
-The `update_charity` script has `--host`, `--port`, `--db` which are used
-to connect to the charitybase database (the defaults are `localhost:3306/charities`).
 
 ### 3. Update beneficiaries
 
