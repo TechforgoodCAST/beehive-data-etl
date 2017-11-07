@@ -521,7 +521,6 @@ def import_ccew_geography(ccew_folder):
 
     for i in charities:
         geo_area = get_geo_area(charities[i])
-        print(geo_area)
         bulk.find({'_id': i}).update({
             "$set": {
                 "areas": charities[i],
