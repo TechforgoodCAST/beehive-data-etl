@@ -7,7 +7,7 @@ from num2words import num2words
 import inflection
 
 from .db import init_db, close_db
-from .login import login_manager, register_user
+from .login import login_manager, register_user, set_password
 
 from .views.insight import insight
 from .views.integrations import integrations
@@ -140,16 +140,6 @@ def register_cli(app):
         update_beneficiaries(funders, skip_funders)
         update_geography(funders, skip_funders)
 
-    @app.cli.command("register_user")
-    @click.argument('email')
-    @click.argument('password')
-    def register_user_command(email, password):
-        try:
-            register_user(email, password)
-            print("User created.")
-        except DuplicateKeyError:
-            print("User already present in DB.")
-
     @app.cli.command("fetch_charities")
     @click.option("--ccew", default="http://data.charitycommission.gov.uk/", help="URL of page containing Charity Commission data")
     @click.option("--ccni", default="http://www.charitycommissionni.org.uk/charity-search/?q=&include=Linked&include=Removed&exportCSV=1", help="CSV of Northern Ireland Charity Commission data")
@@ -167,6 +157,22 @@ def register_cli(app):
         import_oscr()
         import_ccni()
 
+    @app.cli.command("register_user")
+    @click.argument('email')
+    @click.argument('password')
+    def register_user_command(email, password):
+        try:
+            register_user(email, password)
+            print("User created.")
+        except DuplicateKeyError:
+            print("User already present in DB.")
+
+    @app.cli.command("set_password")
+    @click.argument('email')
+    @click.argument('password')
+    def register_user_command(email, password):
+        set_password(email, password)
+        print("Password set.")
 
 def register_template_filter(app):
 

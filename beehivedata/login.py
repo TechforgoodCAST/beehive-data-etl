@@ -83,3 +83,20 @@ def register_user(email, password, name=None, initials=None, role='moderator'):
         "modified": datetime.now(),
         "role": role
     })
+
+
+def set_password(email, password):
+    # Connect to the DB
+    db = get_db()
+
+    # Ask for data to store
+    pass_hash = generate_password_hash(password, method='pbkdf2:sha256')
+
+    # Insert the user in the DB
+    db[current_app.config['USERS_COLLECTION']].find_one_and_update({
+        'email': email
+    }, {
+        '$set': {
+            "password": pass_hash
+        }
+    })
