@@ -7,8 +7,12 @@
   <hr>
   <h2>{{ charity["name"] }}</h2>
   <ul>
+    {% if charity.get("date_registered"): %}
     <li><strong>Registered:</strong> {{ charity["date_registered"].strftime("%d/%m/%Y") }}</li>
+    {% endif %} 
+    {% if charity.get("income"): %}
     <li><strong>Latest income:</strong> £{{ "{:,.0f}".format(charity["income"]) }} (year ending {{ charity["fye"].strftime("%d/%m/%Y") }})</li>
+    {% endif %}
   </ul>
   <h3>{{ grants|length }} grants</h3>
   <table class="ui table">
