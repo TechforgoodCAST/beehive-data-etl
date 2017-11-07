@@ -48,6 +48,14 @@ th.rotate > div > span {
         Files
       </div>
     </div>
+    <div class="statistic">
+      <div class="value">
+        {{ "{:,.0f}".format(num_grants) }}
+      </div>
+      <div class="label">
+        Grants
+      </div>
+    </div>
   </div>
   <table class="ui table">
     <thead>
@@ -55,6 +63,7 @@ th.rotate > div > span {
         <th>Publisher</th>
         <th>File</th>
         <th>License</th>
+        <th>Grants</th>
       </tr>
     </thead>
     <tbody>
@@ -64,6 +73,11 @@ th.rotate > div > span {
         <td>{{ file.publisher.name }}</td>
         <td><a href="{{ d.accessURL }}">{{ d.title }}</a></td>
         <td><a href="{{ file.license }}">{{ file.license_name }}</a></td>
+        <td style="text-align: right;">
+          {% if file._id in source_count %}
+          {{ "{:,.0f}".format(source_count[file._id]) }}
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     {% endfor %}

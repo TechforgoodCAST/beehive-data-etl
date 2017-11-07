@@ -47,7 +47,17 @@ def sources():
     db = get_db()
     sharealike_files = db.files.find(
         {"license": "https://creativecommons.org/licenses/by-sa/4.0/"})
+    
     sources = db.files.find()
+    source_counts = db.grants.aggregate([
+        {"$group": {"_id": "$dataset.id", "count": {"$sum": 1}}}
+    ])
+    source_count_d = {}
+    total_grants = 0
+    for i in source_counts:
+        source_count_d[i["_id"]] = i["count"]
+        total_grants += i["count"]
+
     charities = db.charities.aggregate([
         {"$group": {"_id": "$source", "count": {"$sum": 1}}}
     ])
@@ -80,6 +90,8 @@ def sources():
         r["charities"] = sum([c["count"] for c in charities if c["_id"] == r["name"]])
 
     return render_template('sources.html', sources=list(sources), 
+                                           source_count=source_count_d,
+                                           num_grants=total_grants,
                                            sharealike_files=list(sharealike_files), 
                                            num_charities=num_charities,
                                            regulators=regulators)
