@@ -48,7 +48,7 @@ def sources():
     sharealike_files = db.files.find(
         {"license": "https://creativecommons.org/licenses/by-sa/4.0/"})
     
-    sources = db.files.find()
+    sources = db.files.find(sort=[("publisher.name", 1)])
     source_counts = db.grants.aggregate([
         {"$group": {"_id": "$dataset.id", "count": {"$sum": 1}}}
     ])
