@@ -36,7 +36,12 @@ oscr_to_beehive = {
 def clean_charity_number(regno):
     if not regno:
         return regno
+    regno = regno.upper()
+    regno = regno.strip()
+    if str(regno)=="0" or str(regno)=="":
+        return None
     regno = regno.replace("SCO", "SC0")
+    regno = regno.replace("NIC", "NI")
     regno = regno.replace("GB-CHC-", "")
     regno = regno.replace(" ", "")
     regno = regno.replace(" (charity no)", "")
@@ -47,7 +52,7 @@ def update_charity(funders=None, skip_funders=None):
 
     db = get_db()
 
-    missing_charities = 0
+    missing_charities = []
 
     bulk = db.grants.initialize_unordered_bulk_op()
 
@@ -67,7 +72,7 @@ def update_charity(funders=None, skip_funders=None):
 
             if not charity:
                 r["charityStatus"] = "not found"
-                missing_charities += 1
+                missing_charities.append(charityNumber)
                 continue
 
             r["charityStatus"] = "found"
@@ -102,24 +107,11 @@ def update_charity(funders=None, skip_funders=None):
             r["beehive"]["beneficiaries"] = list(set(r["beehive"]["beneficiaries"]))
 
             # add recipient districts and countries
-            r["beehive"]["countries"] = []
-            r["beehive"]["districts"] = []
+            r["beehive"]["countries"] = list(set(
+                [a["iso3166_1"] for a in charity.get("areas", []) if a["iso3166_1"] != ""]))
+            r["beehive"]["districts"] = list(set(
+                [a["iso3166_2_GB"] for a in charity.get("areas", []) if a["iso3166_2_GB"] != ""]))
             r["beehive"]["multi_national"] = False
-            for i in charity.get("areas", []):
-                area = None
-                for a in CC_AOO_CODES:
-                    if a[0] == i["aootype"] and a[1] == i["aookey"]:
-                        area = a
-
-                if not area:
-                    continue
-
-                if i["aootype"] == "D":
-                    r["beehive"]["countries"].append(i["iso3166_1"])
-                elif i["aootype"] == "E":
-                    r["beehive"]["multi_national"] = True
-                elif i["iso3166_2_GB"]:
-                    r["beehive"]["districts"].append(i["iso3166_2_GB"])
 
             if len(r["beehive"]["districts"]) > 0 and len(r["beehive"]["countries"]) == 0:
                 r["beehive"]["countries"] = ["GB"]
@@ -131,5 +123,5 @@ def update_charity(funders=None, skip_funders=None):
 
     print_mongo_bulk_result(bulk.execute(), "grants", messages=[
         "** Updating Charities **",
-        "{:,.0f} charities not found".format(missing_charities)
+        "{:,.0f} charities not found".format(len(missing_charities))
     ])
