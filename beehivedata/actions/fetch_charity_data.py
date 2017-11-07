@@ -10,6 +10,7 @@ import datetime
 
 from .fetch_data import print_mongo_bulk_result
 from ..assets import bcp
+from ..assets.name_parse import parse_name
 from ..db import get_db
 
 # utilities
@@ -495,6 +496,10 @@ def import_ccew_geography(ccew_folder):
         csvreader = csv.DictReader(a, escapechar="\\", doublequote=False)
         aoo = {}
         for row in csvreader:
+            row["aooname"] = parse_name(
+                row["aooname"].strip().replace("THROUGHOUT ", "").replace(" CITY", ""))
+            row["aoosort"] = parse_name(
+                row["aoosort"].strip().replace("THROUGHOUT ", "").replace(" CITY", ""))
             row["iso3166_1"] = row.pop("ISO3166-1", None)
             row["iso3166_2_GB"] = row.pop("ISO3166-2:GB", None)
             aoo[(row["aootype"], row["aookey"])] = row
@@ -515,10 +520,95 @@ def import_ccew_geography(ccew_folder):
             charities[charity_id].append(aoo[area_id])
 
     for i in charities:
-        bulk.find({'_id': i}).update({"$set": {"areas": charities[i]}})
+        geo_area = get_geo_area(charities[i])
+        print(geo_area)
+        bulk.find({'_id': i}).update({
+            "$set": {
+                "areas": charities[i],
+                "geo_area": get_geo_area(charities[i])
+            }
+        })
 
     print_mongo_bulk_result(bulk.execute(), "charities", [
                             "** Importing CCEW data from extract_charity_aoo.csv **"])
+
+
+def get_geo_area(areas):
+
+    if len(areas) == 1:
+        return areas[0]["aooname"]
+
+    types = list(set([a["aootype"] for a in areas]))
+
+    continent_lookup = {
+        "AF": "Africa",
+        "AS": "Asia",
+        "EU": "Europe",
+        "NA": "North America",
+        "SA": "South America",
+        "OC": "Oceania",
+        "AN": "Antarctica",
+    }
+    uk = { 
+        "aootype": "D",
+        "aookey": "",
+        "aooname": "United Kingdom",
+        "aoosort": "United Kingdom",
+        "welsh": "",
+        "master": "",
+        "GSS": "",
+        "iso3166_1": "GB",
+        "iso3166_2_GB": "",
+        "ContinentCode": "EU",
+        "oldCode": "",
+    }
+    continents = sorted(list(set([continent_lookup[a["ContinentCode"]] for a in areas])))
+    countries = sorted(list(set([a["iso3166_1"] for a in areas])))
+    districts = sorted(list(set([a["iso3166_2_GB"] for a in areas if a["iso3166_2_GB"] != ""])))
+
+    if countries == ["GB"]:
+
+        if districts == sorted(["GB-SCT", "GB-NIR", "GB-EAW"]):
+            return "United Kingdom"
+        if districts == sorted(["GB-SCT", "GB-EAW"]):
+            return "Great Britain"
+        if districts == sorted(["GB-SCT", "GB-NIR"]):
+            return "Scotland and Northern Ireland"
+        if districts == sorted(["GB-EAW", "GB-NIR"]):
+            return "England, Wales and Northern Ireland"
+
+    if len(types) == 1:
+
+        if types[0] == "B" or types[0] == "C":
+            if len(areas) <= 5:
+                return to_sentence([a["aooname"] for a in areas])
+            else:
+                return "{:,.0f} areas across the UK".format(len(areas))
+
+        if types[0] == "D":
+            if len(areas) <= 5:
+                return to_sentence([a["aooname"] for a in areas])
+            elif len(continents) <= 2:
+                return "{:,.0f} countries across {}".format(len(areas), to_sentence(continents))
+            elif len(areas) > 100:
+                return "Worldwide"
+            else:
+                return "{:,.0f} countries".format(len(areas))
+
+    if len(countries) > 1:
+        if "GB" in countries:
+            return get_geo_area([a for a in areas if a["aootype"] == "D" and a["iso3166_2_GB"] == ""] + [uk])
+        else:
+            return get_geo_area([a for a in areas if a["aootype"] == "D" and a["iso3166_2_GB"] == ""])
+
+
+def to_sentence(array, words_connector=", ", two_words_connector=" and ", last_word_connector=", and "):
+    if len(array) == 1:
+        return array[0]
+    if len(array) == 2:
+        return two_words_connector.join(array)
+
+    return words_connector.join(array[:-1]) + last_word_connector + array[-1]
 
 
 CCNI_FIELD_MAP = {
