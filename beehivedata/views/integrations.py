@@ -102,7 +102,7 @@ def get_funder_info(funder):
         "reg_number": funder["reg_number"],
         "website": funder.get("web"),
         "countries": list(set([a["iso3166_1"] for a in funder.get("areas", [])])),
-        "districts": list(set([a["iso3166_2_GB"] for a in funder.get("areas", []) if a["iso3166_2_GB"] != ""])),
+        "districts": list(set([a["oldCode"] for a in funder.get("areas", []) if a.get("oldCode", "") != ""])),
         "geo_area": funder.get("geo_area")
     }
 
