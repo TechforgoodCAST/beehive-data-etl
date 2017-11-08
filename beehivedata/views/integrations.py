@@ -2,8 +2,10 @@ from flask import Blueprint, render_template, jsonify, request
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from flask_login import login_required
+import re
 
 from ..db import get_db
+from ..assets.beneficiaries import theme_regexes
 from ..assets.queries.fund_summary import fund_summary_query, process_fund_summary
 from ..assets.queries.amounts import amounts_query
 from ..assets.queries.durations import durations_query
@@ -98,6 +100,7 @@ def get_funder_info(funder):
     new_funder = {
         "name": funder["name"],
         "reg_number": funder["reg_number"],
+        "website": funder.get("web"),
         "countries": list(set([a["iso3166_1"] for a in funder.get("areas", [])])),
         "districts": list(set([a["iso3166_2_GB"] for a in funder.get("areas", []) if a["iso3166_2_GB"] != ""])),
         "geo_area": funder.get("geo_area")
@@ -114,23 +117,27 @@ def get_funder_info(funder):
     else:
         location = "in {}".format(location)
 
-    # themes
-    themes = ""
+    # purposes
+    purposes = ""
     if len(funder.get("purpose", [])) == 1:
-        themes = " on {}.".format(funder["purpose"][0].lower())
+        purposes = " on {}.".format(funder["purpose"][0].lower())
     elif len(funder.get("purpose", [])) > 1:
-        themes = "\r\n".join([" - {}".format(i[0].upper() + i[1:].lower())
+        purposes = "\r\n".join([" - {}".format(i[0].upper() + i[1:].lower())
                 for i in funder["purpose"]])
-        themes = " on the following themes: \r\n\r\n{}\r\n".format(themes)
+        purposes = " on the following themes: \r\n\r\n{}\r\n".format(purposes)
 
     description += "{} works {}{}\r\n\r\n".format(
         funder["name"], 
         location,
-        themes
+        purposes
     )
 
     # grant amounts
     description += "In the year ending {:%B %Y} they made grants worth £{:,.0f}.".format(funder["fye"], funder["grants_made"])
     new_funder["description"] = description
+
+    # themes
+    new_funder["themes"] = list(
+        set([r for r in theme_regexes if re.search(theme_regexes[r], description, re.I)]))
 
     return new_funder
