@@ -171,7 +171,7 @@ def register_cli(app):
     @app.cli.command("set_password")
     @click.argument('email')
     @click.argument('password')
-    def register_user_command(email, password):
+    def set_password_command(email, password):
         set_password(email, password)
         print("Password set.")
 
@@ -208,4 +208,4 @@ def register_teardowns(app):
 
     # @app.teardown_appcontext
     def close_db_teardown(error):
-        close_db()
+        close_db(error)
