@@ -117,5 +117,12 @@ SWAP_FUNDS = {
         "STVS Advice Strategy": "STVS",
         "STVS Advice Provider": "STVS",
         "STVS General": "STVS",
+    },
+    "London Borough of Southwark": {
+        "Neighbourhoods Fund: Bermondsey & Rotherhithe": "Neighbourhoods Fund",
+        "Neighbourhoods Fund: Borough Bankside & Walworth": "Neighbourhoods Fund",
+        "Neighbourhoods Fund: Camberwell": "Neighbourhoods Fund",
+        "Neighbourhoods Fund: Dulwich": "Neighbourhoods Fund",
+        "Neighbourhoods Fund: Peckham & Nunhead": "Neighbourhoods Fund",
     }
 }
