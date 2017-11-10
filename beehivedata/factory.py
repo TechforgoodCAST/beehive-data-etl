@@ -5,6 +5,7 @@ import click
 from pymongo.errors import DuplicateKeyError
 from num2words import num2words
 import inflection
+import datetime
 
 from .db import init_db, close_db
 from .login import login_manager, register_user, set_password
@@ -197,6 +198,10 @@ def register_template_filter(app):
             return "{} {}".format(value, inflection.pluralize(plural))
         else:
             return value
+
+    @app.context_processor
+    def inject_now():
+        return {'now': datetime.datetime.now()}
 
 
 def register_teardowns(app):
