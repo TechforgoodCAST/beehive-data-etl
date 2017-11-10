@@ -5,6 +5,7 @@ import click
 from pymongo.errors import DuplicateKeyError
 from num2words import num2words
 import inflection
+import datetime
 
 from .db import init_db, close_db
 from .login import login_manager, register_user, set_password
@@ -170,7 +171,7 @@ def register_cli(app):
     @app.cli.command("set_password")
     @click.argument('email')
     @click.argument('password')
-    def register_user_command(email, password):
+    def set_password_command(email, password):
         set_password(email, password)
         print("Password set.")
 
@@ -198,9 +199,13 @@ def register_template_filter(app):
         else:
             return value
 
+    @app.context_processor
+    def inject_now():
+        return {'now': datetime.datetime.now()}
+
 
 def register_teardowns(app):
 
     # @app.teardown_appcontext
     def close_db_teardown(error):
-        close_db()
+        close_db(error)
