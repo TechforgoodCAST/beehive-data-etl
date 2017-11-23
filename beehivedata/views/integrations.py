@@ -73,20 +73,22 @@ def fund_summary(fund_slug=None):
 def funds():
     db = get_db()
 
-    conditions = {
-        "grants_made": {"$gte": 100000},
-        "activities": "MAKES GRANTS TO ORGANISATIONS",
-        "active": True
-    }
+    conditions = [
+        {"grants_made": {"$gte": int(request.values.get("min_size", 100000))}},
+        {"activities": "MAKES GRANTS TO ORGANISATIONS"},
+        {"active": True}
+    ]
+
+    limit = max(int(request.values.get("limit", 50)),1000)
 
     if request.values.get("country"):
-        conditions["areas.iso3166_1"] = {"$in": request.values.get("country").split(",")}
+        conditions.append({"areas.iso3166_1": {"$in": request.values.get("country").split(",")}})
 
     for i in ["beneficiaries", "activities", "purpose"]:
         if request.values.get(i):
-            conditions[i] = {"$in": request.values.get(i).split(",")}
+            conditions.append({i: {"$in": request.values.get(i).split(",")}})
 
-    grant_makers = db.charities.find(conditions, sort=[("grants_made", -1)], limit=50)
+    grant_makers = db.charities.find({"$and": conditions}, sort=[("grants_made", -1)], limit=limit)
 
     grant_makers = [get_funder_info(g) for g in grant_makers]
 
