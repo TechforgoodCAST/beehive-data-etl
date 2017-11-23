@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, request
 from flask_login import login_required
+from werkzeug.contrib.atom import AtomFeed
 
 from ..db import get_db
 from ..assets.queries.status import status_query, FIELDS_TO_CHECK, process_fund
@@ -48,7 +49,7 @@ def sources():
     sharealike_files = db.files.find(
         {"license": "https://creativecommons.org/licenses/by-sa/4.0/"})
     
-    sources = db.files.find(sort=[("publisher.name", 1)])
+    source_files = db.files.find(sort=[("publisher.name", 1)])
     source_counts = db.grants.aggregate([
         {"$group": {"_id": "$dataset.id", "count": {"$sum": 1}}}
     ])
@@ -89,9 +90,27 @@ def sources():
     for r in regulators:
         r["charities"] = sum([c["count"] for c in charities if c["_id"] == r["name"]])
 
-    return render_template('sources.html', sources=list(sources), 
+    return render_template('sources.html', sources=list(source_files),
                                            source_count=source_count_d,
                                            num_grants=total_grants,
                                            sharealike_files=list(sharealike_files), 
                                            num_charities=num_charities,
                                            regulators=regulators)
+
+@home.route('/notifications.atom')
+def notifications():
+    feed = AtomFeed('Recently updated funds',
+                    feed_url=request.url,
+                    url=request.url_root,
+                    author="Beehive")
+    db = get_db()
+    notifications = db.notifications.find({}, sort=[("date_issued", -1)], limit=100)
+    for article in notifications:
+        feed.add(article["notice"], article.get("content", ""),
+                 id=str(article["_id"]),
+                 url=article["fund"],
+                 updated=article["date_issued"],
+                 published=article["date_issued"],
+                 content_type='text',
+        )
+    return feed.get_response()
