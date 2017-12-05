@@ -25,12 +25,7 @@ class Recommender:
         }, {
             "$group": {
                 "_id": {
-                    "fund": {
-                        "$arrayElemAt": ["$grantProgramme.slug", 0]
-                    },
-                    "funder": {
-                        "$arrayElemAt": ["$fundingOrganization.slug", 0]
-                    },
+                    "fund_slug": "$fund_slug",
                     "beneficiary": "$beehive.beneficiaries"
                 },
                 "count": {"$sum": 1}
@@ -38,7 +33,7 @@ class Recommender:
         }, {
             "$project": {
                 "_id": 0,
-                "fund_slug": {"$concat": ["$_id.funder", "-", "$_id.fund"]},
+                "fund_slug": "$_id.fund_slug",
                 "beneficiary": "$_id.beneficiary",
                 "count": "$count"
             }
@@ -60,21 +55,14 @@ class Recommender:
     def get_amounts(self):
         result = self.db.grants.aggregate([{
             "$group": {
-                "_id": {
-                    "fund": {
-                        "$arrayElemAt": ["$grantProgramme.slug", 0]
-                    },
-                    "funder": {
-                        "$arrayElemAt": ["$fundingOrganization.slug", 0]
-                    }
-                },
+                "_id": "$fund_slug",
                 "amounts": {"$push": "$amountAwarded"},
                 "durations": {"$push": {"$arrayElemAt": ["$plannedDates.duration", 0]}}
             }
         }, {
             "$project": {
                 "_id": 0,
-                "fund_slug": {"$concat": ["$_id.funder", "-", "$_id.fund"]},
+                "fund_slug": "$_id",
                 "amounts": "$amounts",
                 "durations": "$durations"
             }
