@@ -96,7 +96,6 @@ def register_cli(app):
         fetch_data(registry, files_since, funders, skip_funders)
 
     @app.cli.command("update_organisations")
-    @click.option('--files-since', default=None, help="Look only for files modified since this date (in format YYYY-MM-DD)")
     @click.option('--funders', default=None, callback=split_funders, help="Only update from these funders (comma separated list of funder prefixes/names/slugs)")
     @click.option('--skip-funders', default=None, callback=split_funders, help="Skip funders from update (comma separated list of funder prefixes/names/slugs)")
     def update_organisations_command(funders, skip_funders):

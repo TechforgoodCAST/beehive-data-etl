@@ -82,6 +82,12 @@ def update_charity(funders=None, skip_funders=None):
             if r["regDate"]:
                 grant["beehive"]["operating_for"] = float((grant["awardDate"] - r["regDate"]).days) / 365
 
+            # get company number if present
+            if r.get("companyNumber", "") == "":
+                if charity.get("company_number", "") != "":
+                    r["companyNumber"] = charity.get("company_number")
+                    grant["beehive"]["org_type"] = 3
+
             # get financial data
             grant["beehive"]["financial_fye"] = charity.get("fye")
             grant["beehive"]["income"] = charity.get("income")
