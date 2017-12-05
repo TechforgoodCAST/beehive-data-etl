@@ -137,11 +137,15 @@ def import_oscr(datafile=None):
         datafile = os.path.join("data", "oscr.csv")
 
     # go through the Scottish charities
+    print("[OSCR] importing charities")
     with open(datafile, encoding="latin1") as a:
         csvreader = csv.DictReader(a)
-        for row in csvreader:
+        for count, row in enumerate(csvreader):
             row = oscr_row_to_object(row)
             bulk.find({'_id': row["_id"]}).upsert().replace_one(row)
+            if count % 10000 == 0:
+                print('\r', "[OSCR] %s charities imported" % count, end='')
+        print('\r', "[OSCR] %s charities imported" % count)
 
     print_mongo_bulk_result(bulk.execute(), "charities", ["** Importing OSCR data **"])
 
@@ -206,6 +210,7 @@ def fetch_ccew_aoo(aoo_file):
     download_file(aoo_file, os.path.join('data', 'ccew_aoo.csv'))
     print("[CCEW] AOO mapping downloaded")
 
+ccew_csv_options = {"escapechar": "\\", "doublequote": False}
 
 def import_ccew():
     db = get_db()
@@ -220,23 +225,32 @@ def import_ccew():
     }})
 
     # then run imports for specific tables
-    import_ccew_charity(ccew_folder)
-    import_ccew_main_charity(ccew_folder)
-    import_ccew_classification(ccew_folder)
-    import_ccew_financial(ccew_folder)
-    import_ccew_registration(ccew_folder)
-    import_ccew_objects(ccew_folder)
-    import_ccew_geography(ccew_folder)
+    charities = import_ccew_charity(ccew_folder)
+    charities = import_ccew_main_charity(ccew_folder, charities)
+    charities = import_ccew_classification(ccew_folder, charities)
+    charities = import_ccew_financial(ccew_folder, charities)
+    charities = import_ccew_registration(ccew_folder, charities)
+    charities = import_ccew_objects(ccew_folder, charities)
+    charities = import_ccew_geography(ccew_folder, charities)
 
 
-def import_ccew_charity(ccew_folder):
+    print("[CCEW] %s charities to import to database" % len(charities))
+    bulk = db.charities.initialize_unordered_bulk_op()
+    for i in charities:
+        bulk.find({'_id': i}).upsert().replace_one(charities[i])
+
+    print_mongo_bulk_result(bulk.execute(), "charities", [
+                            "** Importing CCEW data **"])
+
+
+def import_ccew_charity(ccew_folder, charities = {}):
     # go through the main charity file
     db = get_db()
-    bulk = db.charities.initialize_unordered_bulk_op()
 
+    print("[CCEW] importing ccew_charity")
     with open(os.path.join(ccew_folder, "extract_charity.csv"), encoding="latin1") as a:
-        csvreader = csv.reader(a)
-        for row in csvreader:
+        csvreader = csv.reader(a, **ccew_csv_options)
+        for count, row in enumerate(csvreader):
             if len(row) < 18 or int(row[1]) != 0:
                 continue
             new_row = {
@@ -252,104 +266,112 @@ def import_ccew_charity(ccew_folder):
                 "last_updated": datetime.datetime.now(),
                 "source": "Charity Commission for England and Wales",
             }
-            bulk.find({'_id': new_row["_id"]}).upsert().replace_one(new_row)
+            charities[new_row["_id"]] = new_row
+            if count % 10000 == 0:
+                print('\r', "[CCEW] %s records imported" % count, end='')
+        print('\r', "[CCEW] %s records imported" % count)
 
-    print_mongo_bulk_result(bulk.execute(), "charities", [
-                            "** Importing CCEW data from extract_charity.csv **"])
+    return charities
 
 
-def import_ccew_main_charity(ccew_folder):
+def import_ccew_main_charity(ccew_folder, charities):
     # go through the main_charity file
     db = get_db()
-    bulk = db.charities.initialize_unordered_bulk_op()
 
+    print("[CCEW] importing ccew_main_charity")
     with open(os.path.join(ccew_folder, "extract_main_charity.csv"), encoding="latin1") as a:
-        csvreader = csv.reader(a)
-        for row in csvreader:
+        csvreader = csv.reader(a, **ccew_csv_options)
+        for count, row in enumerate(csvreader):
             if len(row) < 10 or row[0].strip()=="":
                 continue
             charity_id = row[0].strip()
             new_row = {
-                "$set": {
-                    "company_number": row[1].strip(),
-                    "web": row[9].strip(),
-                    "email": row[8].strip(),
-                }
+                "company_number": row[1].strip(),
+                "web": row[9].strip(),
+                "email": row[8].strip(),
             }
-            bulk.find({'_id': charity_id}).update(new_row)
+            charities[charity_id].update(new_row)
+            if count % 10000 == 0:
+                print('\r', "[CCEW] %s records imported" % count, end='')
+        print('\r', "[CCEW] %s records imported" % count)
 
-    print_mongo_bulk_result(bulk.execute(), "charities", [
-                            "** Importing CCEW data from extract_main_charity.csv **"])
+    return charities
 
-
-def import_ccew_classification(ccew_folder):
+def import_ccew_classification(ccew_folder, charities):
     # go through the classification file
     db = get_db()
-    bulk = db.charities.initialize_unordered_bulk_op()
 
     with open(os.path.join(ccew_folder, "extract_class_ref.csv"), encoding="latin1") as a:
-        csvreader = csv.reader(a)
+        csvreader = csv.reader(a, **ccew_csv_options)
         class_ref = {}
-        for row in csvreader:
+        for count, row in enumerate(csvreader):
             if len(row) < 2 or row[0].strip()=="":
                 continue
             class_ref[row[0]] = row[1]
     
+    print("[CCEW] importing ccew_classification")
     with open(os.path.join(ccew_folder, "extract_class.csv"), encoding="latin1") as a:
-        csvreader = csv.reader(a)
+        csvreader = csv.reader(a, **ccew_csv_options)
         class_types = {
             "1": "purpose",
             "2": "beneficiaries",
             "3": "activities"
         }
-        for row in csvreader:
+        for count, row in enumerate(csvreader):
             if len(row) < 2 or row[0].strip()=="":
                 continue
             charity_id = row[0].strip()
             class_ = row[1].strip()
             class_type = class_types.get(class_[0])
             class_data = class_ref.get(class_)
-            bulk.find({'_id': charity_id}).update(
-                {"$addToSet": {class_type: class_data}})
 
-    print_mongo_bulk_result(bulk.execute(), "classes", [
-                            "** Importing CCEW data from extract_class.csv **"])
+            if class_type not in charities[charity_id]:
+                charities[charity_id][class_type] = []
+            charities[charity_id][class_type].append(class_data)
+            if count % 10000 == 0:
+                print('\r', "[CCEW] %s records imported" % count, end='')
+        print('\r', "[CCEW] %s records imported" % count)
 
+    return charities
 
-def import_ccew_financial(ccew_folder):
+def import_ccew_financial(ccew_folder, charities):
     # go through the finances file
     db = get_db()
-    bulk = db.charities.initialize_unordered_bulk_op()
 
+    print("[CCEW] importing ccew_financial")
     with open(os.path.join(ccew_folder, "extract_financial.csv"), encoding="latin1") as a:
-        csvreader = csv.reader(a)
-        charities = {}
-        for row in csvreader:
+        csvreader = csv.reader(a, **ccew_csv_options)
+        charity_finances = {}
+        for count, row in enumerate(csvreader):
             if len(row) < 2 or row[0].strip()=="":
                 continue
             row = clean_row(row, int_fields=[3,4], date_order="YMD")
             charity_id = row[0]
-            if charity_id not in charities:
-                charities[charity_id] = {}
+            if charity_id not in charity_finances:
+                charity_finances[charity_id] = {}
             fyend = datetime.datetime.strptime(row[2], "%Y-%m-%d %H:%M:%S")
             if row[3] or row[4]:
-                charities[charity_id][fyend.date().strftime("%Y%m%d")] = {
+                charity_finances[charity_id][fyend.date().strftime("%Y%m%d")] = {
                     "fyend": fyend,
                     "fystart": datetime.datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S"),
                     "income": row[3],
                     "expend": row[4],
                 }
+            if count % 10000 == 0:
+                print('\r', "[CCEW] %s records imported" % count, end='')
+        print('\r', "[CCEW] %s records imported" % count)
 
     # go through the partb file
+    print("[CCEW] importing ccew_partb")
     with open(os.path.join(ccew_folder, "extract_partb.csv"), encoding="latin1") as a:
-        csvreader = csv.reader(a)
-        for row in csvreader:
+        csvreader = csv.reader(a, **ccew_csv_options)
+        for count, row in enumerate(csvreader):
             if len(row) < 2 or row[0].strip()=="":
                 continue
             row = clean_row(row, int_fields=list(range(4, 43)), date_order="YMD")
             charity_id = row[0]
-            if charity_id not in charities:
-                charities[charity_id] = {}
+            if charity_id not in charity_finances:
+                charity_finances[charity_id] = {}
             fyend = datetime.datetime.strptime(row[3][0:19], "%Y-%m-%d %H:%M:%S")
             if row[3] or row[4]:
                 partb = {
@@ -397,105 +419,110 @@ def import_ccew_financial(ccew_folder):
                     "cons_acc": row[43]=="Y",
                     "charity_acc": row[44]=="Y"
                 }
-                if fyend.date().strftime("%Y%m%d") not in charities[charity_id]:
-                    charities[charity_id][fyend.date().strftime("%Y%m%d")] = {}
-                charities[charity_id][fyend.date().strftime("%Y%m%d")].update(partb)
+                if fyend.date().strftime("%Y%m%d") not in charity_finances[charity_id]:
+                    charity_finances[charity_id][fyend.date().strftime("%Y%m%d")] = {}
+                charity_finances[charity_id][fyend.date().strftime("%Y%m%d")].update(partb)
+            if count % 10000 == 0:
+                print('\r', "[CCEW] %s records imported" % count, end='')
+        print('\r', "[CCEW] %s records imported" % count)
 
-    for i in charities:
-        update = {"finances": charities[i]}
-        years = [int(k) for k in charities[i].keys()]
+    print("[CCEW] processing ccew_financial and ccew_partb")
+    for i in charity_finances:
+        update = {"finances": charity_finances[i]}
+        years = [int(k) for k in charity_finances[i].keys()]
         if len(years):
             latest_year = max(years)
-            update["income"] = charities[i][str(latest_year)]["income"]
-            update["expend"] = charities[i][str(latest_year)]["expend"]
-            update["employees"] = charities[i][str(latest_year)].get("employees")
-            update["volunteers"] = charities[i][str(
+            update["income"] = charity_finances[i][str(latest_year)]["income"]
+            update["expend"] = charity_finances[i][str(latest_year)]["expend"]
+            update["employees"] = charity_finances[i][str(latest_year)].get("employees")
+            update["volunteers"] = charity_finances[i][str(
                 latest_year)].get("volunteers")
-            update["grants_made"] = charities[i][str(
+            update["grants_made"] = charity_finances[i][str(
                 latest_year)].get("exp_grant")
-            update["fye"] = charities[i][str(latest_year)]["fyend"]
+            update["fye"] = charity_finances[i][str(latest_year)]["fyend"]
         update["finances"] = [update["finances"][i] for i in sorted(update["finances"].keys())]
-        bulk.find({'_id': i}).update({"$set": update})
-            
-    print_mongo_bulk_result(bulk.execute(), "charities", [
-                            "** Importing CCEW data from extract_financial.csv **",
-                            "** Importing CCEW data from extract_partb.csv **"])
+        charities[i].update(update)
 
+    return charities
 
-def import_ccew_registration(ccew_folder):
+def import_ccew_registration(ccew_folder, charities):
     # go through the registration file
     db = get_db()
-    bulk = db.charities.initialize_unordered_bulk_op()
 
+    print("[CCEW] importing ccew_registration")
     with open(os.path.join(ccew_folder, "extract_registration.csv"), encoding="latin1") as a:
-        csvreader = csv.reader(a)
-        charities = {}
-        for row in csvreader:
+        csvreader = csv.reader(a, **ccew_csv_options)
+        charity_registrations = {}
+        for count, row in enumerate(csvreader):
             if len(row) < 2 or row[0].strip()=="" or int(row[1]) != 0:
                 continue
             row = clean_row(row)
             charity_id = row[0]
-            if charity_id not in charities:
-                charities[charity_id] = []
-            charities[charity_id].append({
+            if charity_id not in charity_registrations:
+                charity_registrations[charity_id] = []
+            charity_registrations[charity_id].append({
                 "regdate": datetime.datetime.strptime(row[2], "%Y-%m-%d %H:%M:%S"),
                 "remdate": datetime.datetime.strptime(row[3], "%Y-%m-%d %H:%M:%S") if row[3] else None,
                 "remcode": row[3],
             })
+            if count % 10000 == 0:
+                print('\r', "[CCEW] %s records imported" % count, end='')
+        print('\r', "[CCEW] %s records imported" % count)
 
-    for i in charities:
-        reg_years = sorted(charities[i], key=lambda k: k["regdate"])
-        bulk.find({'_id': i}).update({"$set": {
+    print("[CCEW] processing ccew_registration")
+    for i in charity_registrations:
+        reg_years = sorted(charity_registrations[i], key=lambda k: k["regdate"])
+        charities[i].update({
                 "date_registered": reg_years[0]["regdate"],
                 "date_removed": reg_years[-1]["remdate"],
-            }})
+            })
 
-    print_mongo_bulk_result(bulk.execute(), "charities", [
-                            "** Importing CCEW data from extract_registration.csv **"])
+    return charities
 
-
-def import_ccew_objects(ccew_folder):
+def import_ccew_objects(ccew_folder, charities):
     # go through the objects file
     db = get_db()
     bulk = db.charities.initialize_unordered_bulk_op()
 
+    print("[CCEW] importing ccew_objects")
     with open(os.path.join(ccew_folder, "extract_objects.csv"), encoding="latin1") as a:
-        csvreader = csv.reader(a, escapechar="\\", doublequote=False)
-        charities = {}
-        for row in csvreader:
+        csvreader = csv.reader(a, **ccew_csv_options)
+        charity_objects = {}
+        for count, row in enumerate(csvreader):
             if len(row) < 2 or row[0].strip()=="" or int(row[1]) != 0:
                 continue
             row = clean_row(row)
             charity_id = row[0]
-            if charity_id not in charities:
-                charities[charity_id] = []
-            charities[charity_id].append([row[2], row[3]])
+            if charity_id not in charity_objects:
+                charity_objects[charity_id] = []
+            charity_objects[charity_id].append([row[2], row[3]])
+            if count % 10000 == 0:
+                print('\r', "[CCEW] %s records imported" % count, end='')
+        print('\r', "[CCEW] %s records imported" % count)
 
-    for i in charities:
-        seqnos = [o[0] for o in charities[i]]
+    print("[CCEW] processing ccew_objects")
+    for i in charity_objects:
+        seqnos = [o[0] for o in charity_objects[i]]
         objects = []
-        for o in charities[i]:
+        for o in charity_objects[i]:
             if not o[1]:
                 continue
             for s in seqnos:
                 if o[1].endswith(s):
                     o[1] = o[1][:-4]
             objects.append(o[1])
-        bulk.find({'_id': i}).update({"$set": {"objects": "".join(objects)}})
+        charities[i]["objects"] = "".join(objects)
 
-    print_mongo_bulk_result(bulk.execute(), "charities", [
-                            "** Importing CCEW data from extract_objects.csv **"])
+    return charities
 
-
-def import_ccew_geography(ccew_folder):
+def import_ccew_geography(ccew_folder, charities):
     # go through the geography file
     db = get_db()
-    bulk = db.charities.initialize_unordered_bulk_op()
 
     with open(os.path.join("data", "ccew_aoo.csv")) as a:
-        csvreader = csv.DictReader(a, escapechar="\\", doublequote=False)
+        csvreader = csv.DictReader(a, **ccew_csv_options)
         aoo = {}
-        for row in csvreader:
+        for count, row in enumerate(csvreader):
             row["aooname"] = parse_name(
                 row["aooname"].strip().replace("THROUGHOUT ", "").replace(" CITY", ""))
             row["aoosort"] = parse_name(
@@ -504,33 +531,34 @@ def import_ccew_geography(ccew_folder):
             row["iso3166_2_GB"] = row.pop("ISO3166-2:GB", None)
             aoo[(row["aootype"], row["aookey"])] = row
 
+    print("[CCEW] importing ccew_geography")
     with open(os.path.join(ccew_folder, "extract_charity_aoo.csv"), encoding="latin1") as a:
-        csvreader = csv.reader(a, escapechar="\\", doublequote=False)
-        charities = {}
-        for row in csvreader:
+        csvreader = csv.reader(a, **ccew_csv_options)
+        charity_aoos = {}
+        for count, row in enumerate(csvreader):
             if len(row) < 2 or row[0].strip()=="":
                 continue
             row = clean_row(row)
             charity_id = row[0]
-            if charity_id not in charities:
-                charities[charity_id] = []
+            if charity_id not in charity_aoos:
+                charity_aoos[charity_id] = []
             area_id = (row[1], row[2])
             if area_id not in aoo:
                 print("Area %s not found" % area_id)
-            charities[charity_id].append(aoo[area_id])
+            charity_aoos[charity_id].append(aoo[area_id])
+            if count % 10000 == 0:
+                print('\r', "[CCEW] %s records imported" % count, end='')
+        print('\r', "[CCEW] %s records imported" % count)
 
-    for i in charities:
-        geo_area = get_geo_area(charities[i])
-        bulk.find({'_id': i}).update({
-            "$set": {
-                "areas": charities[i],
-                "geo_area": get_geo_area(charities[i])
-            }
+    print("[CCEW] processing ccew_geography")
+    for i in charity_aoos:
+        geo_area = get_geo_area(charity_aoos[i])
+        charities[i].update({
+            "areas": charity_aoos[i],
+            "geo_area": get_geo_area(charity_aoos[i])
         })
 
-    print_mongo_bulk_result(bulk.execute(), "charities", [
-                            "** Importing CCEW data from extract_charity_aoo.csv **"])
-
+    return charities
 
 def get_geo_area(areas):
 
@@ -647,11 +675,15 @@ def import_ccni(datafile=None):
         datafile = os.path.join("data", "ccni.csv")
 
     # go through the Northern Irish charities
+    print("[CCNI] importing charities")
     with open(datafile, encoding="latin1") as a:
         csvreader = csv.DictReader(a)
-        for row in csvreader:
+        for count, row in enumerate(csvreader):
             row = ccni_row_to_object(row)
             bulk.find({'_id': row["_id"]}).upsert().replace_one(row)
+            if count % 10000 == 0:
+                print('\r', "[CCNI] %s charities imported" % count, end='')
+        print('\r', "[CCNI] %s charities imported" % count)
 
     print_mongo_bulk_result(bulk.execute(), "charities", [
                             "** Importing CCNI data **"])
