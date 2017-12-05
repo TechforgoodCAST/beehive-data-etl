@@ -8,30 +8,36 @@ from .integrations import get_fund_data
 api = Blueprint('api', __name__)
 
 
-@api.route('/charity/<charity_no>')
-@api.route('/charity/<charity_no>.json')
-def charity(charity_no):
+def find_charity(charity_no):
     db = get_db()
-    grants = db.grants.find({'recipientOrganization.charityNumber': charity_no})\
-               .sort("awardDate", DESCENDING)
-    charity = db.charities.find_one({"_id": charity_no}) or {}
-    charity["grants"] = list(grants)
-    return jsonify(charity)
-
-
-@api.route('/charity/<charity_no>.html')
-def charity_html(charity_no):
-    db = get_db()
-    grants = db.grants.find({'recipientOrganization.charityNumber': charity_no})\
-               .sort("awardDate", DESCENDING)
     charity = db.charities.find_one({"_id": charity_no})
-    grants = list(grants)
+    grants = db.grants.find({'recipientOrganization.charityNumber': charity_no})\
+               .sort("awardDate", DESCENDING)
+    if grants:
+        charity["grants"] = list(grants)
+    else:
+        charity["grants"] = []
     if not charity:
         charity = {"_id": charity_no}
         names = [g.get("recipientOrganization", [{}])[0].get("name") for g in grants]
         names = [n for n in names if n is not None]
         if len(names) > 0:
             charity["name"] = names[0]
+    return charity
+
+
+
+@api.route('/charity/<charity_no>')
+@api.route('/charity/<charity_no>.json')
+def charity(charity_no):
+    charity = find_charity(charity_no)
+    return jsonify(charity)
+
+
+@api.route('/charity/<charity_no>.html')
+def charity_html(charity_no):
+    charity = find_charity(charity_no)
+    grants = charity["grants"]
     return render_template('charity.html', grants=grants, charity=charity)
 
 
