@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class='ui container basic segment'>
+  <h1 class='ui header'>
+    <a class='logo' href='/' title='Beehive Data'>Beehive Data</a>
+  </h1>
+  <hr>
+  {% for scrape in scrapes %}
+  <section>
+    <h2>{{ scrape["funder"] }}</h2>
+    {% for s in scrape["scrapes"] %}
+    <div class="ui grid">
+      <div class="row">
+        <div class="four wide column">
+          <h3>
+            <a href="{{ s.link }}" target="_blank">{{ s.title }}</a>
+          </h3>
+          <p>{{ s.description }}</p>
+          {% if s.first_scraped == s.last_scraped %}
+          <p><strong>Scraped:</strong> {{ s.first_scraped.strftime("%d %b %Y %I:%M %p") }}</p>
+          {% else %}
+          <p><strong>First scraped:</strong> {{ s.first_scraped.strftime("%d %b %Y %I:%M %p") }}</p>
+          <p><strong>Last scraped:</strong> {{ s.last_scraped.strftime("%d %b %Y %I:%M %p") }}</p>
+          {% endif %}
+        </div>
+        <div class="twelve wide column">
+          <div class="ui piled segment">{{ s["info"]|clean|safe }}</div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

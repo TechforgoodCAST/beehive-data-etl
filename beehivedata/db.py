@@ -41,6 +41,7 @@ def init_db():
     db.grants.create_index("recipientOrganization.charityNumber")
     db.grants.create_index("recipientOrganization.companyNumber")
     db.grants.create_index("recipientOrganization.id")
+    db.grants.create_index("dataset.id")
     db.charities.create_index("source")
     db[current_app.config['USERS_COLLECTION']].create_index("email", unique=True)
 

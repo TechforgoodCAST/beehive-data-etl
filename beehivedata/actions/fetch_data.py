@@ -476,6 +476,8 @@ def process_grant(i):
 def print_mongo_bulk_result(result, name="records", messages=[]):
     messages.extend(["{:,.0f} {} {}".format(result["n" + i], name, i.lower())
                     for i in ["Inserted", "Matched", "Modified", "Removed", "Upserted"]])
+    for m in messages:
+        print(m)
     current_app.logger.info("\r\n".join(messages))
 
 
