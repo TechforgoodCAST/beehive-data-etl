@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class='ui container basic segment'>
+  <h1 class='ui header'>
+    <a class='logo' href='/' title='Beehive Data'>Beehive Data</a>
+  </h1>
+  <hr>
+  {% for funder in funders %}
+  <section>
+    <h2>{{ funder._id }}</h2>
+    <div class="ui statistics">
+      <div class="statistic">
+        <div class="value">{{ funder.funds|length }}</div>
+        <div class="label">Funds</div>
+      </div>
+      <div class="statistic">
+        <div class="value">{{ funder.funds|map(attribute='scrapes')|map('length')|sum }}</div>
+        <div class="label">Scrapes</div>
+      </div>
+    </div>
+    <div>
+      <table class="ui table">
+        <thead>
+          <tr>
+            <th>Fund</th>
+            <th></th>
+            <th>Versions</th>
+            <th>First scraped</th>
+            <th>Last scraped</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for fund in funder.funds %}
+          <tr>
+            <td><a href="{{ url_for('scraper.scraper_fund', fund_id=fund._id|b64) }}">{{ fund.scrapes[-1].title }}</a></td>
+            <td><a href="{{ fund.scrapes[-1].link }}" target="_blank">Link</a></td>
+            <td>{{ fund.scrapes|length }}</td>
+            <td>{{ fund.scrapes[0].first_scraped.strftime("%d %b %Y %I:%M %p") }}</td>
+            <td>{{ fund.scrapes[-1].last_scraped.strftime("%d %b %Y %I:%M %p") }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

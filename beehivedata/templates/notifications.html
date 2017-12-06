@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class='ui container basic segment'>
+  <h1 class='ui header'>
+    <a class='logo' href='/' title='Beehive Data'>Beehive Data</a>
+  </h1>
+  <hr>
+  <h2>Scraper notifications
+  <small>[<a href="{{ url_for('scraper.notifications_feed') }}">Atom feed</a>]</small>
+  </h2>
+  <div class="ui large feed">
+  {% for n in notifications %}
+    <div class="event">
+      <!-- <div class="label">
+      </div> -->
+      <div class="content">
+        <div class="date">
+           {{ n["date_issued"].strftime("%d %b %Y %I:%M %p") }}
+        </div>
+        <div class="summary">
+          {% if n.get("fund", "") != "" %}
+          <a href="{{ n.fund }}" target="_blank">{{ n.notice }}</a>
+          {% else %}
+          {{ n["notice"] }}
+          {% endif %}
+        </div>
+        <div class="extra text">
+          {{ n.get("content", "") }}
+        </div>
+        <div class="meta">
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+</div>
+{% endblock %}
