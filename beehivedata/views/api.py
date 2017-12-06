@@ -11,18 +11,21 @@ api = Blueprint('api', __name__)
 def find_charity(charity_no):
     db = get_db()
     charity = db.charities.find_one({"_id": charity_no})
-    grants = db.grants.find({'recipientOrganization.charityNumber': charity_no})\
-               .sort("awardDate", DESCENDING)
-    if grants:
-        charity["grants"] = list(grants)
-    else:
-        charity["grants"] = []
+
     if not charity:
         charity = {"_id": charity_no}
         names = [g.get("recipientOrganization", [{}])[0].get("name") for g in grants]
         names = [n for n in names if n is not None]
         if len(names) > 0:
             charity["name"] = names[0]
+
+    grants = db.grants.find({'recipientOrganization.charityNumber': charity_no})\
+               .sort("awardDate", DESCENDING)
+    if grants:
+        charity["grants"] = list(grants)
+    else:
+        charity["grants"] = []
+
     return charity
 
 
