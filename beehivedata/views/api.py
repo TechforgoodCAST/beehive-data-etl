@@ -14,6 +14,10 @@ def find_charity(charity_no):
 
     grants = db.grants.find({'recipientOrganization.charityNumber': charity_no})\
                .sort("awardDate", DESCENDING)
+    if grants:
+        grants = list(grants)
+    else:
+        grants = []
 
     if not charity:
         charity = {"_id": charity_no}
@@ -23,10 +27,7 @@ def find_charity(charity_no):
             if len(names) > 0:
                 charity["name"] = names[0]
 
-    if grants:
-        charity["grants"] = list(grants)
-    else:
-        charity["grants"] = []
+    charity["grants"] = grants
 
     return charity
 
