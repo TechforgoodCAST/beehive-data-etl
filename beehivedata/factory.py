@@ -6,6 +6,9 @@ from pymongo.errors import DuplicateKeyError
 from num2words import num2words
 import inflection
 import datetime
+import bleach
+import re
+import base64
 
 from .db import init_db, close_db
 from .login import login_manager, register_user, set_password
@@ -15,6 +18,7 @@ from .views.integrations import integrations
 from .views.api import api
 from .views.home import home
 from .views.user import user
+from .views.scraper import scraper
 
 from .actions.fetch_data import fetch_data, fetch_new
 from .actions.fetch_charity_data import fetch_oscr, fetch_ccew, fetch_ccew_aoo, fetch_ccni, import_oscr, import_ccew, import_ccni
@@ -61,6 +65,7 @@ def register_blueprints(app):
     app.register_blueprint(insight, url_prefix='/insight')
     app.register_blueprint(integrations, url_prefix='/v1/integrations')
     app.register_blueprint(api, url_prefix='/v1')
+    app.register_blueprint(scraper, url_prefix='/scraper')
     app.register_blueprint(home)
     app.register_blueprint(user)
     return None
@@ -186,6 +191,22 @@ def register_template_filter(app):
     def chart_label(value):
         return chart_data(value, "label")
 
+    # custom jinja2 filter for cleaning unsafe html
+    @app.template_filter()
+    def clean(value):
+        allowed_tags = bleach.sanitizer.ALLOWED_TAGS + \
+            ['br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+        value = value.replace("</div>", "</div><br>")
+        value = bleach.clean(value, 
+                            strip=True, 
+                            strip_comments=True,
+                            tags=allowed_tags
+                             )
+        value = re.sub(r'(\<br\>)\1+', r'\1', value)
+        value = re.sub(r'(</(ul|ol|p|h1|h2|h3|h4|h5|h6|li)>)<br>', r'\1', value)
+        value = re.sub(r'<br>(<(ul|ol|p|h1|h2|h3|h4|h5|h6|li)>)', r'\1', value)
+        return value
+
     @app.template_filter()
     def format_number(value, plural=None, word_before=10, ordinal=False, num_format=",.0f"):
         if word_before:
@@ -197,6 +218,10 @@ def register_template_filter(app):
             return "{} {}".format(value, inflection.pluralize(plural))
         else:
             return value
+
+    @app.template_filter()
+    def b64(value):
+        return base64.urlsafe_b64encode(value.encode())
 
     @app.context_processor
     def inject_now():
