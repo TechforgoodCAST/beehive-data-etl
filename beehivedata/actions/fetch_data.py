@@ -401,7 +401,7 @@ def process_grant(i):
                     fund_amounts = SWAP_FUNDS[funder].get("fund_amounts")
                     grantprogramme = fund_amounts["funds"][-1]
                     for k, v in enumerate(fund_amounts["amounts"]):
-                        if i.get("amountAwarded") < v:
+                        if i.get("amountAwarded") <= v:
                             grantprogramme = fund_amounts["funds"][k]
                             break
 
