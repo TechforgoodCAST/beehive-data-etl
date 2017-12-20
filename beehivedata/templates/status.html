@@ -70,10 +70,11 @@ th.rotate > div > span {
       <tr>
         <td colspan="{{ fields|length + 1 }}">
           <div style="float: right;">
+            <code>{{ fund["_id"] }}</code> |
             {{ "{0:,.0f}".format(fund["count"]) }} grants |
             &pound;{{ "{0:,.0f}".format(fund["sum"]) }}
           </div>
-          <strong>{{ fund["_id"] }}</strong>
+          <strong>{{ fund["fund"] }}</strong>
         </td>
       </tr>
       <tr>

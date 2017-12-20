@@ -44,7 +44,7 @@ def status_query():
     }}
     group["_id"] = {
         "fund_slug": "$fund_slug",
-        "fund": {"$arrayElemAt": ["$grantProgramme.slug", 0]},
+        "fund": {"$arrayElemAt": ["$grantProgramme.title", 0]},
         "funder": {"$arrayElemAt": ["$fundingOrganization.name", 0]},
     }
     group["count"] = {"$sum": 1}
